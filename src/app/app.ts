@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcher } from './shared/components/language-switcher/language-switcher';
+import { LanguageService } from './core/services/language.service';
 
 @Component({
   selector: 'pdj-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, TranslateModule, LanguageSwitcher],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('pdj-backoffice');
+  // LanguageService is injected to trigger initialization on app start
+  constructor(private langService: LanguageService) {}
 }

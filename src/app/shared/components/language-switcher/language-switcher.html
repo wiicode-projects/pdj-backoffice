@@ -1,0 +1,25 @@
+<div class="lang-switcher">
+  <button class="lang-switcher__toggle" (click)="toggleDropdown()" type="button">
+    <span class="lang-switcher__flag">{{ langService.currentLanguage().flag }}</span>
+    <span class="lang-switcher__code">{{ langService.currentLanguage().code | uppercase }}</span>
+    <span class="lang-switcher__arrow" [class.lang-switcher__arrow--open]="isOpen">▾</span>
+  </button>
+
+  @if (isOpen) {
+    <ul class="lang-switcher__dropdown">
+      @for (lang of langService.languages; track lang.code) {
+        <li>
+          <button
+            class="lang-switcher__option"
+            [class.lang-switcher__option--active]="lang.code === langService.currentLanguage().code"
+            (click)="selectLanguage(lang)"
+            type="button"
+          >
+            <span class="lang-switcher__flag">{{ lang.flag }}</span>
+            <span class="lang-switcher__label">{{ lang.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

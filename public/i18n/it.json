@@ -27,12 +27,20 @@
   },
   "AUTH": {
     "LOGIN": "Accesso",
+    "LOGIN_SUBTITLE": "Benvenuto. Inserisci le tue credenziali per accedere al pannello di controllo",
     "LOGOUT": "Disconnettersi",
     "EMAIL": "Indirizzo e-mail",
+    "EMAIL_LABEL": "Nome utente o E-mail",
+    "EMAIL_PLACEHOLDER": "Admin@leplatdujour.ch",
     "PASSWORD": "Password",
     "SIGN_IN": "Accedi",
+    "ACCESS_DASHBOARD": "Accedi al Dashboard",
+    "REMEMBER_ME": "Ricordami",
     "FORGOT_PASSWORD": "Password dimenticata?",
+    "TOGGLE_PASSWORD": "Mostra/nascondi password",
     "LOGIN_ERROR": "E-mail o password errata",
+    "FIELDS_REQUIRED": "Compila tutti i campi",
+    "SERVER_ERROR": "Errore del server, riprova",
     "SESSION_EXPIRED": "La sessione è scaduta, effettua nuovamente l'accesso"
   },
   "NAV": {

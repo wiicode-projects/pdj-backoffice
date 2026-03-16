@@ -1,0 +1,124 @@
+<div class="login-page">
+  <!-- Language switcher -->
+  <div class="login-page__lang">
+    <pdj-language-switcher />
+  </div>
+
+  <div class="login-page__container">
+    <!-- Logo -->
+    <div class="login-page__logo">
+      <img src="/images/login-logo.png" alt="Le Plat du Jour" class="login-page__logo-img" />
+    </div>
+
+    <!-- Card -->
+    <div class="login-page__card">
+      <h1 class="login-page__title">{{ 'AUTH.LOGIN' | translate }}</h1>
+      <p class="login-page__subtitle">{{ 'AUTH.LOGIN_SUBTITLE' | translate }}</p>
+
+      <!-- Error message -->
+      @if (errorMessage()) {
+        <div class="login-page__error">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 4.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+          </svg>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="login-page__form">
+        <!-- Email field -->
+        <div class="login-page__field">
+          <label class="login-page__label" for="email">{{ 'AUTH.EMAIL_LABEL' | translate }}</label>
+          <div class="login-page__input-wrapper">
+            <svg class="login-page__input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 6L10 11L18 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input
+              id="email"
+              type="email"
+              class="login-page__input"
+              [(ngModel)]="email"
+              name="email"
+              [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Password field -->
+        <div class="login-page__field">
+          <label class="login-page__label" for="password">{{ 'AUTH.PASSWORD' | translate }}</label>
+          <div class="login-page__input-wrapper">
+            <svg class="login-page__input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="8" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 8V5C7 3.34 8.34 2 10 2C11.66 2 13 3.34 13 5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="10" cy="13" r="1.5" fill="currentColor"/>
+            </svg>
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              class="login-page__input"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="••••••••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="login-page__toggle-password"
+              (click)="togglePassword()"
+              [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate"
+            >
+              @if (showPassword()) {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2.5 10C2.5 10 5 4.5 10 4.5C15 4.5 17.5 10 17.5 10C17.5 10 15 15.5 10 15.5C5 15.5 2.5 10 2.5 10Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="3" y1="17" x2="17" y2="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2.5 10C2.5 10 5 4.5 10 4.5C15 4.5 17.5 10 17.5 10C17.5 10 15 15.5 10 15.5C5 15.5 2.5 10 2.5 10Z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember me + Forgot password -->
+        <div class="login-page__options">
+          <label class="login-page__checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="rememberMe"
+              name="rememberMe"
+              class="login-page__checkbox"
+            />
+            <span class="login-page__checkbox-custom"></span>
+            <span>{{ 'AUTH.REMEMBER_ME' | translate }}</span>
+          </label>
+          <a href="javascript:void(0)" class="login-page__forgot">
+            {{ 'AUTH.FORGOT_PASSWORD' | translate }}
+          </a>
+        </div>
+
+        <!-- Submit button -->
+        <button
+          type="submit"
+          class="login-page__submit"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span class="login-page__spinner"></span>
+          }
+          <span>{{ 'AUTH.ACCESS_DASHBOARD' | translate }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

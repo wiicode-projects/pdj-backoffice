@@ -27,12 +27,20 @@
   },
   "AUTH": {
     "LOGIN": "Anmeldung",
+    "LOGIN_SUBTITLE": "Willkommen. Bitte geben Sie Ihre Zugangsdaten ein, um auf das Dashboard zuzugreifen",
     "LOGOUT": "Abmelden",
     "EMAIL": "E-Mail-Adresse",
+    "EMAIL_LABEL": "Benutzername oder E-Mail",
+    "EMAIL_PLACEHOLDER": "Admin@leplatdujour.ch",
     "PASSWORD": "Passwort",
     "SIGN_IN": "Anmelden",
+    "ACCESS_DASHBOARD": "Zum Dashboard",
+    "REMEMBER_ME": "Angemeldet bleiben",
     "FORGOT_PASSWORD": "Passwort vergessen?",
+    "TOGGLE_PASSWORD": "Passwort anzeigen/verbergen",
     "LOGIN_ERROR": "Falsche E-Mail oder falsches Passwort",
+    "FIELDS_REQUIRED": "Bitte füllen Sie alle Felder aus",
+    "SERVER_ERROR": "Serverfehler, bitte versuchen Sie es erneut",
     "SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen, bitte melden Sie sich erneut an"
   },
   "NAV": {

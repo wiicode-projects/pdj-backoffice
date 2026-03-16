@@ -1,0 +1,346 @@
+$primary-red: #DC2626;
+$primary-red-hover: #B91C1C;
+$bg-color: #F3F4F6;
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border-color: #E5E7EB;
+$input-bg: #F9FAFB;
+$error-bg: #FEF2F2;
+$error-text: #DC2626;
+$error-border: #FECACA;
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $bg-color;
+  font-family: 'PolySans Trial', -apple-system, sans-serif;
+  padding: 20px;
+  position: relative;
+
+  &__lang {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+
+    ::ng-deep .lang-switcher {
+      &__toggle {
+        color: $text-medium;
+        border-color: $border-color;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+          border-color: $text-light;
+        }
+      }
+
+      &__dropdown {
+        background: $card-bg;
+        border-color: $border-color;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      &__option {
+        color: $text-medium;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+          color: $text-dark;
+        }
+
+        &--active {
+          background: rgba($primary-red, 0.06);
+          color: $primary-red;
+        }
+      }
+    }
+  }
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 460px;
+  }
+
+  // Logo
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  &__logo-img {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  // Card
+  &__card {
+    width: 100%;
+    background: $card-bg;
+    border-radius: 16px;
+    padding: 40px 36px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px rgba(0, 0, 0, 0.04);
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $text-dark;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-medium;
+    text-align: center;
+    margin: 0 0 28px;
+    line-height: 1.5;
+  }
+
+  // Error
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: $error-bg;
+    border: 1px solid $error-border;
+    border-radius: 10px;
+    color: $error-text;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    animation: shakeIn 0.3s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  // Form
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $text-dark;
+  }
+
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__input-icon {
+    position: absolute;
+    left: 16px;
+    color: $text-light;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    background: $input-bg;
+    border: 1.5px solid $border-color;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: $text-dark;
+    transition: all 0.2s ease;
+    outline: none;
+    font-family: inherit;
+
+    &::placeholder {
+      color: $text-light;
+    }
+
+    &:focus {
+      border-color: $primary-red;
+      background: $card-bg;
+      box-shadow: 0 0 0 3px rgba($primary-red, 0.08);
+    }
+  }
+
+  &__toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-light;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+
+    &:hover {
+      color: $text-medium;
+      background: rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  // Options row
+  &__options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: $text-medium;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__checkbox {
+    display: none;
+
+    &:checked + .login-page__checkbox-custom {
+      background: $primary-red;
+      border-color: $primary-red;
+
+      &::after {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  &__checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid $border-color;
+    border-radius: 5px;
+    position: relative;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) scale(0);
+      opacity: 0;
+      transition: all 0.15s ease;
+    }
+  }
+
+  &__forgot {
+    font-size: 0.85rem;
+    color: $primary-red;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Submit
+  &__submit {
+    width: 100%;
+    padding: 15px;
+    background: $primary-red;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    margin-top: 4px;
+
+    &:hover:not(:disabled) {
+      background: $primary-red-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($primary-red, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  // Spinner
+  &__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shakeIn {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+
+// Responsive
+@media (max-width: 520px) {
+  .login-page {
+    &__card {
+      padding: 28px 20px;
+      border-radius: 12px;
+    }
+
+    &__title {
+      font-size: 1.5rem;
+    }
+
+    &__logo-img {
+      height: 72px;
+    }
+  }
+}

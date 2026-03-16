@@ -1,1 +1,97 @@
-/* You can add global styles to this file, and also import other style files */
+/* PolySans Trial Font Family */
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Slim.woff2') format('woff2'),
+       url('/fonts/PolySans-Slim.woff') format('woff'),
+       url('/fonts/PolySans-Slim.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Regular.woff2') format('woff2'),
+       url('/fonts/PolySans-Regular.woff') format('woff'),
+       url('/fonts/PolySans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Median.woff2') format('woff2'),
+       url('/fonts/PolySans-Median.woff') format('woff'),
+       url('/fonts/PolySans-Median.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Bold.woff2') format('woff2'),
+       url('/fonts/PolySans-Bold.woff') format('woff'),
+       url('/fonts/PolySans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Heavy.woff2') format('woff2'),
+       url('/fonts/PolySans-Heavy.woff') format('woff'),
+       url('/fonts/PolySans-Heavy.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans Trial';
+  src: url('/fonts/PolySans-Black.woff2') format('woff2'),
+       url('/fonts/PolySans-Black.woff') format('woff'),
+       url('/fonts/PolySans-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'PolySans Trial', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  color: #1F2937;
+  background-color: #F3F4F6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
+}

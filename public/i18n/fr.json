@@ -46,7 +46,20 @@
     "RESET_SUBTITLE": "Saisissez votre adresse e-mail pour recevoir un lien de récupération sécurisé",
     "SEND_RESET_LINK": "Envoyer le lien de récupération",
     "BACK_TO_LOGIN": "Retour à la connexion",
-    "RESET_LINK_SENT": "Un lien de réinitialisation a été envoyé à votre adresse e-mail"
+    "RESET_LINK_SENT": "Un lien de réinitialisation a été envoyé à votre adresse e-mail",
+    "NEW_PASSWORD_TITLE": "Nouveau mot de passe",
+    "NEW_PASSWORD_SUBTITLE": "Créez un nouveau mot de passe sécurisé pour votre compte",
+    "NEW_PASSWORD": "Nouveau mot de passe",
+    "NEW_PASSWORD_PLACEHOLDER": "Entrez votre nouveau mot de passe",
+    "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Confirmez votre nouveau mot de passe",
+    "RESET_PASSWORD_BTN": "Réinitialiser le mot de passe",
+    "PASSWORDS_MISMATCH": "Les mots de passe ne correspondent pas",
+    "PASSWORD_TOO_SHORT": "Le mot de passe doit contenir au moins 8 caractères",
+    "PASSWORD_WEAK": "Faible",
+    "PASSWORD_MEDIUM": "Moyen",
+    "PASSWORD_STRONG": "Fort",
+    "PASSWORD_RESET_SUCCESS": "Votre mot de passe a été réinitialisé avec succès"
   },
   "NAV": {
     "DASHBOARD": "Tableau de bord",

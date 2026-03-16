@@ -46,7 +46,20 @@
     "RESET_SUBTITLE": "Enter your email address to receive a secure recovery link",
     "SEND_RESET_LINK": "Send recovery link",
     "BACK_TO_LOGIN": "Back to login",
-    "RESET_LINK_SENT": "A reset link has been sent to your email address"
+    "RESET_LINK_SENT": "A reset link has been sent to your email address",
+    "NEW_PASSWORD_TITLE": "New password",
+    "NEW_PASSWORD_SUBTITLE": "Create a new secure password for your account",
+    "NEW_PASSWORD": "New password",
+    "NEW_PASSWORD_PLACEHOLDER": "Enter your new password",
+    "CONFIRM_PASSWORD": "Confirm password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Confirm your new password",
+    "RESET_PASSWORD_BTN": "Reset password",
+    "PASSWORDS_MISMATCH": "Passwords do not match",
+    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters",
+    "PASSWORD_WEAK": "Weak",
+    "PASSWORD_MEDIUM": "Medium",
+    "PASSWORD_STRONG": "Strong",
+    "PASSWORD_RESET_SUCCESS": "Your password has been reset successfully"
   },
   "NAV": {
     "DASHBOARD": "Dashboard",

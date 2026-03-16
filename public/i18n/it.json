@@ -46,7 +46,20 @@
     "RESET_SUBTITLE": "Inserisci il tuo indirizzo e-mail per ricevere un link di recupero sicuro",
     "SEND_RESET_LINK": "Invia il link di recupero",
     "BACK_TO_LOGIN": "Torna all'accesso",
-    "RESET_LINK_SENT": "Un link di reimpostazione è stato inviato al tuo indirizzo e-mail"
+    "RESET_LINK_SENT": "Un link di reimpostazione è stato inviato al tuo indirizzo e-mail",
+    "NEW_PASSWORD_TITLE": "Nuova password",
+    "NEW_PASSWORD_SUBTITLE": "Crea una nuova password sicura per il tuo account",
+    "NEW_PASSWORD": "Nuova password",
+    "NEW_PASSWORD_PLACEHOLDER": "Inserisci la tua nuova password",
+    "CONFIRM_PASSWORD": "Conferma password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Conferma la tua nuova password",
+    "RESET_PASSWORD_BTN": "Reimposta password",
+    "PASSWORDS_MISMATCH": "Le password non corrispondono",
+    "PASSWORD_TOO_SHORT": "La password deve contenere almeno 8 caratteri",
+    "PASSWORD_WEAK": "Debole",
+    "PASSWORD_MEDIUM": "Media",
+    "PASSWORD_STRONG": "Forte",
+    "PASSWORD_RESET_SUCCESS": "La tua password è stata reimpostata con successo"
   },
   "NAV": {
     "DASHBOARD": "Pannello di controllo",

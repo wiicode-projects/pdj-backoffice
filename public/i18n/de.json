@@ -46,7 +46,20 @@
     "RESET_SUBTITLE": "Geben Sie Ihre E-Mail-Adresse ein, um einen sicheren Wiederherstellungslink zu erhalten",
     "SEND_RESET_LINK": "Wiederherstellungslink senden",
     "BACK_TO_LOGIN": "Zurück zur Anmeldung",
-    "RESET_LINK_SENT": "Ein Link zum Zurücksetzen wurde an Ihre E-Mail-Adresse gesendet"
+    "RESET_LINK_SENT": "Ein Link zum Zurücksetzen wurde an Ihre E-Mail-Adresse gesendet",
+    "NEW_PASSWORD_TITLE": "Neues Passwort",
+    "NEW_PASSWORD_SUBTITLE": "Erstellen Sie ein neues sicheres Passwort für Ihr Konto",
+    "NEW_PASSWORD": "Neues Passwort",
+    "NEW_PASSWORD_PLACEHOLDER": "Geben Sie Ihr neues Passwort ein",
+    "CONFIRM_PASSWORD": "Passwort bestätigen",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Bestätigen Sie Ihr neues Passwort",
+    "RESET_PASSWORD_BTN": "Passwort zurücksetzen",
+    "PASSWORDS_MISMATCH": "Passwörter stimmen nicht überein",
+    "PASSWORD_TOO_SHORT": "Das Passwort muss mindestens 8 Zeichen lang sein",
+    "PASSWORD_WEAK": "Schwach",
+    "PASSWORD_MEDIUM": "Mittel",
+    "PASSWORD_STRONG": "Stark",
+    "PASSWORD_RESET_SUCCESS": "Ihr Passwort wurde erfolgreich zurückgesetzt"
   },
   "NAV": {
     "DASHBOARD": "Dashboard",

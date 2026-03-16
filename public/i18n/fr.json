@@ -41,7 +41,12 @@
     "LOGIN_ERROR": "E-mail ou mot de passe incorrect",
     "FIELDS_REQUIRED": "Veuillez remplir tous les champs",
     "SERVER_ERROR": "Erreur du serveur, veuillez réessayer",
-    "SESSION_EXPIRED": "Votre session a expiré, veuillez vous reconnecter"
+    "SESSION_EXPIRED": "Votre session a expiré, veuillez vous reconnecter",
+    "RESET_TITLE": "Réinitialisation du mot de passe",
+    "RESET_SUBTITLE": "Saisissez votre adresse e-mail pour recevoir un lien de récupération sécurisé",
+    "SEND_RESET_LINK": "Envoyer le lien de récupération",
+    "BACK_TO_LOGIN": "Retour à la connexion",
+    "RESET_LINK_SENT": "Un lien de réinitialisation a été envoyé à votre adresse e-mail"
   },
   "NAV": {
     "DASHBOARD": "Tableau de bord",

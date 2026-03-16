@@ -41,7 +41,12 @@
     "LOGIN_ERROR": "Falsche E-Mail oder falsches Passwort",
     "FIELDS_REQUIRED": "Bitte füllen Sie alle Felder aus",
     "SERVER_ERROR": "Serverfehler, bitte versuchen Sie es erneut",
-    "SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen, bitte melden Sie sich erneut an"
+    "SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen, bitte melden Sie sich erneut an",
+    "RESET_TITLE": "Passwort zurücksetzen",
+    "RESET_SUBTITLE": "Geben Sie Ihre E-Mail-Adresse ein, um einen sicheren Wiederherstellungslink zu erhalten",
+    "SEND_RESET_LINK": "Wiederherstellungslink senden",
+    "BACK_TO_LOGIN": "Zurück zur Anmeldung",
+    "RESET_LINK_SENT": "Ein Link zum Zurücksetzen wurde an Ihre E-Mail-Adresse gesendet"
   },
   "NAV": {
     "DASHBOARD": "Dashboard",

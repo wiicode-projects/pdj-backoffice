@@ -41,7 +41,12 @@
     "LOGIN_ERROR": "Incorrect email or password",
     "FIELDS_REQUIRED": "Please fill in all fields",
     "SERVER_ERROR": "Server error, please try again",
-    "SESSION_EXPIRED": "Your session has expired, please log in again"
+    "SESSION_EXPIRED": "Your session has expired, please log in again",
+    "RESET_TITLE": "Reset your password",
+    "RESET_SUBTITLE": "Enter your email address to receive a secure recovery link",
+    "SEND_RESET_LINK": "Send recovery link",
+    "BACK_TO_LOGIN": "Back to login",
+    "RESET_LINK_SENT": "A reset link has been sent to your email address"
   },
   "NAV": {
     "DASHBOARD": "Dashboard",

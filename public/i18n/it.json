@@ -78,8 +78,8 @@
     "TITLE": "Pannello di controllo",
     "TOTAL_USERS": "Utenti totali",
     "TOTAL_RESTAURANTS": "Ristoranti totali",
-    "TOTAL_DISHES": "Piatti totali",
-    "ACTIVE_SUBSCRIPTIONS": "Abbonamenti attivi",
+    "PREMIUM_USERS": "Utenti premium",
+    "PREMIUM_RESTAURANTS": "Ristoranti premium",
     "RECENT_USERS": "Ultimi utenti registrati",
     "RECENT_RESTAURANTS": "Ultimi ristoranti aggiunti"
   },
@@ -149,6 +149,9 @@
     "BILLING_PERIOD": "Periodo di fatturazione",
     "CURRENCY": "Valuta",
     "TRIAL_DAYS": "Giorni di prova"
+  },
+  "MENUS": {
+    "TITLE": "Gestione menù"
   },
   "ROLES": {
     "TITLE": "Gestione ruoli",

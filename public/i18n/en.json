@@ -78,8 +78,8 @@
     "TITLE": "Dashboard",
     "TOTAL_USERS": "Total users",
     "TOTAL_RESTAURANTS": "Total restaurants",
-    "TOTAL_DISHES": "Total dishes",
-    "ACTIVE_SUBSCRIPTIONS": "Active subscriptions",
+    "PREMIUM_USERS": "Premium users",
+    "PREMIUM_RESTAURANTS": "Premium restaurants",
     "RECENT_USERS": "Recent users",
     "RECENT_RESTAURANTS": "Recent restaurants"
   },
@@ -149,6 +149,9 @@
     "BILLING_PERIOD": "Billing period",
     "CURRENCY": "Currency",
     "TRIAL_DAYS": "Trial days"
+  },
+  "MENUS": {
+    "TITLE": "Menu Management"
   },
   "ROLES": {
     "TITLE": "Role Management",

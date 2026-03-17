@@ -45,7 +45,9 @@ export class AuthService {
   readonly user = this.currentUser.asReadonly();
   readonly loading = this.isLoading.asReadonly();
   readonly isAuthenticated = computed(() => !!this.currentUser());
-  readonly isAdmin = computed(() => this.currentUser()?.role?.name === 'ADMIN');
+  readonly userRole = computed(() => this.currentUser()?.role?.name || null);
+  readonly isAdmin = computed(() => this.userRole() === 'ADMIN');
+  readonly isRestaurant = computed(() => this.userRole() === 'RESTAURANT');
 
   constructor(
     private http: HttpClient,

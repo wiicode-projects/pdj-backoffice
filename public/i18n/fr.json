@@ -78,8 +78,8 @@
     "TITLE": "Tableau de bord",
     "TOTAL_USERS": "Total utilisateurs",
     "TOTAL_RESTAURANTS": "Total restaurants",
-    "TOTAL_DISHES": "Total plats",
-    "ACTIVE_SUBSCRIPTIONS": "Abonnements actifs",
+    "PREMIUM_USERS": "Utilisateurs premium",
+    "PREMIUM_RESTAURANTS": "Restaurants premium",
     "RECENT_USERS": "Derniers utilisateurs inscrits",
     "RECENT_RESTAURANTS": "Derniers restaurants ajoutés"
   },
@@ -149,6 +149,9 @@
     "BILLING_PERIOD": "Période de facturation",
     "CURRENCY": "Devise",
     "TRIAL_DAYS": "Jours d'essai"
+  },
+  "MENUS": {
+    "TITLE": "Gestion des menus"
   },
   "ROLES": {
     "TITLE": "Gestion des rôles",

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.leplatdujour.ch/api/v1',
+  apiUrl: '/api/v1',
 };

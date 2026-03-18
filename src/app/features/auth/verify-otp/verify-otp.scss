@@ -1,0 +1,257 @@
+$primary-red: #DC2626;
+$primary-red-hover: #B91C1C;
+$bg-color: #F3F4F6;
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border-color: #E5E7EB;
+$error-bg: #FEF2F2;
+$error-text: #DC2626;
+$error-border: #FECACA;
+$success-bg: #F0FDF4;
+$success-text: #16A34A;
+$success-border: #BBF7D0;
+
+.verify-otp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $bg-color;
+  padding: 24px;
+  font-family: 'PolySans Trial', -apple-system, sans-serif;
+}
+
+.verify-otp-card {
+  background: $card-bg;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+
+  &__lang {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
+
+  &__logo {
+    margin-bottom: 28px;
+
+    img {
+      height: 52px;
+      width: auto;
+    }
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 8px;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-medium;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  &__email {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 24px;
+  }
+
+  // Error
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: $error-bg;
+    color: $error-text;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid $error-border;
+    margin-bottom: 20px;
+  }
+
+  // Success
+  &__success {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: $success-bg;
+    color: $success-text;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid $success-border;
+    margin-bottom: 20px;
+  }
+
+  // Submit
+  &__submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: $primary-red;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s ease;
+    margin-top: 28px;
+
+    &:hover:not(:disabled) {
+      background: $primary-red-hover;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  // Resend
+  &__resend {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: $text-medium;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  &__resend-btn {
+    background: none;
+    border: none;
+    color: $primary-red;
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Back
+  &__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-size: 0.88rem;
+    color: $text-medium;
+    text-decoration: none;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: $text-dark;
+    }
+  }
+}
+
+// ==============================
+// OTP Inputs
+// ==============================
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+
+  &__digit {
+    width: 52px;
+    height: 60px;
+    border: 2px solid $border-color;
+    border-radius: 12px;
+    background: #F9FAFB;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: inherit;
+    text-align: center;
+    color: $text-dark;
+    outline: none;
+    transition: all 0.15s ease;
+    caret-color: $primary-red;
+
+    &:focus {
+      border-color: $primary-red;
+      background: white;
+      box-shadow: 0 0 0 3px rgba($primary-red, 0.1);
+    }
+
+    &--filled {
+      border-color: $primary-red;
+      background: white;
+    }
+
+    &--error {
+      border-color: $error-text !important;
+      background: $error-bg;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ==============================
+// Responsive
+// ==============================
+@media (max-width: 480px) {
+  .verify-otp-card {
+    padding: 32px 24px;
+  }
+
+  .otp-inputs {
+    gap: 6px;
+
+    &__digit {
+      width: 44px;
+      height: 52px;
+      font-size: 1.25rem;
+    }
+  }
+}

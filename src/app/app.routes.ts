@@ -20,6 +20,12 @@ export const routes: Routes = [
       import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
   },
   {
+    path: 'verify-otp',
+    canActivate: [loginGuard],
+    loadComponent: () =>
+      import('./features/auth/verify-otp/verify-otp').then((m) => m.VerifyOtp),
+  },
+  {
     path: 'app',
     canActivate: [authGuard],
     loadComponent: () =>

@@ -2,8 +2,10 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'pdj-reset-password',
@@ -13,8 +15,8 @@ import { LanguageSwitcher } from '../../../shared/components/language-switcher/l
   styleUrl: './reset-password.scss',
 })
 export class ResetPassword {
-  newPassword = '';
-  confirmPassword = '';
+  newPassword = signal('');
+  confirmPassword = signal('');
   showNewPassword = signal(false);
   showConfirmPassword = signal(false);
   isSubmitting = signal(false);
@@ -24,12 +26,14 @@ export class ResetPassword {
   private token = '';
 
   readonly passwordsMatch = computed(() => {
-    if (!this.newPassword || !this.confirmPassword) return true;
-    return this.newPassword === this.confirmPassword;
+    const pwd = this.newPassword();
+    const confirm = this.confirmPassword();
+    if (!pwd || !confirm) return true;
+    return pwd === confirm;
   });
 
   readonly passwordStrength = computed(() => {
-    const pwd = this.newPassword;
+    const pwd = this.newPassword();
     if (!pwd) return 0;
     let score = 0;
     if (pwd.length >= 8) score++;
@@ -43,10 +47,19 @@ export class ResetPassword {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private http: HttpClient,
   ) {
     this.route.queryParams.subscribe((params) => {
       this.token = params['token'] || '';
     });
+  }
+
+  onNewPasswordInput(value: string): void {
+    this.newPassword.set(value);
+  }
+
+  onConfirmPasswordInput(value: string): void {
+    this.confirmPassword.set(value);
   }
 
   toggleNewPassword(): void {
@@ -58,17 +71,20 @@ export class ResetPassword {
   }
 
   onSubmit(): void {
-    if (!this.newPassword || !this.confirmPassword) {
+    const pwd = this.newPassword();
+    const confirm = this.confirmPassword();
+
+    if (!pwd || !confirm) {
       this.errorMessage.set('AUTH.FIELDS_REQUIRED');
       return;
     }
 
-    if (this.newPassword !== this.confirmPassword) {
+    if (pwd !== confirm) {
       this.errorMessage.set('AUTH.PASSWORDS_MISMATCH');
       return;
     }
 
-    if (this.newPassword.length < 8) {
+    if (pwd.length < 8) {
       this.errorMessage.set('AUTH.PASSWORD_TOO_SHORT');
       return;
     }
@@ -77,10 +93,32 @@ export class ResetPassword {
     this.successMessage.set('');
     this.isSubmitting.set(true);
 
-    // TODO: Replace with actual API call when endpoint is available
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-      this.successMessage.set('AUTH.PASSWORD_RESET_SUCCESS');
-    }, 1500);
+    this.http
+      .post(
+        `${environment.apiUrl}/auth/password/reset`,
+        {
+          password: pwd,
+          confirmPassword: confirm,
+          token: this.token,
+        },
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.successMessage.set('AUTH.PASSWORD_RESET_SUCCESS');
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
+        },
+        error: (err) => {
+          this.isSubmitting.set(false);
+          if (err.status === 401) {
+            this.errorMessage.set('AUTH.TOKEN_EXPIRED');
+          } else {
+            this.errorMessage.set('AUTH.SERVER_ERROR');
+          }
+        },
+      });
   }
 }
+

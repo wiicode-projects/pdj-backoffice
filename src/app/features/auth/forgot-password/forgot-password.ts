@@ -2,8 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'pdj-forgot-password',
@@ -18,7 +20,10 @@ export class ForgotPassword {
   errorMessage = signal('');
   successMessage = signal('');
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+  ) {}
 
   onSubmit(): void {
     if (!this.email) {
@@ -30,11 +35,29 @@ export class ForgotPassword {
     this.successMessage.set('');
     this.isSubmitting.set(true);
 
-    // TODO: Replace with actual API call when endpoint is available
-    // For now, simulate a success response
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-      this.successMessage.set('AUTH.RESET_LINK_SENT');
-    }, 1500);
+    this.http
+      .post<{ status: number; token: string; message: string }>(
+        `${environment.apiUrl}/auth/password/forgot`,
+        { email: this.email, type: 'PASSWORDFORGET' },
+      )
+      .subscribe({
+        next: (response) => {
+          this.isSubmitting.set(false);
+          this.router.navigate(['/verify-otp'], {
+            queryParams: {
+              token: response.token,
+              email: this.email,
+            },
+          });
+        },
+        error: (err) => {
+          this.isSubmitting.set(false);
+          if (err.status === 404) {
+            this.errorMessage.set('AUTH.EMAIL_NOT_FOUND');
+          } else {
+            this.errorMessage.set('AUTH.SERVER_ERROR');
+          }
+        },
+      });
   }
 }

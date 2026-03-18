@@ -59,7 +59,18 @@
     "PASSWORD_WEAK": "Debole",
     "PASSWORD_MEDIUM": "Media",
     "PASSWORD_STRONG": "Forte",
-    "PASSWORD_RESET_SUCCESS": "La tua password è stata reimpostata con successo"
+    "PASSWORD_RESET_SUCCESS": "La tua password è stata reimpostata con successo",
+    "OTP_TITLE": "Verifica del codice",
+    "OTP_SUBTITLE": "Inserisci il codice a 6 cifre inviato al tuo indirizzo e-mail",
+    "VERIFY_CODE": "Verifica codice",
+    "OTP_NOT_RECEIVED": "Non hai ricevuto il codice?",
+    "OTP_RESEND": "Rinvia",
+    "OTP_RESENT": "Un nuovo codice è stato inviato",
+    "OTP_INCOMPLETE": "Inserisci tutte le 6 cifre",
+    "OTP_INVALID": "Il codice inserito non è corretto",
+    "OTP_EXPIRED": "Il codice è scaduto, richiedine uno nuovo",
+    "EMAIL_NOT_FOUND": "Nessun account trovato con questo indirizzo e-mail",
+    "TOKEN_EXPIRED": "Sessione scaduta, ricomincia da capo"
   },
   "NAV": {
     "DASHBOARD": "Pannello di controllo",

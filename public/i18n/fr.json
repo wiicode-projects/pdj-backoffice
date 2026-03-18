@@ -59,7 +59,18 @@
     "PASSWORD_WEAK": "Faible",
     "PASSWORD_MEDIUM": "Moyen",
     "PASSWORD_STRONG": "Fort",
-    "PASSWORD_RESET_SUCCESS": "Votre mot de passe a été réinitialisé avec succès"
+    "PASSWORD_RESET_SUCCESS": "Votre mot de passe a été réinitialisé avec succès",
+    "OTP_TITLE": "Vérification du code",
+    "OTP_SUBTITLE": "Entrez le code à 6 chiffres envoyé à votre adresse e-mail",
+    "VERIFY_CODE": "Vérifier le code",
+    "OTP_NOT_RECEIVED": "Code non reçu ?",
+    "OTP_RESEND": "Renvoyer",
+    "OTP_RESENT": "Un nouveau code a été envoyé",
+    "OTP_INCOMPLETE": "Veuillez entrer les 6 chiffres",
+    "OTP_INVALID": "Le code entré est incorrect",
+    "OTP_EXPIRED": "Le code a expiré, veuillez en demander un nouveau",
+    "EMAIL_NOT_FOUND": "Aucun compte trouvé avec cette adresse e-mail",
+    "TOKEN_EXPIRED": "La session a expiré, veuillez recommencer"
   },
   "NAV": {
     "DASHBOARD": "Tableau de bord",

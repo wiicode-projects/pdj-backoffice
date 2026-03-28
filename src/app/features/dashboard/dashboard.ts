@@ -1,26 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
+import {
+  DashboardService,
+  DashboardStats,
+  RecentUser,
+  RecentRestaurant,
+} from '../../core/services/dashboard.service';
 
 interface KpiCard {
   icon: string;
   labelKey: string;
   value: number;
   color: string;
-}
-
-interface RecentUser {
-  name: string;
-  email: string;
-  role: string;
-  date: string;
-}
-
-interface RecentRestaurant {
-  name: string;
-  type: string;
-  city: string;
-  date: string;
 }
 
 @Component({
@@ -30,29 +23,54 @@ interface RecentRestaurant {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
+  loading = true;
+
   kpiCards: KpiCard[] = [
-    { icon: 'users', labelKey: 'DASHBOARD.TOTAL_USERS', value: 248, color: '#3B82F6' },
-    { icon: 'restaurants', labelKey: 'DASHBOARD.TOTAL_RESTAURANTS', value: 42, color: '#F59E0B' },
-    { icon: 'premium-users', labelKey: 'DASHBOARD.PREMIUM_USERS', value: 18, color: '#8B5CF6' },
-    { icon: 'premium-restaurants', labelKey: 'DASHBOARD.PREMIUM_RESTAURANTS', value: 27, color: '#10B981' },
+    { icon: 'users', labelKey: 'DASHBOARD.TOTAL_USERS', value: 0, color: '#3B82F6' },
+    { icon: 'restaurants', labelKey: 'DASHBOARD.TOTAL_RESTAURANTS', value: 0, color: '#F59E0B' },
+    { icon: 'premium-users', labelKey: 'DASHBOARD.PREMIUM_USERS', value: 0, color: '#8B5CF6' },
+    { icon: 'premium-restaurants', labelKey: 'DASHBOARD.PREMIUM_RESTAURANTS', value: 0, color: '#10B981' },
   ];
 
-  recentUsers: RecentUser[] = [
-    { name: 'Sophie Martin', email: 'sophie@example.com', role: 'USER', date: '16 Mar 2026' },
-    { name: 'Jean Dupont', email: 'jean@restaurant.ch', role: 'RESTAURANT', date: '15 Mar 2026' },
-    { name: 'Marc Bern', email: 'marc@leplatdujour.ch', role: 'ADMIN', date: '14 Mar 2026' },
-    { name: 'Claire Dubois', email: 'claire@example.com', role: 'USER', date: '13 Mar 2026' },
-    { name: 'Luca Rossi', email: 'luca@restaurant.ch', role: 'RESTAURANT', date: '12 Mar 2026' },
-  ];
+  recentUsers: RecentUser[] = [];
+  recentRestaurants: RecentRestaurant[] = [];
 
-  recentRestaurants: RecentRestaurant[] = [
-    { name: 'Le Petit Bistro', type: 'RESTAURANT', city: 'Lausanne', date: '16 Mar 2026' },
-    { name: 'Pasta Fresca', type: 'RESTAURANT', city: 'Genève', date: '15 Mar 2026' },
-    { name: 'Burger Express', type: 'FOOD_TRUCK', city: 'Zürich', date: '14 Mar 2026' },
-    { name: 'Sushi Zen', type: 'RESTAURANT', city: 'Bern', date: '13 Mar 2026' },
-    { name: 'Crêperie du Lac', type: 'RESTAURANT', city: 'Neuchâtel', date: '12 Mar 2026' },
-  ];
+  constructor(
+    private dashboardService: DashboardService,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+  loadDashboard(): void {
+    this.loading = true;
+    this.dashboardService.getDashboard()
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (data) => {
+          this.kpiCards[0].value = data.totalUsers;
+          this.kpiCards[1].value = data.totalRestaurants;
+          this.kpiCards[2].value = data.premiumUsers;
+          this.kpiCards[3].value = data.premiumRestaurants;
+          this.recentUsers = data.recentUsers;
+          this.recentRestaurants = data.recentRestaurants;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load dashboard:', err);
+        },
+      });
+  }
+
+  getUserName(user: RecentUser): string {
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+  }
 
   getRoleBadgeClass(role: string): string {
     switch (role) {

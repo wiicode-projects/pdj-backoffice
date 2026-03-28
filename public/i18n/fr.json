@@ -188,7 +188,10 @@
       "BACKOFFICE": "Back-office complet",
       "ID_CARD": "Carte ID Premium",
       "REFERRAL": "Parrainage via code",
-      "DRAWS": "Participation tirages"
+      "DRAWS": "Participation tirages",
+      "ITINERANT": "Restaurant itinérant",
+      "GIFT": "Cadeaux autorisés",
+      "MULTI_RESTAURANT": "Multi-restaurant"
     },
     "FEATURES_LIST": {
       "NO_ADS": "Sans publicité",

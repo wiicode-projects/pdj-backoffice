@@ -188,7 +188,10 @@
       "BACKOFFICE": "Back-office completo",
       "ID_CARD": "Tessera ID Premium",
       "REFERRAL": "Referral tramite codice",
-      "DRAWS": "Partecipazione estrazioni"
+      "DRAWS": "Partecipazione estrazioni",
+      "ITINERANT": "Ristorante itinerante",
+      "GIFT": "Regali consentiti",
+      "MULTI_RESTAURANT": "Multi-ristorante"
     },
     "FEATURES_LIST": {
       "NO_ADS": "Senza pubblicità",

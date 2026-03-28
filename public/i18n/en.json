@@ -188,7 +188,10 @@
       "BACKOFFICE": "Full Back-office",
       "ID_CARD": "Premium ID Card",
       "REFERRAL": "Referral via code",
-      "DRAWS": "Draws participation"
+      "DRAWS": "Draws participation",
+      "ITINERANT": "Itinerant restaurant",
+      "GIFT": "Gifts allowed",
+      "MULTI_RESTAURANT": "Multi-restaurant"
     },
     "FEATURES_LIST": {
       "NO_ADS": "No Ads",

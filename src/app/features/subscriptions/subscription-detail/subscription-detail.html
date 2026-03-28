@@ -137,6 +137,25 @@
               <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.DRAWS' | translate }}</span>
               <span class="feat-row__status">{{ subscription.participationTirages ? '✓' : '✗' }}</span>
             </div>
+
+            <!-- Restaurant-specific features -->
+            @if (isRestaurant()) {
+              <div class="feat-row" [class.feat-row--active]="subscription.isAllowedToBeItinerant">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.ITINERANT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.isAllowedToBeItinerant ? '✓' : '✗' }}</span>
+              </div>
+              <div class="feat-row" [class.feat-row--active]="subscription.canHaveGift">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.GIFT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.canHaveGift ? '✓' : '✗' }}</span>
+              </div>
+              <div class="feat-row" [class.feat-row--active]="subscription.isMultiRestaurant">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.MULTI_RESTAURANT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.isMultiRestaurant ? '✓' : '✗' }}</span>
+              </div>
+            }
           </div>
         </div>
       }

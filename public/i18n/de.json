@@ -188,7 +188,10 @@
       "BACKOFFICE": "Vollständiges Back-office",
       "ID_CARD": "Premium-Ausweis",
       "REFERRAL": "Empfehlung per Code",
-      "DRAWS": "Teilnahme an Verlosungen"
+      "DRAWS": "Teilnahme an Verlosungen",
+      "ITINERANT": "Fahrendes Restaurant",
+      "GIFT": "Geschenke erlaubt",
+      "MULTI_RESTAURANT": "Multi-Restaurant"
     },
     "FEATURES_LIST": {
       "NO_ADS": "Ohne Werbung",

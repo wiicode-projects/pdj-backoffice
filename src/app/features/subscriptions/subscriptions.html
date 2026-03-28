@@ -143,6 +143,24 @@
             </div>
           }
 
+          <!-- Restaurant-specific features -->
+          @if (sub.targetType === 'RESTAURANT') {
+            <div class="sub-card__features">
+              <div class="sub-card__feature" [class.sub-card__feature--active]="sub.isAllowedToBeItinerant">
+                <span class="sub-card__feature-dot"></span>
+                {{ 'SUBSCRIPTIONS.FEAT.ITINERANT' | translate }}
+              </div>
+              <div class="sub-card__feature" [class.sub-card__feature--active]="sub.canHaveGift">
+                <span class="sub-card__feature-dot"></span>
+                {{ 'SUBSCRIPTIONS.FEAT.GIFT' | translate }}
+              </div>
+              <div class="sub-card__feature" [class.sub-card__feature--active]="sub.isMultiRestaurant">
+                <span class="sub-card__feature-dot"></span>
+                {{ 'SUBSCRIPTIONS.FEAT.MULTI_RESTAURANT' | translate }}
+              </div>
+            </div>
+          }
+
           <!-- Feature tags -->
           @if (sub.features && sub.features.length > 0) {
             <div class="sub-card__tags">
@@ -268,6 +286,30 @@
                       <input class="form-input" type="number" [(ngModel)]="newSub.maxRestaurants" name="maxRestaurants" required min="0" />
                     </div>
                   </div>
+                </div>
+
+                <div class="form-toggles" style="margin-top: 16px">
+                  <label class="form-toggle-row">
+                    <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ITINERANT' | translate }}</span>
+                    <span class="form-toggle">
+                      <input type="checkbox" [(ngModel)]="newSub.isAllowedToBeItinerant" name="isAllowedToBeItinerant" />
+                      <span class="form-toggle__slider"></span>
+                    </span>
+                  </label>
+                  <label class="form-toggle-row">
+                    <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.GIFT' | translate }}</span>
+                    <span class="form-toggle">
+                      <input type="checkbox" [(ngModel)]="newSub.canHaveGift" name="canHaveGift" />
+                      <span class="form-toggle__slider"></span>
+                    </span>
+                  </label>
+                  <label class="form-toggle-row">
+                    <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.MULTI_RESTAURANT' | translate }}</span>
+                    <span class="form-toggle">
+                      <input type="checkbox" [(ngModel)]="newSub.isMultiRestaurant" name="isMultiRestaurant" />
+                      <span class="form-toggle__slider"></span>
+                    </span>
+                  </label>
                 </div>
               }
             </div>

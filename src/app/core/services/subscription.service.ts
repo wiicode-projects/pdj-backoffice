@@ -57,6 +57,9 @@ export interface Subscription {
   idCardPremium: boolean;
   parrainageViaCode: boolean;
   participationTirages: boolean;
+  isAllowedToBeItinerant: boolean;
+  canHaveGift: boolean;
+  isMultiRestaurant: boolean;
   plans?: SubscriptionPlan[] | null;
   createdAt: string;
   updatedAt: string;
@@ -93,6 +96,9 @@ export interface CreateSubscriptionDto {
   idCardPremium?: boolean;
   parrainageViaCode?: boolean;
   participationTirages?: boolean;
+  isAllowedToBeItinerant?: boolean;
+  canHaveGift?: boolean;
+  isMultiRestaurant?: boolean;
   isDefault?: boolean;
 }
 

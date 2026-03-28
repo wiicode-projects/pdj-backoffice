@@ -154,6 +154,9 @@ export class Subscriptions implements OnInit {
       idCardPremium: false,
       parrainageViaCode: false,
       participationTirages: false,
+      isAllowedToBeItinerant: false,
+      canHaveGift: false,
+      isMultiRestaurant: false,
       isDefault: false,
     };
   }

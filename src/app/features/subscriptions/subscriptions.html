@@ -43,7 +43,7 @@
   @if (!loading && subscriptions.length > 0) {
     <div class="cards-grid">
       @for (sub of subscriptions; track sub.id) {
-        <div class="sub-card" [class.sub-card--restaurant]="sub.targetType === 'RESTAURANT'">
+        <div class="sub-card" [class.sub-card--restaurant]="sub.targetType === 'RESTAURANT'" (click)="navigateToDetail(sub)">
           <!-- Card header -->
           <div class="sub-card__header">
             <div class="sub-card__icon">

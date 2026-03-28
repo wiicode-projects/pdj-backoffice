@@ -193,6 +193,12 @@
       "ADVANCED_FILTERS": "Advanced Filters",
       "EXCLUSIVE_OFFERS": "Exclusive Offers",
       "HIGHLIGHT_IN_SEARCH": "Highlight in Search"
+    },
+    "DETAIL": {
+      "DISCOUNT": "Discount",
+      "DAYS": "days",
+      "NO_PLANS": "No plans defined yet",
+      "CREATED": "Created on"
     }
   },
   "MENUS": {

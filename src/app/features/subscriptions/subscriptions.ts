@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import {
@@ -33,6 +34,7 @@ export class Subscriptions implements OnInit {
   constructor(
     private subscriptionService: SubscriptionService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -107,6 +109,10 @@ export class Subscriptions implements OnInit {
       return 'SUBSCRIPTIONS.STEP_LIMITS';
     }
     return 'SUBSCRIPTIONS.STEP_FEATURES';
+  }
+
+  navigateToDetail(sub: Subscription): void {
+    this.router.navigate(['/app/subscriptions', sub.id]);
   }
 
   closeDialog(): void {

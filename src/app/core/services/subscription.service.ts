@@ -84,8 +84,8 @@ export class SubscriptionService {
     return this.http.get<{ status: number; subscriptions: Subscription[] }>(this.apiUrl);
   }
 
-  findOne(id: string): Observable<Subscription> {
-    return this.http.get<Subscription>(`${this.apiUrl}/${id}`);
+  findOne(id: string): Observable<{ status: number; subscription: Subscription }> {
+    return this.http.get<{ status: number; subscription: Subscription }>(`${this.apiUrl}/${id}`);
   }
 
   create(dto: CreateSubscriptionDto): Observable<{ status: number; subscription: Subscription }> {

@@ -149,17 +149,51 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Gestion des abonnements",
+    "SUBTITLE": "Gérez vos offres d'abonnement pour les utilisateurs et restaurants",
     "CREATE": "Créer un abonnement",
     "NAME": "Nom",
     "DESCRIPTION": "Description",
-    "PRICE": "Prix",
+    "PRICE": "Prix mensuel",
     "TARGET_TYPE": "Type cible",
     "PLANS": "Plans",
     "FEATURES": "Fonctionnalités",
     "MEMBERS": "Membres",
     "BILLING_PERIOD": "Période de facturation",
     "CURRENCY": "Devise",
-    "TRIAL_DAYS": "Jours d'essai"
+    "TRIAL_DAYS": "Jours d'essai",
+    "MONTH": "mois",
+    "NEXT": "Suivant",
+    "STEP_INFO": "Informations",
+    "STEP_LIMITS": "Limites",
+    "STEP_FEATURES": "Options",
+    "EMPTY_HINT": "Commencez par créer votre premier abonnement",
+    "TARGET_TYPES": {
+      "USER": "Utilisateur",
+      "RESTAURANT": "Restaurant"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menus / jour",
+      "IMAGES_DISH": "Images / plat",
+      "PHOTOS": "Photos profil",
+      "RESTAURANTS": "Restaurants"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Accès Menus & Profils",
+      "SEARCH_GEO": "Recherche & Géo",
+      "MINI_GAMES": "Mini-jeux",
+      "BACKOFFICE": "Back-office complet",
+      "ID_CARD": "Carte ID Premium",
+      "REFERRAL": "Parrainage via code",
+      "DRAWS": "Participation tirages"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "Sans publicité",
+      "PREMIUM_ID_CARD": "Carte ID Premium",
+      "UNLIMITED_GAMES": "Jeux illimités",
+      "ADVANCED_FILTERS": "Filtres avancés",
+      "EXCLUSIVE_OFFERS": "Offres exclusives",
+      "HIGHLIGHT_IN_SEARCH": "Mise en avant"
+    }
   },
   "MENUS": {
     "TITLE": "Gestion des menus"

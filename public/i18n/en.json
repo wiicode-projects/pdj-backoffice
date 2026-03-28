@@ -149,17 +149,51 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Subscription Management",
+    "SUBTITLE": "Manage your subscription plans for users and restaurants",
     "CREATE": "Create subscription",
     "NAME": "Name",
     "DESCRIPTION": "Description",
-    "PRICE": "Price",
+    "PRICE": "Monthly price",
     "TARGET_TYPE": "Target type",
     "PLANS": "Plans",
     "FEATURES": "Features",
     "MEMBERS": "Members",
     "BILLING_PERIOD": "Billing period",
     "CURRENCY": "Currency",
-    "TRIAL_DAYS": "Trial days"
+    "TRIAL_DAYS": "Trial days",
+    "MONTH": "month",
+    "NEXT": "Next",
+    "STEP_INFO": "Information",
+    "STEP_LIMITS": "Limits",
+    "STEP_FEATURES": "Options",
+    "EMPTY_HINT": "Start by creating your first subscription",
+    "TARGET_TYPES": {
+      "USER": "User",
+      "RESTAURANT": "Restaurant"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menus / day",
+      "IMAGES_DISH": "Images / dish",
+      "PHOTOS": "Profile photos",
+      "RESTAURANTS": "Restaurants"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Menus & Profiles Access",
+      "SEARCH_GEO": "Search & Geo",
+      "MINI_GAMES": "Mini Games",
+      "BACKOFFICE": "Full Back-office",
+      "ID_CARD": "Premium ID Card",
+      "REFERRAL": "Referral via code",
+      "DRAWS": "Draws participation"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "No Ads",
+      "PREMIUM_ID_CARD": "Premium ID Card",
+      "UNLIMITED_GAMES": "Unlimited Games",
+      "ADVANCED_FILTERS": "Advanced Filters",
+      "EXCLUSIVE_OFFERS": "Exclusive Offers",
+      "HIGHLIGHT_IN_SEARCH": "Highlight in Search"
+    }
   },
   "MENUS": {
     "TITLE": "Menu Management"

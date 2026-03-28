@@ -167,6 +167,8 @@
     "STEP_LIMITS": "Limits",
     "STEP_FEATURES": "Options",
     "EMPTY_HINT": "Start by creating your first subscription",
+    "DEFAULT": "Default subscription",
+    "COLOR": "Color",
     "TARGET_TYPES": {
       "USER": "User",
       "RESTAURANT": "Restaurant"
@@ -181,6 +183,8 @@
       "ACCESS_MENUS": "Menus & Profiles Access",
       "SEARCH_GEO": "Search & Geo",
       "MINI_GAMES": "Mini Games",
+      "NO_ADS": "No Ads",
+      "ADS": "With Ads",
       "BACKOFFICE": "Full Back-office",
       "ID_CARD": "Premium ID Card",
       "REFERRAL": "Referral via code",
@@ -199,6 +203,17 @@
       "DAYS": "days",
       "NO_PLANS": "No plans defined yet",
       "CREATED": "Created on"
+    },
+    "PLAN": {
+      "ADD": "Add plan",
+      "CREATE_TITLE": "Create a plan",
+      "TYPE": "Plan type",
+      "PERIODS": {
+        "MONTHLY": "Monthly",
+        "QUARTERLY": "Quarterly",
+        "SEMI_ANNUALLY": "Semi-annually",
+        "YEARLY": "Yearly"
+      }
     }
   },
   "MENUS": {

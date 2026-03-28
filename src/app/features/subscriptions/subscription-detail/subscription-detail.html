@@ -36,6 +36,9 @@
           <span class="detail-hero__badge" [class.detail-hero__badge--restaurant]="isRestaurant()">
             {{ 'SUBSCRIPTIONS.TARGET_TYPES.' + subscription.targetType | translate }}
           </span>
+          @if (subscription.isDefault) {
+            <span class="detail-hero__badge detail-hero__badge--default">Par défaut</span>
+          }
           <h1 class="detail-hero__title">{{ subscription.name }}</h1>
           @if (subscription.description) {
             <p class="detail-hero__desc">{{ subscription.description }}</p>
@@ -109,6 +112,11 @@
               <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.MINI_GAMES' | translate }}</span>
               <span class="feat-row__status">{{ subscription.miniGames ? '✓' : '✗' }}</span>
             </div>
+            <div class="feat-row" [class.feat-row--active]="!subscription.hasAdvertisement">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.NO_ADS' | translate }}</span>
+              <span class="feat-row__status">{{ !subscription.hasAdvertisement ? '✓' : '✗' }}</span>
+            </div>
             <div class="feat-row" [class.feat-row--active]="subscription.backOfficeComplet">
               <span class="feat-row__dot"></span>
               <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.BACKOFFICE' | translate }}</span>
@@ -153,13 +161,21 @@
 
       <!-- Plans -->
       <div class="detail-card detail-card--full">
-        <h3 class="detail-card__title">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-            <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M2 8H18" stroke="currentColor" stroke-width="1.5"/>
-          </svg>
-          {{ 'SUBSCRIPTIONS.PLANS' | translate }}
-        </h3>
+        <div class="detail-card__header">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 8H18" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.PLANS' | translate }}
+          </h3>
+          <button class="btn btn--primary btn--sm" (click)="openPlanDialog()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.PLAN.ADD' | translate }}
+          </button>
+        </div>
         @if (subscription.plans && subscription.plans.length > 0) {
           <div class="plans-grid">
             @for (plan of subscription.plans; track plan.id) {
@@ -203,3 +219,78 @@
     </div>
   }
 </div>
+
+<!-- Create Plan Dialog -->
+@if (showPlanDialog) {
+  <div class="dialog-overlay" (click)="closePlanDialog()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <h2>{{ 'SUBSCRIPTIONS.PLAN.CREATE_TITLE' | translate }}</h2>
+        <button class="dialog__close" (click)="closePlanDialog()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="dialog__body" (ngSubmit)="createPlan()">
+        <div class="form-section">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.BILLING_PERIOD' | translate }} *</label>
+              <select class="form-input" [(ngModel)]="newPlan.billingPeriod" name="billingPeriod" required>
+                <option value="">--</option>
+                @for (bp of billingPeriods; track bp) {
+                  <option [value]="bp">{{ 'SUBSCRIPTIONS.PLAN.PERIODS.' + bp | translate }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.CURRENCY' | translate }} *</label>
+              <select class="form-input" [(ngModel)]="newPlan.currency" name="currency" required>
+                <option value="">--</option>
+                @for (c of currencies; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.DETAIL.DISCOUNT' | translate }} (%) *</label>
+              <input class="form-input" type="number" [(ngModel)]="newPlan.discount" name="discount" required min="0" max="100" step="1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.TRIAL_DAYS' | translate }} *</label>
+              <input class="form-input" type="number" [(ngModel)]="newPlan.trialPeriodDays" name="trialPeriodDays" required min="1" />
+            </div>
+          </div>
+        </div>
+
+          @if (planError) {
+            <div class="dialog__error">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              {{ planError }}
+            </div>
+          }
+
+        <div class="dialog__footer">
+          <button type="button" class="btn btn--secondary" (click)="closePlanDialog()">
+            {{ 'COMMON.CANCEL' | translate }}
+          </button>
+          <button type="submit" class="btn btn--primary" [disabled]="creatingPlan || !newPlan.billingPeriod || !newPlan.currency">
+            @if (creatingPlan) {
+              <div class="btn__spinner"></div>
+            }
+            {{ 'COMMON.CREATE' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

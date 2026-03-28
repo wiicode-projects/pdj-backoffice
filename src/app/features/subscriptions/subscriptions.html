@@ -41,8 +41,21 @@
 
   <!-- Cards grid -->
   @if (!loading && subscriptions.length > 0) {
+    <div class="filter-tabs">
+      <button class="filter-tab" [class.filter-tab--active]="targetFilter === ''" (click)="targetFilter = ''">
+        {{ 'COMMON.TOTAL' | translate }}
+        <span class="filter-tab__count">{{ subscriptions.length }}</span>
+      </button>
+      @for (t of targetTypes; track t) {
+        <button class="filter-tab" [class.filter-tab--active]="targetFilter === t" (click)="targetFilter = t">
+          {{ 'SUBSCRIPTIONS.TARGET_TYPES.' + t | translate }}
+          <span class="filter-tab__count">{{ getCountByTarget(t) }}</span>
+        </button>
+      }
+    </div>
+
     <div class="cards-grid">
-      @for (sub of subscriptions; track sub.id) {
+      @for (sub of filteredSubscriptions; track sub.id) {
         <div class="sub-card" [class.sub-card--restaurant]="sub.targetType === 'RESTAURANT'" (click)="navigateToDetail(sub)">
           <!-- Card header -->
           <div class="sub-card__header">
@@ -61,6 +74,9 @@
               }
             </div>
             <span class="sub-card__target">{{ 'SUBSCRIPTIONS.TARGET_TYPES.' + sub.targetType | translate }}</span>
+            @if (sub.isDefault) {
+              <span class="sub-card__default-badge">Par défaut</span>
+            }
           </div>
 
           <h3 class="sub-card__name">{{ sub.name }}</h3>
@@ -107,6 +123,10 @@
               <div class="sub-card__feature" [class.sub-card__feature--active]="sub.miniGames">
                 <span class="sub-card__feature-dot"></span>
                 {{ 'SUBSCRIPTIONS.FEAT.MINI_GAMES' | translate }}
+              </div>
+              <div class="sub-card__feature" [class.sub-card__feature--active]="!sub.hasAdvertisement">
+                <span class="sub-card__feature-dot"></span>
+                {{ 'SUBSCRIPTIONS.FEAT.NO_ADS' | translate }}
               </div>
               <div class="sub-card__feature" [class.sub-card__feature--active]="sub.backOfficeComplet">
                 <span class="sub-card__feature-dot"></span>
@@ -181,7 +201,7 @@
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">{{ 'SUBSCRIPTIONS.PRICE' | translate }} (CHF) *</label>
-                  <input class="form-input" type="number" [(ngModel)]="newSub.monthlyPrice" name="monthlyPrice" required min="1" step="0.5" />
+                  <input class="form-input" type="number" [(ngModel)]="newSub.monthlyPrice" name="monthlyPrice" required min="0" step="0.5" />
                 </div>
                 <div class="form-group">
                   <label class="form-label">{{ 'SUBSCRIPTIONS.TARGET_TYPE' | translate }} *</label>
@@ -193,6 +213,22 @@
                   </select>
                 </div>
               </div>
+
+              <div class="form-group">
+                <label class="form-label">{{ 'SUBSCRIPTIONS.COLOR' | translate }}</label>
+                <div class="color-input">
+                  <input type="color" [(ngModel)]="newSub.color" name="color" class="color-input__picker" />
+                  <input class="form-input color-input__text" type="text" [(ngModel)]="newSub.color" name="colorText" placeholder="#DC2626" />
+                </div>
+              </div>
+
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.DEFAULT' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="newSub.isDefault" name="isDefault" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
 
               <!-- Feature chips: USER only -->
               @if (newSub.targetType === 'USER') {
@@ -263,6 +299,13 @@
                   </span>
                 </label>
                 <label class="form-toggle-row">
+                  <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ADS' | translate }}</span>
+                  <span class="form-toggle">
+                    <input type="checkbox" [(ngModel)]="newSub.hasAdvertisement" name="hasAdvertisement" />
+                    <span class="form-toggle__slider"></span>
+                  </span>
+                </label>
+                <label class="form-toggle-row">
                   <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.BACKOFFICE' | translate }}</span>
                   <span class="form-toggle">
                     <input type="checkbox" [(ngModel)]="newSub.backOfficeComplet" name="backOfficeComplet" />
@@ -291,6 +334,16 @@
                   </span>
                 </label>
               </div>
+            </div>
+          }
+
+          @if (createError) {
+            <div class="dialog__error">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              {{ createError }}
             </div>
           }
 

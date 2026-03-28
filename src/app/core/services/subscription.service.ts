@@ -17,13 +17,33 @@ export enum SubscriptionFeature {
   HIGHLIGHT_IN_SEARCH = 'HIGHLIGHT_IN_SEARCH',
 }
 
+export enum BillingPeriod {
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  SEMI_ANNUALLY = 'SEMI_ANNUALLY',
+  YEARLY = 'YEARLY',
+}
+
+export enum Currency {
+  EUR = 'EUR',
+  CHF = 'CHF',
+}
+
+export enum PlanType {
+  CLASSIQUE = 'Classique',
+  PREMIUM = 'Premium',
+  MULTI = 'Multi',
+}
+
 export interface Subscription {
   id: string;
   name: string;
   description: string;
   price: number;
   isDeleted: boolean;
+  isDefault: boolean;
   targetType: TargetType;
+  color: string | null;
   features: SubscriptionFeature[] | null;
   maxMenusPerDay: number;
   maxImagesPerDish: number;
@@ -32,6 +52,7 @@ export interface Subscription {
   accessMenusAndProfils: boolean;
   rechercheAndGeo: boolean;
   miniGames: boolean;
+  hasAdvertisement: boolean;
   backOfficeComplet: boolean;
   idCardPremium: boolean;
   parrainageViaCode: boolean;
@@ -58,6 +79,7 @@ export interface CreateSubscriptionDto {
   description: string;
   monthlyPrice: number;
   targetType: TargetType;
+  color?: string;
   features?: SubscriptionFeature[];
   maxMenusPerDay: number;
   maxImagesPerDish: number;
@@ -66,10 +88,20 @@ export interface CreateSubscriptionDto {
   accessMenusAndProfils?: boolean;
   rechercheAndGeo?: boolean;
   miniGames?: boolean;
+  hasAdvertisement?: boolean;
   backOfficeComplet?: boolean;
   idCardPremium?: boolean;
   parrainageViaCode?: boolean;
   participationTirages?: boolean;
+  isDefault?: boolean;
+}
+
+export interface CreatePlanDto {
+  discount: number;
+  trialPeriodDays: number;
+  billingPeriod: BillingPeriod;
+  currency: Currency;
+  type?: PlanType;
 }
 
 @Injectable({
@@ -90,6 +122,10 @@ export class SubscriptionService {
 
   create(dto: CreateSubscriptionDto): Observable<{ status: number; subscription: Subscription }> {
     return this.http.post<{ status: number; subscription: Subscription }>(this.apiUrl, dto);
+  }
+
+  createPlan(subscriptionId: string, dto: CreatePlanDto): Observable<{ status: number; plan: SubscriptionPlan }> {
+    return this.http.post<{ status: number; plan: SubscriptionPlan }>(`${this.apiUrl}/${subscriptionId}/plans`, dto);
   }
 
   update(id: string, dto: Partial<CreateSubscriptionDto>): Observable<Subscription> {

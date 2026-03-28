@@ -167,6 +167,8 @@
     "STEP_LIMITS": "Limites",
     "STEP_FEATURES": "Options",
     "EMPTY_HINT": "Commencez par créer votre premier abonnement",
+    "DEFAULT": "Abonnement par défaut",
+    "COLOR": "Couleur",
     "TARGET_TYPES": {
       "USER": "Utilisateur",
       "RESTAURANT": "Restaurant"
@@ -181,6 +183,8 @@
       "ACCESS_MENUS": "Accès Menus & Profils",
       "SEARCH_GEO": "Recherche & Géo",
       "MINI_GAMES": "Mini-jeux",
+      "NO_ADS": "Sans publicité",
+      "ADS": "Avec publicité",
       "BACKOFFICE": "Back-office complet",
       "ID_CARD": "Carte ID Premium",
       "REFERRAL": "Parrainage via code",
@@ -199,6 +203,17 @@
       "DAYS": "jours",
       "NO_PLANS": "Aucun plan défini pour le moment",
       "CREATED": "Créé le"
+    },
+    "PLAN": {
+      "ADD": "Ajouter un plan",
+      "CREATE_TITLE": "Créer un plan",
+      "TYPE": "Type de plan",
+      "PERIODS": {
+        "MONTHLY": "Mensuel",
+        "QUARTERLY": "Trimestriel",
+        "SEMI_ANNUALLY": "Semestriel",
+        "YEARLY": "Annuel"
+      }
     }
   },
   "MENUS": {

@@ -149,17 +149,72 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Gestione abbonamenti",
+    "SUBTITLE": "Gestisci le offerte di abbonamento per utenti e ristoranti",
     "CREATE": "Creare abbonamento",
     "NAME": "Nome",
     "DESCRIPTION": "Descrizione",
-    "PRICE": "Prezzo",
+    "PRICE": "Prezzo mensile",
     "TARGET_TYPE": "Tipo di destinazione",
     "PLANS": "Piani",
     "FEATURES": "Funzionalità",
     "MEMBERS": "Membri",
     "BILLING_PERIOD": "Periodo di fatturazione",
     "CURRENCY": "Valuta",
-    "TRIAL_DAYS": "Giorni di prova"
+    "TRIAL_DAYS": "Giorni di prova",
+    "MONTH": "mese",
+    "NEXT": "Avanti",
+    "STEP_INFO": "Informazioni",
+    "STEP_LIMITS": "Limiti",
+    "STEP_FEATURES": "Opzioni",
+    "EMPTY_HINT": "Inizia creando il tuo primo abbonamento",
+    "DEFAULT": "Abbonamento predefinito",
+    "COLOR": "Colore",
+    "TARGET_TYPES": {
+      "USER": "Utente",
+      "RESTAURANT": "Ristorante"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menù / giorno",
+      "IMAGES_DISH": "Immagini / piatto",
+      "PHOTOS": "Foto profilo",
+      "RESTAURANTS": "Ristoranti"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Accesso Menù e Profili",
+      "SEARCH_GEO": "Ricerca e Geo",
+      "MINI_GAMES": "Mini giochi",
+      "NO_ADS": "Senza pubblicità",
+      "ADS": "Con pubblicità",
+      "BACKOFFICE": "Back-office completo",
+      "ID_CARD": "Tessera ID Premium",
+      "REFERRAL": "Referral tramite codice",
+      "DRAWS": "Partecipazione estrazioni"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "Senza pubblicità",
+      "PREMIUM_ID_CARD": "Tessera ID Premium",
+      "UNLIMITED_GAMES": "Giochi illimitati",
+      "ADVANCED_FILTERS": "Filtri avanzati",
+      "EXCLUSIVE_OFFERS": "Offerte esclusive",
+      "HIGHLIGHT_IN_SEARCH": "In evidenza nella ricerca"
+    },
+    "DETAIL": {
+      "DISCOUNT": "Sconto",
+      "DAYS": "giorni",
+      "NO_PLANS": "Nessun piano definito al momento",
+      "CREATED": "Creato il"
+    },
+    "PLAN": {
+      "ADD": "Aggiungi piano",
+      "CREATE_TITLE": "Crea un piano",
+      "TYPE": "Tipo di piano",
+      "PERIODS": {
+        "MONTHLY": "Mensile",
+        "QUARTERLY": "Trimestrale",
+        "SEMI_ANNUALLY": "Semestrale",
+        "YEARLY": "Annuale"
+      }
+    }
   },
   "MENUS": {
     "TITLE": "Gestione menù"

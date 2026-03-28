@@ -155,6 +155,11 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
       color: $accent-blue;
       background: $accent-blue-light;
     }
+
+    &--default {
+      color: $success;
+      background: $success-light;
+    }
   }
 
   &__title {
@@ -457,6 +462,239 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     color: $text-light;
   }
 }
+
+// ==============================
+// CARD HEADER
+// ==============================
+.detail-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+
+  .detail-card__title {
+    margin: 0;
+  }
+}
+
+// ==============================
+// DIALOG
+// ==============================
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.dialog {
+  background: $card-bg;
+  border-radius: $radius-xl;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+  animation: dialogIn 0.3s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px 0;
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: $border-light;
+    border-radius: 50%;
+    cursor: pointer;
+    color: $text-medium;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $border;
+      color: $text-dark;
+    }
+  }
+
+  &__body {
+    padding: 20px 28px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 28px 24px;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 28px;
+    padding: 10px 14px;
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.4;
+    animation: fadeIn 0.2s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// ==============================
+// FORM
+// ==============================
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  font-family: $font;
+  color: $text-dark;
+  background: $card-bg;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $primary-light;
+  }
+
+  &::placeholder {
+    color: $text-light;
+  }
+}
+
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+// ==============================
+// BUTTONS
+// ==============================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: $font;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+
+  &--primary {
+    background: $primary;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: $primary-dark;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &--secondary {
+    background: $card-bg;
+    border: 1px solid $border;
+    color: $text-medium;
+
+    &:hover {
+      background: $border-light;
+      color: $text-dark;
+    }
+  }
+
+  &--sm {
+    padding: 7px 14px;
+    font-size: 0.78rem;
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+}
+
 
 // ==============================
 // ANIMATIONS

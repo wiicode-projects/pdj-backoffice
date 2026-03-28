@@ -176,6 +176,95 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 // ==============================
+// COLOR INPUT
+// ==============================
+.color-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &__picker {
+    width: 40px;
+    height: 40px;
+    border: 2px solid $border;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    padding: 2px;
+    background: $card-bg;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: #D1D5DB;
+    }
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 4px;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    font-family: monospace;
+    letter-spacing: 0.02em;
+  }
+}
+
+// ==============================
+// FILTER TABS
+// ==============================
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.filter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid $border;
+  border-radius: 20px;
+  background: $card-bg;
+  color: $text-medium;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: $font;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #D1D5DB;
+    color: $text-dark;
+  }
+
+  &--active {
+    background: $primary;
+    border-color: $primary;
+    color: white;
+
+    .filter-tab__count {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+  }
+
+  &__count {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: $border-light;
+    color: $text-light;
+    padding: 2px 8px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+}
+
+// ==============================
 // CARDS GRID
 // ==============================
 .cards-grid {
@@ -278,6 +367,18 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     background: $primary-light;
     padding: 4px 10px;
     border-radius: 20px;
+  }
+
+  &__default-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $success;
+    background: $success-light;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-left: auto;
   }
 
   &__name {
@@ -486,6 +587,26 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     border-top: 1px solid $border;
     background: $border-light;
     border-radius: 0 0 $radius-xl $radius-xl;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 24px;
+    padding: 10px 14px;
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    border-radius: $radius-sm;
+    color: $primary;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.4;
+    animation: fadeIn 0.2s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
   }
 }
 

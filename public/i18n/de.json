@@ -149,17 +149,72 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Abonnementverwaltung",
+    "SUBTITLE": "Verwalten Sie Ihre Abonnementangebote für Benutzer und Restaurants",
     "CREATE": "Abonnement erstellen",
     "NAME": "Name",
     "DESCRIPTION": "Beschreibung",
-    "PRICE": "Preis",
+    "PRICE": "Monatspreis",
     "TARGET_TYPE": "Zieltyp",
     "PLANS": "Pläne",
     "FEATURES": "Funktionen",
     "MEMBERS": "Mitglieder",
     "BILLING_PERIOD": "Abrechnungszeitraum",
     "CURRENCY": "Währung",
-    "TRIAL_DAYS": "Testtage"
+    "TRIAL_DAYS": "Testtage",
+    "MONTH": "Monat",
+    "NEXT": "Weiter",
+    "STEP_INFO": "Informationen",
+    "STEP_LIMITS": "Limits",
+    "STEP_FEATURES": "Optionen",
+    "EMPTY_HINT": "Erstellen Sie Ihr erstes Abonnement",
+    "DEFAULT": "Standardabonnement",
+    "COLOR": "Farbe",
+    "TARGET_TYPES": {
+      "USER": "Benutzer",
+      "RESTAURANT": "Restaurant"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menüs / Tag",
+      "IMAGES_DISH": "Bilder / Gericht",
+      "PHOTOS": "Profilfotos",
+      "RESTAURANTS": "Restaurants"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Menüs & Profile Zugang",
+      "SEARCH_GEO": "Suche & Geo",
+      "MINI_GAMES": "Minispiele",
+      "NO_ADS": "Ohne Werbung",
+      "ADS": "Mit Werbung",
+      "BACKOFFICE": "Vollständiges Back-office",
+      "ID_CARD": "Premium-Ausweis",
+      "REFERRAL": "Empfehlung per Code",
+      "DRAWS": "Teilnahme an Verlosungen"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "Ohne Werbung",
+      "PREMIUM_ID_CARD": "Premium-Ausweis",
+      "UNLIMITED_GAMES": "Unbegrenzte Spiele",
+      "ADVANCED_FILTERS": "Erweiterte Filter",
+      "EXCLUSIVE_OFFERS": "Exklusive Angebote",
+      "HIGHLIGHT_IN_SEARCH": "Hervorhebung in der Suche"
+    },
+    "DETAIL": {
+      "DISCOUNT": "Rabatt",
+      "DAYS": "Tage",
+      "NO_PLANS": "Noch keine Pläne definiert",
+      "CREATED": "Erstellt am"
+    },
+    "PLAN": {
+      "ADD": "Plan hinzufügen",
+      "CREATE_TITLE": "Plan erstellen",
+      "TYPE": "Plantyp",
+      "PERIODS": {
+        "MONTHLY": "Monatlich",
+        "QUARTERLY": "Vierteljährlich",
+        "SEMI_ANNUALLY": "Halbjährlich",
+        "YEARLY": "Jährlich"
+      }
+    }
   },
   "MENUS": {
     "TITLE": "Menüverwaltung"

@@ -23,13 +23,20 @@ export class Subscriptions implements OnInit {
   subscriptions: Subscription[] = [];
   loading = false;
   creating = false;
+  createError = '';
   showCreateDialog = false;
   currentStep = 1;
 
   targetTypes = Object.values(TargetType);
   allFeatures = Object.values(SubscriptionFeature);
+  targetFilter: string = '';
 
   newSub: CreateSubscriptionDto = this.getEmptySubscription();
+
+  get filteredSubscriptions(): Subscription[] {
+    if (!this.targetFilter) return this.subscriptions;
+    return this.subscriptions.filter(s => s.targetType === this.targetFilter);
+  }
 
   constructor(
     private subscriptionService: SubscriptionService,
@@ -84,6 +91,8 @@ export class Subscriptions implements OnInit {
         },
         error: (err) => {
           console.error('Failed to create subscription:', err);
+          this.createError = err.error?.message || 'Une erreur est survenue lors de la création.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -111,6 +120,10 @@ export class Subscriptions implements OnInit {
     return 'SUBSCRIPTIONS.STEP_FEATURES';
   }
 
+  getCountByTarget(targetType: string): number {
+    return this.subscriptions.filter(s => s.targetType === targetType).length;
+  }
+
   navigateToDetail(sub: Subscription): void {
     this.router.navigate(['/app/subscriptions', sub.id]);
   }
@@ -118,6 +131,7 @@ export class Subscriptions implements OnInit {
   closeDialog(): void {
     this.showCreateDialog = false;
     this.currentStep = 1;
+    this.createError = '';
     this.newSub = this.getEmptySubscription();
   }
 
@@ -135,10 +149,12 @@ export class Subscriptions implements OnInit {
       accessMenusAndProfils: false,
       rechercheAndGeo: false,
       miniGames: false,
+      hasAdvertisement: true,
       backOfficeComplet: false,
       idCardPremium: false,
       parrainageViaCode: false,
       participationTirages: false,
+      isDefault: false,
     };
   }
 }

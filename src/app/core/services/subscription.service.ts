@@ -134,8 +134,8 @@ export class SubscriptionService {
     return this.http.post<{ status: number; plan: SubscriptionPlan }>(`${this.apiUrl}/${subscriptionId}/plans`, dto);
   }
 
-  update(id: string, dto: Partial<CreateSubscriptionDto>): Observable<Subscription> {
-    return this.http.patch<Subscription>(`${this.apiUrl}/${id}`, dto);
+  update(id: string, dto: Partial<CreateSubscriptionDto>): Observable<{ status: number; subscription: Subscription }> {
+    return this.http.patch<{ status: number; subscription: Subscription }>(`${this.apiUrl}/${id}`, dto);
   }
 
   delete(id: string): Observable<void> {

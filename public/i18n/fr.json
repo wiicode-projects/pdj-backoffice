@@ -201,6 +201,12 @@
       "EXCLUSIVE_OFFERS": "Offres exclusives",
       "HIGHLIGHT_IN_SEARCH": "Mise en avant"
     },
+    "EDIT_TITLE": "Modifier l'abonnement",
+    "DELETE_TITLE": "Supprimer l'abonnement",
+    "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer cet abonnement ?",
+    "DELETE_WARNING": "Cette action est irréversible. Tous les plans associés seront également supprimés.",
+    "UPDATE_SUCCESS": "Abonnement mis à jour avec succès",
+    "DELETE_SUCCESS": "Abonnement supprimé avec succès",
     "DETAIL": {
       "DISCOUNT": "Réduction",
       "DAYS": "jours",

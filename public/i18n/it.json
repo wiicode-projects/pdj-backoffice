@@ -201,6 +201,12 @@
       "EXCLUSIVE_OFFERS": "Offerte esclusive",
       "HIGHLIGHT_IN_SEARCH": "In evidenza nella ricerca"
     },
+    "EDIT_TITLE": "Modifica abbonamento",
+    "DELETE_TITLE": "Elimina abbonamento",
+    "DELETE_CONFIRM": "Sei sicuro di voler eliminare questo abbonamento?",
+    "DELETE_WARNING": "Questa azione è irreversibile. Tutti i piani associati verranno eliminati.",
+    "UPDATE_SUCCESS": "Abbonamento aggiornato con successo",
+    "DELETE_SUCCESS": "Abbonamento eliminato con successo",
     "DETAIL": {
       "DISCOUNT": "Sconto",
       "DAYS": "giorni",

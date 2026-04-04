@@ -201,6 +201,12 @@
       "EXCLUSIVE_OFFERS": "Exklusive Angebote",
       "HIGHLIGHT_IN_SEARCH": "Hervorhebung in der Suche"
     },
+    "EDIT_TITLE": "Abonnement bearbeiten",
+    "DELETE_TITLE": "Abonnement löschen",
+    "DELETE_CONFIRM": "Sind Sie sicher, dass Sie dieses Abonnement löschen möchten?",
+    "DELETE_WARNING": "Diese Aktion ist unwiderruflich. Alle zugehörigen Pläne werden ebenfalls gelöscht.",
+    "UPDATE_SUCCESS": "Abonnement erfolgreich aktualisiert",
+    "DELETE_SUCCESS": "Abonnement erfolgreich gelöscht",
     "DETAIL": {
       "DISCOUNT": "Rabatt",
       "DAYS": "Tage",

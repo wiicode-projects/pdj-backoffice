@@ -14,6 +14,7 @@ $border-color: #E5E7EB;
     font-weight: 700;
     color: $text-dark;
     margin-bottom: 24px;
+    animation: fadeSlideDown 0.5s ease both;
   }
 
   // KPI Cards
@@ -49,8 +50,78 @@ $border-color: #E5E7EB;
   padding: 20px 0;
 }
 
+// ==============================
+// ANIMATIONS
+// ==============================
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iconPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes tableSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 // ==============================
@@ -64,11 +135,54 @@ $border-color: #E5E7EB;
   align-items: center;
   gap: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+
+  // Staggered entrance animation
+  animation: cardSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+
+  // Subtle shimmer accent line at top
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent
+    );
+    background-size: 200% 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    &::before {
+      opacity: 1;
+      animation: shimmer 1.5s ease infinite;
+    }
+
+    .kpi-card__icon {
+      transform: scale(1.1) rotate(-4deg);
+    }
+
+    .kpi-card__value {
+      transform: scale(1.05);
+    }
   }
 
   &__icon {
@@ -79,6 +193,14 @@ $border-color: #E5E7EB;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    @for $i from 1 through 4 {
+      .kpi-card:nth-child(#{$i}) & {
+        animation-delay: #{0.15 + $i * 0.1}s;
+      }
+    }
   }
 
   &__content {
@@ -91,6 +213,8 @@ $border-color: #E5E7EB;
     font-weight: 700;
     color: $text-dark;
     line-height: 1.2;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: left center;
   }
 
   &__label {
@@ -114,6 +238,20 @@ $border-color: #E5E7EB;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  animation: tableSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: box-shadow 0.25s ease;
+
+  &:nth-child(1) {
+    animation-delay: 0.5s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.65s;
+  }
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
 
   &__header {
     display: flex;
@@ -158,6 +296,23 @@ $border-color: #E5E7EB;
     white-space: nowrap;
   }
 
+  // Row staggered fade-in
+  tbody tr {
+    animation: rowFadeIn 0.35s ease both;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{0.6 + $i * 0.05}s;
+      }
+    }
+
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: rgba($border-color, 0.25);
+    }
+  }
+
   tr:last-child td {
     border-bottom: none;
   }
@@ -187,6 +342,11 @@ $border-color: #E5E7EB;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 
   &--admin {
     background: rgba($primary-red, 0.1);

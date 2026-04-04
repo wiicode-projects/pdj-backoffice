@@ -10,7 +10,7 @@
   @if (!loading) {
     <!-- KPI Cards -->
     <div class="dashboard__kpis">
-      @for (card of kpiCards; track card.labelKey) {
+      @for (card of kpiCards; track card.labelKey; let i = $index) {
         <div class="kpi-card">
           <div class="kpi-card__icon" [style.background]="card.color + '14'" [style.color]="card.color">
             @switch (card.icon) {
@@ -43,7 +43,7 @@
             }
           </div>
           <div class="kpi-card__content">
-            <span class="kpi-card__value">{{ card.value }}</span>
+            <span class="kpi-card__value">{{ animatedValues[i] }}</span>
             <span class="kpi-card__label">{{ card.labelKey | translate }}</span>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
@@ -25,6 +25,7 @@ interface KpiCard {
 })
 export class Dashboard implements OnInit {
   loading = true;
+  animatedValues: number[] = [0, 0, 0, 0];
 
   kpiCards: KpiCard[] = [
     { icon: 'users', labelKey: 'DASHBOARD.TOTAL_USERS', value: 0, color: '#3B82F6' },
@@ -61,6 +62,8 @@ export class Dashboard implements OnInit {
           this.recentUsers = data.recentUsers;
           this.recentRestaurants = data.recentRestaurants;
           this.cdr.detectChanges();
+          // Trigger count-up animation after data loads
+          this.animateCountUp();
         },
         error: (err) => {
           console.error('Failed to load dashboard:', err);
@@ -78,5 +81,31 @@ export class Dashboard implements OnInit {
       case 'RESTAURANT': return 'badge--restaurant';
       default: return 'badge--user';
     }
+  }
+
+  private animateCountUp(): void {
+    const duration = 1200;
+    const startTime = performance.now();
+
+    const easeOutExpo = (t: number): number => {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    };
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutExpo(progress);
+
+      this.animatedValues = this.kpiCards.map(card =>
+        Math.round(eased * card.value)
+      );
+      this.cdr.detectChanges();
+
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      }
+    };
+
+    requestAnimationFrame(tick);
   }
 }

@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideTranslateHttpLoader({
       prefix: './i18n/',
-      suffix: '.json',
+      suffix: `.json?v=${Date.now()}`,
     }),
     provideTranslateService({
       defaultLanguage: 'fr',

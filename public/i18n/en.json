@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "User Management",
+    "SUBTITLE": "Users registered on the platform",
     "CREATE": "Create user",
     "EDIT": "Edit user",
     "FIRST_NAME": "First name",
@@ -104,14 +105,44 @@
     "PHONE": "Phone",
     "ROLE": "Role",
     "LANGUAGE": "Language",
+    "ADDRESS": "Address",
     "CREATED_AT": "Created at",
+    "VERIFIED": "Verified",
+    "UNVERIFIED": "Unverified",
+    "EMPTY_HINT": "No users found for selected filters",
+    "SEARCH_PLACEHOLDER": "Search by name or email...",
     "DELETE_CONFIRM": "Are you sure you want to delete this user?",
     "CREATE_SUCCESS": "User created successfully",
     "UPDATE_SUCCESS": "User updated successfully",
-    "DELETE_SUCCESS": "User deleted successfully"
+    "DELETE_SUCCESS": "User deleted successfully",
+    "KPI": {
+      "TOTAL": "Total users",
+      "ACTIVE": "Active",
+      "VERIFIED": "Verified emails",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "User",
+      "CONTACT": "Phone",
+      "STATUS": "Status",
+      "SUBSCRIPTION": "Subscription",
+      "REGISTERED": "Registered"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Free"
+    },
+    "PANEL": {
+      "STATUS": "Account status",
+      "INFOS": "Information",
+      "SUBSCRIPTION": "Subscription",
+      "EXPIRES": "Expires on",
+      "NO_SUBSCRIPTION": "No active subscription"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Restaurant Management",
+    "SUBTITLE": "Main restaurants registered on the platform",
     "CREATE": "Create restaurant",
     "EDIT": "Edit restaurant",
     "ONBOARDING": "Onboard restaurant",
@@ -121,11 +152,40 @@
     "ADDRESS": "Address",
     "RESERVATION_ENABLED": "Reservation enabled",
     "LOCATIONS": "Locations",
-    "OWNER": "Owner",
+    "OWNER": "Booking contact",
+    "EMPTY_HINT": "No restaurants found for selected filters",
+    "SEARCH_PLACEHOLDER": "Search by name or city...",
     "DELETE_CONFIRM": "Are you sure you want to delete this restaurant?",
     "CREATE_SUCCESS": "Restaurant created successfully",
     "UPDATE_SUCCESS": "Restaurant updated successfully",
-    "DELETE_SUCCESS": "Restaurant deleted successfully"
+    "DELETE_SUCCESS": "Restaurant deleted successfully",
+    "TYPE": {
+      "FIXED": "Fixed",
+      "ITINERANT": "Itinerant"
+    },
+    "KPI": {
+      "TOTAL": "Total restaurants",
+      "PREMIUM": "Premium subscribers",
+      "ITINERANT": "Itinerant",
+      "BRANCHES": "Branches",
+      "VIEWS": "Views",
+      "CLICKS": "Clicks"
+    },
+    "TABLE": {
+      "RESTAURANT": "Restaurant",
+      "CITY": "City",
+      "TYPE": "Type",
+      "SUBSCRIPTION": "Subscription",
+      "VIEWS": "Views",
+      "BRANCHES": "Branches"
+    },
+    "PANEL": {
+      "INFOS": "Information",
+      "SUBSCRIPTION": "Subscription",
+      "BRANCHES": "Branches",
+      "NO_SUBSCRIPTION": "No active subscription",
+      "NO_BRANCHES": "No branches"
+    }
   },
   "DISHES": {
     "TITLE": "Dish Management",

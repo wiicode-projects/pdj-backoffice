@@ -1,0 +1,379 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="page__header">
+    <div>
+      <h1 class="page__title">{{ 'RESTAURANTS.TITLE' | translate }}</h1>
+      <p class="page__subtitle">{{ 'RESTAURANTS.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--orange">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 3V12C3 13.1 3.9 14 5 14H9V21H11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 3V9C16 10.1 16.9 11 18 11H19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ allRestaurants.length }}</span>
+        <span class="kpi-card__label">{{ 'RESTAURANTS.KPI.TOTAL' | translate }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ totalPremium }}</span>
+        <span class="kpi-card__label">{{ 'RESTAURANTS.KPI.PREMIUM' | translate }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--blue">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ totalItinerant }}</span>
+        <span class="kpi-card__label">{{ 'RESTAURANTS.KPI.ITINERANT' | translate }}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ totalBranches }}</span>
+        <span class="kpi-card__label">{{ 'RESTAURANTS.KPI.BRANCHES' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg class="search-box__icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        class="search-box__input"
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="{{ 'RESTAURANTS.SEARCH_PLACEHOLDER' | translate }}"
+      />
+      @if (searchQuery) {
+        <button class="search-box__clear" (click)="searchQuery = ''">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-tab" [class.filter-tab--active]="typeFilter === 'all'" (click)="typeFilter = 'all'">
+        {{ 'COMMON.TOTAL' | translate }}
+        <span class="filter-tab__count">{{ allRestaurants.length }}</span>
+      </button>
+      <button class="filter-tab" [class.filter-tab--active]="typeFilter === 'FIXED'" (click)="typeFilter = 'FIXED'">
+        {{ 'RESTAURANTS.TYPE.FIXED' | translate }}
+        <span class="filter-tab__count">{{ totalFixed }}</span>
+      </button>
+      <button class="filter-tab filter-tab--itinerant" [class.filter-tab--active]="typeFilter === 'ITINERANT'" (click)="typeFilter = 'ITINERANT'">
+        {{ 'RESTAURANTS.TYPE.ITINERANT' | translate }}
+        <span class="filter-tab__count">{{ totalItinerant }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && filteredRestaurants.length === 0) {
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path d="M5 5V20C5 21.8 6.5 23.3 8.3 23.3H15V35H18.3V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M26.7 5V15C26.7 16.8 28.2 18.3 30 18.3H31.7V35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M31.7 5V18.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>{{ 'COMMON.NO_DATA' | translate }}</h3>
+      <p>{{ 'RESTAURANTS.EMPTY_HINT' | translate }}</p>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!loading && filteredRestaurants.length > 0) {
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'RESTAURANTS.TABLE.RESTAURANT' | translate }}</th>
+            <th>{{ 'RESTAURANTS.TABLE.CITY' | translate }}</th>
+            <th>{{ 'RESTAURANTS.TABLE.TYPE' | translate }}</th>
+            <th>{{ 'RESTAURANTS.TABLE.SUBSCRIPTION' | translate }}</th>
+            <th>{{ 'RESTAURANTS.TABLE.VIEWS' | translate }}</th>
+            <th>{{ 'RESTAURANTS.TABLE.BRANCHES' | translate }}</th>
+            <th>{{ 'USERS.CREATED_AT' | translate }}</th>
+            <th>{{ 'COMMON.ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of filteredRestaurants; track r.id) {
+            <tr class="data-table__row" (click)="openPanel(r)">
+
+              <!-- Name + image -->
+              <td>
+                <div class="resto-cell">
+                  <div class="resto-img" [class.resto-img--placeholder]="!getImageUrl(r)">
+                    @if (getImageUrl(r)) {
+                      <img [src]="getImageUrl(r)" [alt]="r.name" />
+                    } @else {
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 3V12C3 13.1 3.9 14 5 14H9V21H11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M16 3V9C16 10.1 16.9 11 18 11H19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    }
+                  </div>
+                  <span class="resto-cell__name">{{ r.name }}</span>
+                </div>
+              </td>
+
+              <!-- City -->
+              <td><span class="text-secondary">{{ r.city || '—' }}</span></td>
+
+              <!-- Type -->
+              <td>
+                <span class="type-badge" [class.type-badge--itinerant]="r.type === 'ITINERANT'">
+                  {{ 'RESTAURANTS.TYPE.' + r.type | translate }}
+                </span>
+              </td>
+
+              <!-- Subscription -->
+              <td>
+                <div class="sub-cell">
+                  <span class="sub-cell__name" [class.sub-cell__name--none]="!r.membership">
+                    {{ r.membership?.subscription?.name || '—' }}
+                  </span>
+                  @if (r.membership) {
+                    <span class="sub-pill" [class.sub-pill--active]="getMembershipStatus(r) === 'active'" [class.sub-pill--inactive]="getMembershipStatus(r) === 'inactive'">
+                      {{ getMembershipStatus(r) === 'active' ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                    </span>
+                  }
+                </div>
+              </td>
+
+              <!-- Views -->
+              <td>
+                <div class="metric-cell">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                  <span>{{ r.viewCount }}</span>
+                </div>
+              </td>
+
+              <!-- Branches -->
+              <td>
+                @if (getBranchCount(r) > 0) {
+                  <span class="branch-badge">{{ getBranchCount(r) }}</span>
+                } @else {
+                  <span class="text-secondary">—</span>
+                }
+              </td>
+
+              <!-- Date -->
+              <td><span class="text-secondary">{{ r.createdAt | date:'dd/MM/yyyy' }}</span></td>
+
+              <!-- Actions -->
+              <td (click)="$event.stopPropagation()">
+                @if (confirmDeleteId !== r.id) {
+                  <button class="action-btn action-btn--danger" (click)="askDelete(r.id, $event)" title="Supprimer">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                      <path d="M2 4H13M5 4V3C5 2.4 5.4 2 6 2H9C9.6 2 10 2.4 10 3V4M11 4L10.5 12C10.5 12.6 10 13 9.4 13H5.6C5 13 4.5 12.6 4.5 12L4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                } @else {
+                  <div class="confirm-delete">
+                    <span>{{ 'COMMON.CONFIRM' | translate }} ?</span>
+                    <button class="action-btn action-btn--danger-confirm" [disabled]="deleting" (click)="confirmDelete(r.id)">{{ 'COMMON.YES' | translate }}</button>
+                    <button class="action-btn action-btn--cancel" (click)="cancelDelete()">{{ 'COMMON.NO' | translate }}</button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Side Panel -->
+  @if (panelOpen && selectedRestaurant) {
+    <div class="panel-overlay" (click)="closePanel()">
+      <aside class="panel" (click)="$event.stopPropagation()">
+
+        <div class="panel__header">
+          <div class="panel__img" [class.panel__img--placeholder]="!getImageUrl(selectedRestaurant)">
+            @if (getImageUrl(selectedRestaurant)) {
+              <img [src]="getImageUrl(selectedRestaurant)" [alt]="selectedRestaurant.name" />
+            } @else {
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 3V12C3 13.1 3.9 14 5 14H9V21H11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M16 3V9C16 10.1 16.9 11 18 11H19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            }
+          </div>
+          <div class="panel__title-group">
+            <h2 class="panel__name">{{ selectedRestaurant.name }}</h2>
+            <span class="type-badge" [class.type-badge--itinerant]="selectedRestaurant.type === 'ITINERANT'">
+              {{ 'RESTAURANTS.TYPE.' + selectedRestaurant.type | translate }}
+            </span>
+          </div>
+          <button class="panel__close" (click)="closePanel()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="panel__body">
+
+          <!-- Info -->
+          <div class="panel__section">
+            <p class="panel__section-title">{{ 'RESTAURANTS.PANEL.INFOS' | translate }}</p>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-row__label">{{ 'RESTAURANTS.CITY' | translate }}</span>
+                <span class="info-row__value">{{ selectedRestaurant.city || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">{{ 'RESTAURANTS.ADDRESS' | translate }}</span>
+                <span class="info-row__value">{{ selectedRestaurant.address || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">{{ 'RESTAURANTS.KPI.VIEWS' | translate }}</span>
+                <span class="info-row__value">{{ selectedRestaurant.viewCount }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">{{ 'RESTAURANTS.KPI.CLICKS' | translate }}</span>
+                <span class="info-row__value">{{ selectedRestaurant.clickCount }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">{{ 'RESTAURANTS.RESERVATION_ENABLED' | translate }}</span>
+                <span class="info-row__value">
+                  {{ selectedRestaurant.reservationEnabled ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}
+                </span>
+              </div>
+              @if (selectedRestaurant.reservationEnabled && selectedRestaurant.bookingContact) {
+                <div class="info-row">
+                  <span class="info-row__label">{{ 'RESTAURANTS.OWNER' | translate }}</span>
+                  <span class="info-row__value">{{ selectedRestaurant.bookingContact }}</span>
+                </div>
+              }
+              <div class="info-row">
+                <span class="info-row__label">{{ 'USERS.CREATED_AT' | translate }}</span>
+                <span class="info-row__value">{{ selectedRestaurant.createdAt | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription -->
+          <div class="panel__section">
+            <p class="panel__section-title">{{ 'RESTAURANTS.PANEL.SUBSCRIPTION' | translate }}</p>
+            @if (selectedRestaurant.membership) {
+              <div class="sub-detail">
+                <div class="sub-detail__name">{{ selectedRestaurant.membership.subscription?.name || '—' }}</div>
+                <span class="sub-pill" [class.sub-pill--active]="selectedRestaurant.membership.isActive" [class.sub-pill--inactive]="!selectedRestaurant.membership.isActive">
+                  {{ selectedRestaurant.membership.isActive ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                </span>
+                @if (selectedRestaurant.membership.endingAt) {
+                  <div class="sub-detail__expires">
+                    {{ 'USERS.PANEL.EXPIRES' | translate }} {{ selectedRestaurant.membership.endingAt | date:'dd/MM/yyyy' }}
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="panel__empty-hint">{{ 'RESTAURANTS.PANEL.NO_SUBSCRIPTION' | translate }}</p>
+            }
+          </div>
+
+          <!-- Branches -->
+          <div class="panel__section">
+            <p class="panel__section-title">
+              {{ 'RESTAURANTS.PANEL.BRANCHES' | translate }}
+              @if (getBranchCount(selectedRestaurant) > 0) {
+                <span class="branch-badge branch-badge--sm">{{ getBranchCount(selectedRestaurant) }}</span>
+              }
+            </p>
+            @if (getBranchCount(selectedRestaurant) === 0) {
+              <p class="panel__empty-hint">{{ 'RESTAURANTS.PANEL.NO_BRANCHES' | translate }}</p>
+            } @else {
+              <div class="branches-list">
+                @for (branch of selectedRestaurant.branches; track branch.id) {
+                  <div class="branch-item">
+                    <div class="branch-item__dot"></div>
+                    <div class="branch-item__info">
+                      <span class="branch-item__name">{{ branch.name }}</span>
+                      @if (branch.city) {
+                        <span class="branch-item__city">{{ branch.city }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="panel__footer">
+          @if (confirmDeleteId !== selectedRestaurant.id) {
+            <button class="btn btn--danger-outline" (click)="askDelete(selectedRestaurant.id, $event)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 4.5H14M5.5 4.5V3.5C5.5 3 5.9 2.5 6.5 2.5H9.5C10.1 2.5 10.5 3 10.5 3.5V4.5M12 4.5L11.4 13C11.4 13.6 10.9 14 10.3 14H5.7C5.1 14 4.6 13.6 4.6 13L4 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              {{ 'COMMON.DELETE' | translate }}
+            </button>
+          } @else {
+            <div class="confirm-bar">
+              <span>{{ 'RESTAURANTS.DELETE_CONFIRM' | translate }}</span>
+              <div class="confirm-bar__actions">
+                <button class="btn btn--secondary btn--sm" (click)="cancelDelete()">{{ 'COMMON.NO' | translate }}</button>
+                <button class="btn btn--danger btn--sm" [disabled]="deleting" (click)="confirmDelete(selectedRestaurant.id)">
+                  @if (deleting) { <div class="btn__spinner"></div> }
+                  {{ 'COMMON.YES' | translate }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </aside>
+    </div>
+  }
+
+</div>

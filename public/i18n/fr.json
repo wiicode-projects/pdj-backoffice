@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "Gestion des utilisateurs",
+    "SUBTITLE": "Utilisateurs inscrits sur la plateforme",
     "CREATE": "Créer un utilisateur",
     "EDIT": "Modifier l'utilisateur",
     "FIRST_NAME": "Prénom",
@@ -104,14 +105,44 @@
     "PHONE": "Téléphone",
     "ROLE": "Rôle",
     "LANGUAGE": "Langue",
+    "ADDRESS": "Adresse",
     "CREATED_AT": "Date de création",
+    "VERIFIED": "Vérifié",
+    "UNVERIFIED": "Non vérifié",
+    "EMPTY_HINT": "Aucun utilisateur trouvé pour les filtres sélectionnés",
+    "SEARCH_PLACEHOLDER": "Rechercher par nom ou e-mail...",
     "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
     "CREATE_SUCCESS": "Utilisateur créé avec succès",
     "UPDATE_SUCCESS": "Utilisateur mis à jour avec succès",
-    "DELETE_SUCCESS": "Utilisateur supprimé avec succès"
+    "DELETE_SUCCESS": "Utilisateur supprimé avec succès",
+    "KPI": {
+      "TOTAL": "Total utilisateurs",
+      "ACTIVE": "Actifs",
+      "VERIFIED": "E-mails vérifiés",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "Utilisateur",
+      "CONTACT": "Téléphone",
+      "STATUS": "Statut",
+      "SUBSCRIPTION": "Abonnement",
+      "REGISTERED": "Inscription"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Gratuit"
+    },
+    "PANEL": {
+      "STATUS": "Statut du compte",
+      "INFOS": "Informations",
+      "SUBSCRIPTION": "Abonnement",
+      "EXPIRES": "Expire le",
+      "NO_SUBSCRIPTION": "Aucun abonnement actif"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Gestion des restaurants",
+    "SUBTITLE": "Restaurants principaux enregistrés sur la plateforme",
     "CREATE": "Créer un restaurant",
     "EDIT": "Modifier le restaurant",
     "ONBOARDING": "Intégrer un restaurant",
@@ -121,11 +152,40 @@
     "ADDRESS": "Adresse",
     "RESERVATION_ENABLED": "Réservation activée",
     "LOCATIONS": "Localisations",
-    "OWNER": "Propriétaire",
+    "OWNER": "Contact réservation",
+    "EMPTY_HINT": "Aucun restaurant trouvé pour les filtres sélectionnés",
+    "SEARCH_PLACEHOLDER": "Rechercher par nom ou ville...",
     "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer ce restaurant ?",
     "CREATE_SUCCESS": "Restaurant créé avec succès",
     "UPDATE_SUCCESS": "Restaurant mis à jour avec succès",
-    "DELETE_SUCCESS": "Restaurant supprimé avec succès"
+    "DELETE_SUCCESS": "Restaurant supprimé avec succès",
+    "TYPE": {
+      "FIXED": "Fixe",
+      "ITINERANT": "Itinérant"
+    },
+    "KPI": {
+      "TOTAL": "Total restaurants",
+      "PREMIUM": "Abonnés premium",
+      "ITINERANT": "Itinérants",
+      "BRANCHES": "Succursales",
+      "VIEWS": "Vues",
+      "CLICKS": "Clics"
+    },
+    "TABLE": {
+      "RESTAURANT": "Restaurant",
+      "CITY": "Ville",
+      "TYPE": "Type",
+      "SUBSCRIPTION": "Abonnement",
+      "VIEWS": "Vues",
+      "BRANCHES": "Succursales"
+    },
+    "PANEL": {
+      "INFOS": "Informations",
+      "SUBSCRIPTION": "Abonnement",
+      "BRANCHES": "Succursales",
+      "NO_SUBSCRIPTION": "Aucun abonnement actif",
+      "NO_BRANCHES": "Aucune succursale"
+    }
   },
   "DISHES": {
     "TITLE": "Gestion des plats",

@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "Benutzerverwaltung",
+    "SUBTITLE": "Auf der Plattform registrierte Benutzer",
     "CREATE": "Benutzer erstellen",
     "EDIT": "Benutzer bearbeiten",
     "FIRST_NAME": "Vorname",
@@ -104,14 +105,44 @@
     "PHONE": "Telefon",
     "ROLE": "Rolle",
     "LANGUAGE": "Sprache",
+    "ADDRESS": "Adresse",
     "CREATED_AT": "Erstellt am",
+    "VERIFIED": "Verifiziert",
+    "UNVERIFIED": "Nicht verifiziert",
+    "EMPTY_HINT": "Keine Benutzer für die gewählten Filter gefunden",
+    "SEARCH_PLACEHOLDER": "Nach Name oder E-Mail suchen...",
     "DELETE_CONFIRM": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?",
     "CREATE_SUCCESS": "Benutzer erfolgreich erstellt",
     "UPDATE_SUCCESS": "Benutzer erfolgreich aktualisiert",
-    "DELETE_SUCCESS": "Benutzer erfolgreich gelöscht"
+    "DELETE_SUCCESS": "Benutzer erfolgreich gelöscht",
+    "KPI": {
+      "TOTAL": "Benutzer gesamt",
+      "ACTIVE": "Aktiv",
+      "VERIFIED": "Verifizierte E-Mails",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "Benutzer",
+      "CONTACT": "Telefon",
+      "STATUS": "Status",
+      "SUBSCRIPTION": "Abonnement",
+      "REGISTERED": "Registriert"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Kostenlos"
+    },
+    "PANEL": {
+      "STATUS": "Kontostatus",
+      "INFOS": "Informationen",
+      "SUBSCRIPTION": "Abonnement",
+      "EXPIRES": "Läuft ab am",
+      "NO_SUBSCRIPTION": "Kein aktives Abonnement"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Restaurantverwaltung",
+    "SUBTITLE": "Hauptrestaurants auf der Plattform",
     "CREATE": "Restaurant erstellen",
     "EDIT": "Restaurant bearbeiten",
     "ONBOARDING": "Restaurant einrichten",
@@ -121,11 +152,40 @@
     "ADDRESS": "Adresse",
     "RESERVATION_ENABLED": "Reservierung aktiviert",
     "LOCATIONS": "Standorte",
-    "OWNER": "Besitzer",
+    "OWNER": "Buchungskontakt",
+    "EMPTY_HINT": "Keine Restaurants für die gewählten Filter gefunden",
+    "SEARCH_PLACEHOLDER": "Nach Name oder Stadt suchen...",
     "DELETE_CONFIRM": "Sind Sie sicher, dass Sie dieses Restaurant löschen möchten?",
     "CREATE_SUCCESS": "Restaurant erfolgreich erstellt",
     "UPDATE_SUCCESS": "Restaurant erfolgreich aktualisiert",
-    "DELETE_SUCCESS": "Restaurant erfolgreich gelöscht"
+    "DELETE_SUCCESS": "Restaurant erfolgreich gelöscht",
+    "TYPE": {
+      "FIXED": "Fest",
+      "ITINERANT": "Fahrend"
+    },
+    "KPI": {
+      "TOTAL": "Restaurants gesamt",
+      "PREMIUM": "Premium-Abonnenten",
+      "ITINERANT": "Fahrend",
+      "BRANCHES": "Filialen",
+      "VIEWS": "Aufrufe",
+      "CLICKS": "Klicks"
+    },
+    "TABLE": {
+      "RESTAURANT": "Restaurant",
+      "CITY": "Stadt",
+      "TYPE": "Typ",
+      "SUBSCRIPTION": "Abonnement",
+      "VIEWS": "Aufrufe",
+      "BRANCHES": "Filialen"
+    },
+    "PANEL": {
+      "INFOS": "Informationen",
+      "SUBSCRIPTION": "Abonnement",
+      "BRANCHES": "Filialen",
+      "NO_SUBSCRIPTION": "Kein aktives Abonnement",
+      "NO_BRANCHES": "Keine Filialen"
+    }
   },
   "DISHES": {
     "TITLE": "Gerichteverwaltung",

@@ -2,7 +2,7 @@ name: Build and Deploy PDJ Backoffice Dev
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, infra/devops ]
 
   workflow_dispatch:
 
@@ -46,6 +46,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          port: ${{ secrets.DEV_SERVER_SSH_PORT }}
+          source: "docker/docker-compose.staging.yml"
+          target: "${{ env.DEPLOY_PATH }}"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -56,8 +70,6 @@ jobs:
           script: |
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             cd ${{ env.DEPLOY_PATH }}
-            # Clean up old Docker resources to free disk space (preserves volumes for database data)
-            docker system prune -af || true
-            # Remove dangling images
-            docker image prune -af || true
+            mv docker-compose.staging.yml docker-compose.yml
             docker compose up -d --pull always pdj_backoffice
+            docker image prune -f

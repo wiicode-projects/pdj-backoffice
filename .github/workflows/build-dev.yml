@@ -72,5 +72,5 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             cd ${{ env.DEPLOY_PATH }}
             mv docker-compose.staging.yml docker-compose.yml
-            docker compose up -d --pull always pdj_backoffice
+            docker compose up -d --pull always --force-recreate --remove-orphans pdj_backoffice
             docker image prune -f

@@ -7,7 +7,8 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"] #port 80 par défaut
+      #test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/health"]
       interval: 1m30s
       timeout: 30s
       retries: 5

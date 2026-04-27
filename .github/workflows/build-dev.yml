@@ -59,6 +59,7 @@ jobs:
           port: ${{ secrets.DEV_SERVER_SSH_PORT }}
           source: "docker/docker-compose.staging.yml"
           target: "${{ env.DEPLOY_PATH }}"
+          strip_components: 1
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3

@@ -1,0 +1,138 @@
+name: PLAT DU JOUR - BACKOFFICE - CI/CD
+on:
+  push:
+    branches: [ main, dev, infra/devops ]
+
+  pull_request:
+    branches: [ main, dev, infra/devops ]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: pdj-backoffice-dev
+  DEPLOY_PATH: /home/wiicodeadmin/projets/pdj/backoffice/dev
+  #DEPLOY_PATH_PROD: /home/wiicodeadmin/projets/pdj/backoffice/prod
+
+jobs:
+  
+  # ==========================================================================
+  # JOB 1 — BIULD & PUSH  uniquement sur dev et main (merge depuis infra/devops)
+  # ==========================================================================
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate short SHA
+        id: vars
+        run: echo "SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build & Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.SHA_SHORT }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+
+  # ===================================================================
+  # JOB 3 — DEPLOY STAGING
+  # Uniquement sur dev (merge depuis infra/devops) et pus direct sur dev
+  # =====================================================================    
+
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          port: ${{ secrets.DEV_SERVER_SSH_PORT }}
+          source: "docker/docker-compose.staging.yml"
+          target: "${{ env.DEPLOY_PATH }}"
+          strip_components: 1
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          port: ${{ secrets.DEV_SERVER_SSH_PORT }}
+          script: |
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+            cd ${{ env.DEPLOY_PATH }}
+            mv docker-compose.staging.yml docker-compose.yml
+            IMAGE_TAG=${{ steps.vars.outputs.SHA_SHORT }} \
+            docker compose up -d --pull always --force-recreate --remove-orphans pdj_backoffice
+            docker image prune -f
+
+  # ============================================================
+  # JOB 3 — DEPLOY PROD
+  # Uniquement sur main (merge depuis dev)
+  # ============================================================
+
+  # deploy-prod:
+  #   name: Deploy to Production
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   if: github.ref == 'refs/heads/main'
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Get short SHA
+  #       id: vars
+  #       run: echo "SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+  #     - name: Copy compose to server
+  #       uses: appleboy/scp-action@v0.1.7
+  #       with:
+  #         host: ${{ secrets.PROD_SERVER_HOST }}
+  #         username: ${{ secrets.PROD_SERVER_USER }}
+  #         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+  #         port: ${{ secrets.PROD_SERVER_SSH_PORT }}
+  #         source: "docker/docker-compose.prod.yml"
+  #         target: ${{ env.DEPLOY_PATH_PROD }}
+  #         strip_components: 1
+
+  #     - name: Deploy
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.PROD_SERVER_HOST }}
+  #         username: ${{ secrets.PROD_SERVER_USER }}
+  #         key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+  #         port: ${{ secrets.PROD_SERVER_SSH_PORT }}
+  #         script: |
+  #           echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+  #           cd ${{ env.DEPLOY_PATH_PROD }}
+  
+  #           mv docker-compose.prod.yml docker-compose.yml
+
+  #           IMAGE_TAG=${{ steps.vars.outputs.SHA_SHORT }} \
+  #           docker compose up -d --pull always --force-recreate --remove-orphans pdj_backoffice
+
+  #           docker image prune -f

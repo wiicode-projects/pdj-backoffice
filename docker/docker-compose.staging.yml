@@ -2,7 +2,7 @@
 name: pdj-backoffice
 services:
   pdj_backoffice:
-    image:  ghcr.io/wiicode-projects/pdj-backoffice-dev:latest
+    image:  ghcr.io/wiicode-projects/pdj-backoffice-dev:${IMAGE_TAG:-latest}
     container_name: pdj_backoffice
     networks:
       - proxy-network

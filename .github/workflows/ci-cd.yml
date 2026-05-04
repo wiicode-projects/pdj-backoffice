@@ -128,9 +128,8 @@ jobs:
   #         port: ${{ secrets.PROD_SERVER_SSH_PORT }}
   #         script: |
   #           echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
-
   #           cd ${{ env.DEPLOY_PATH_PROD }}
-
+  
   #           mv docker-compose.prod.yml docker-compose.yml
 
   #           IMAGE_TAG=${{ steps.vars.outputs.SHA_SHORT }} \

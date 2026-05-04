@@ -1,0 +1,17 @@
+
+name: pdj-backoffice
+services:
+  pdj_backoffice:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    #image:  ghcr.io/wiicode-projects/pdj-backoffice-dev:latest
+    container_name: pdj_backoffice
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s

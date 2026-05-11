@@ -1,0 +1,530 @@
+<div class="settings-page">
+
+  <!-- Page Header -->
+  <div class="settings-page__header">
+    <div>
+      <h1 class="settings-page__title">Paramètres</h1>
+      <p class="settings-page__subtitle">Configuration de la plateforme</p>
+    </div>
+  </div>
+
+  <!-- Tab bar + Content side by side -->
+  <div class="settings-layout">
+
+    <!-- Sidebar tabs -->
+    <nav class="settings-nav" role="tablist">
+      @for (tab of tabs; track tab.id) {
+        <button
+          class="settings-nav__item"
+          [class.settings-nav__item--active]="activeTab === tab.id"
+          (click)="setTab(tab.id)"
+          [id]="'tab-' + tab.id"
+          role="tab"
+        >
+          <span class="settings-nav__icon">
+            @switch (tab.icon) {
+              @case ('general') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+              }
+              @case ('payment') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M5 15h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('bell') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('email') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              }
+            }
+          </span>
+          <span class="settings-nav__label">{{ tab.label }}</span>
+          @if (activeTab === tab.id) {
+            <span class="settings-nav__indicator"></span>
+          }
+        </button>
+      }
+    </nav>
+
+    <!-- Main panel -->
+    <div class="settings-panel" role="tabpanel">
+
+      @if (loading) {
+        <div class="settings-panel__loading">
+          <div class="settings-spinner"></div>
+          <span>Chargement des paramètres...</span>
+        </div>
+      }
+
+      @if (!loading) {
+
+        <!-- ── GENERAL TAB ─────────────────────────────────────── -->
+        @if (activeTab === 'general') {
+          <div class="settings-section" id="panel-general">
+            <div class="settings-section__header">
+              <h2 class="settings-section__title">Informations générales</h2>
+              <p class="settings-section__desc">Paramètres de base de la plateforme</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label" for="platform-name">Nom de la plateforme</label>
+                <input
+                  id="platform-name"
+                  class="form-input"
+                  type="text"
+                  [(ngModel)]="generalForm.platformName"
+                  placeholder="Plat du Jour"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="form-label" for="support-email">E-mail de support</label>
+                <input
+                  id="support-email"
+                  class="form-input"
+                  type="email"
+                  [(ngModel)]="generalForm.supportEmail"
+                  placeholder="support@leplatdujour.ch"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="form-label" for="support-phone">Téléphone de support</label>
+                <input
+                  id="support-phone"
+                  class="form-input"
+                  type="tel"
+                  [(ngModel)]="generalForm.supportPhone"
+                  placeholder="+41 XX XXX XX XX"
+                />
+              </div>
+            </div>
+
+            <div class="settings-actions">
+              <div class="settings-feedback">
+                @if (saveSuccess) {
+                  <span class="settings-feedback--success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Paramètres enregistrés
+                  </span>
+                }
+                @if (saveError) {
+                  <span class="settings-feedback--error">{{ saveError }}</span>
+                }
+              </div>
+              <button class="btn-save" (click)="saveGeneral()" [disabled]="saving" id="save-general">
+                @if (saving) { <span class="btn-spinner"></span> }
+                {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ── PAYMENT TAB ─────────────────────────────────────── -->
+        @if (activeTab === 'payment') {
+          <div class="settings-section" id="panel-payment">
+            <div class="settings-section__header">
+              <h2 class="settings-section__title">Fournisseurs de paiement</h2>
+              <p class="settings-section__desc">Configurez les intégrations Twint et MyPos pour la gestion des paiements</p>
+            </div>
+
+            <!-- TWINT Card -->
+            <div class="provider-card" [class.provider-card--active]="twintEnabled" id="twint-card">
+              <div class="provider-card__header">
+                <div class="provider-logo provider-logo--twint">
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+                    <rect width="48" height="48" rx="12" fill="#0C1B33"/>
+                    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
+                          font-family="Arial, sans-serif" font-weight="800" font-size="14" fill="white">TWINT</text>
+                  </svg>
+                </div>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">Twint</h3>
+                  <p class="provider-card__desc">Paiement mobile suisse — QR Code & NFC</p>
+                </div>
+                <div class="provider-toggle">
+                  <label class="toggle" [for]="'toggle-twint'">
+                    <input
+                      type="checkbox"
+                      id="toggle-twint"
+                      [(ngModel)]="twintEnabled"
+                      class="toggle__input"
+                    />
+                    <span class="toggle__track">
+                      <span class="toggle__thumb"></span>
+                    </span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="twintEnabled">
+                    {{ twintEnabled ? 'Activé' : 'Désactivé' }}
+                  </span>
+                </div>
+              </div>
+
+              @if (twintEnabled) {
+                <div class="provider-card__fields">
+                  <div class="form-field">
+                    <label class="form-label" for="twint-webhook">URL Webhook</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="twint-webhook"
+                        class="form-input"
+                        type="url"
+                        [(ngModel)]="twintWebhookUrl"
+                        placeholder="https://api.leplatdujour.ch/webhooks/twint"
+                      />
+                      <button class="copy-btn" (click)="copyToClipboard(twintWebhookUrl)" title="Copier" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                      </button>
+                    </div>
+                    <span class="form-hint">URL appelée par Twint lors d'un événement de paiement</span>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-label" for="twint-merchant-id">Merchant ID</label>
+                    <input
+                      id="twint-merchant-id"
+                      class="form-input"
+                      type="text"
+                      [(ngModel)]="twintMerchantId"
+                      placeholder="TWINT-MERCHANT-XXXXX"
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-label" for="twint-api-key">Clé API secrète</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="twint-api-key"
+                        class="form-input form-input--secret"
+                        [type]="showTwintKey ? 'text' : 'password'"
+                        [(ngModel)]="twintApiKey"
+                        placeholder="sk_live_••••••••••••••••"
+                        autocomplete="new-password"
+                      />
+                      <button class="copy-btn" (click)="showTwintKey = !showTwintKey" title="Afficher/masquer" type="button">
+                        @if (!showTwintKey) {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                        } @else {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                        }
+                      </button>
+                    </div>
+                    <span class="form-hint form-hint--warn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+                      Ne partagez jamais votre clé API secrète
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  Activez Twint pour configurer les paramètres d'intégration
+                </div>
+              }
+            </div>
+
+            <!-- MYPOS Card -->
+            <div class="provider-card" [class.provider-card--active]="myposEnabled" id="mypos-card">
+              <div class="provider-card__header">
+                <div class="provider-logo provider-logo--mypos">
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+                    <rect width="48" height="48" rx="12" fill="#E63946"/>
+                    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
+                          font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="white">myPOS</text>
+                  </svg>
+                </div>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">MyPos</h3>
+                  <p class="provider-card__desc">Terminal de paiement carte & lien de paiement</p>
+                </div>
+                <div class="provider-toggle">
+                  <label class="toggle" [for]="'toggle-mypos'">
+                    <input
+                      type="checkbox"
+                      id="toggle-mypos"
+                      [(ngModel)]="myposEnabled"
+                      class="toggle__input"
+                    />
+                    <span class="toggle__track">
+                      <span class="toggle__thumb"></span>
+                    </span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="myposEnabled">
+                    {{ myposEnabled ? 'Activé' : 'Désactivé' }}
+                  </span>
+                </div>
+              </div>
+
+              @if (myposEnabled) {
+                <div class="provider-card__fields">
+                  <div class="form-field">
+                    <label class="form-label" for="mypos-webhook">URL Webhook</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="mypos-webhook"
+                        class="form-input"
+                        type="url"
+                        [(ngModel)]="myposWebhookUrl"
+                        placeholder="https://api.leplatdujour.ch/webhooks/mypos"
+                      />
+                      <button class="copy-btn" (click)="copyToClipboard(myposWebhookUrl)" title="Copier" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                      </button>
+                    </div>
+                    <span class="form-hint">URL de notification pour les événements de paiement MyPos</span>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-label" for="mypos-merchant-id">Merchant ID</label>
+                    <input
+                      id="mypos-merchant-id"
+                      class="form-input"
+                      type="text"
+                      [(ngModel)]="myposMerchantId"
+                      placeholder="MYPOS-XXXXXXXXXX"
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-label" for="mypos-api-key">Clé API secrète</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="mypos-api-key"
+                        class="form-input form-input--secret"
+                        [type]="showMyposKey ? 'text' : 'password'"
+                        [(ngModel)]="myposApiKey"
+                        placeholder="mp_live_••••••••••••••••"
+                        autocomplete="new-password"
+                      />
+                      <button class="copy-btn" (click)="showMyposKey = !showMyposKey" title="Afficher/masquer" type="button">
+                        @if (!showMyposKey) {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                        } @else {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                        }
+                      </button>
+                    </div>
+                    <span class="form-hint form-hint--warn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+                      Ne partagez jamais votre clé API secrète
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  Activez MyPos pour configurer les paramètres d'intégration
+                </div>
+              }
+            </div>
+
+            <!-- Save bar -->
+            <div class="settings-actions">
+              <div class="settings-feedback">
+                @if (saveSuccess) {
+                  <span class="settings-feedback--success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Configuration de paiement sauvegardée
+                  </span>
+                }
+                @if (saveError) {
+                  <span class="settings-feedback--error">{{ saveError }}</span>
+                }
+              </div>
+              <button class="btn-save" (click)="savePayment()" [disabled]="saving" id="save-payment">
+                @if (saving) { <span class="btn-spinner"></span> }
+                {{ saving ? 'Enregistrement...' : 'Enregistrer les paiements' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ── EMAIL TAB ────────────────────────────────────────── -->
+        @if (activeTab === 'email') {
+          <div class="settings-section" id="panel-email">
+            <div class="settings-section__header">
+              <h2 class="settings-section__title">Configuration e-mail</h2>
+              <p class="settings-section__desc">Paramètres Brevo (ex-Sendinblue) et contrôle des envois par type</p>
+            </div>
+
+            <!-- Master toggle -->
+            <div class="email-master-toggle">
+              <div class="email-master-toggle__text">
+                <strong>Envois d'e-mails activés</strong>
+                <span>Désactivez pour bloquer TOUS les envois automatiques</span>
+              </div>
+              <div class="provider-toggle">
+                <label class="toggle" for="toggle-email-master">
+                  <input type="checkbox" id="toggle-email-master" [(ngModel)]="emailEnabled" class="toggle__input" />
+                  <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                </label>
+                <span class="provider-status" [class.provider-status--on]="emailEnabled">
+                  {{ emailEnabled ? 'Activé' : 'Désactivé' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Brevo config block -->
+            <div class="email-config-block" [class.email-config-block--disabled]="!emailEnabled">
+              <div class="email-config-block__title">
+                <div class="provider-logo" style="width:36px;height:36px;background:#0B7285;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="white" opacity=".9"/>
+                    <path d="M22 6l-10 7L2 6" stroke="#0B7285" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <strong>Brevo (Sendinblue)</strong>
+                  <span>Fournisseur d'e-mails transactionnels</span>
+                </div>
+                @if (emailMissingConfig) {
+                  <span class="email-warning-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#F59E0B" stroke-width="1.8"/><path d="M12 9v4M12 17h.01" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    Clé API manquante
+                  </span>
+                }
+              </div>
+
+              <div class="form-grid" style="margin-top:20px;">
+                <div class="form-field">
+                  <label class="form-label" for="brevo-api-key">Clé API Brevo</label>
+                  <div class="input-with-copy">
+                    <input
+                      id="brevo-api-key"
+                      class="form-input form-input--secret"
+                      [type]="showBrevoKey ? 'text' : 'password'"
+                      [(ngModel)]="brevoApiKey"
+                      placeholder="xkeysib-••••••••••••••••"
+                      autocomplete="new-password"
+                      [disabled]="!emailEnabled"
+                    />
+                    <button class="copy-btn" (click)="showBrevoKey = !showBrevoKey" title="Afficher/masquer" type="button">
+                      @if (!showBrevoKey) {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                      } @else {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                      }
+                    </button>
+                  </div>
+                  <span class="form-hint form-hint--warn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+                    Récupérez votre clé sur <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener" style="color:#DC2626">app.brevo.com</a>
+                  </span>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="email-sender-name">Nom de l'expéditeur</label>
+                  <input
+                    id="email-sender-name"
+                    class="form-input"
+                    type="text"
+                    [(ngModel)]="emailSenderName"
+                    placeholder="Plat du Jour"
+                    [disabled]="!emailEnabled"
+                  />
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="email-sender-address">Adresse expéditeur</label>
+                  <input
+                    id="email-sender-address"
+                    class="form-input"
+                    type="email"
+                    [(ngModel)]="emailSenderAddress"
+                    placeholder="contact@caytout.com"
+                    [disabled]="!emailEnabled"
+                  />
+                  <span class="form-hint">Doit être vérifiée dans votre compte Brevo</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Per-type toggles -->
+            <div class="email-toggles">
+              <div class="email-toggles__header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Types d'e-mails — activez ou désactivez chaque catégorie
+              </div>
+
+              @for (row of emailToggleRows; track row.key) {
+                <div class="email-toggle-row" [class.email-toggle-row--disabled]="!emailEnabled">
+                  <div class="email-toggle-row__info">
+                    <div class="email-toggle-row__type">
+                      <span class="email-type-badge email-type-badge--{{ row.type }}">{{ row.type }}</span>
+                    </div>
+                    <div>
+                      <strong>{{ row.label }}</strong>
+                      <span>{{ row.desc }}</span>
+                    </div>
+                  </div>
+                  <label class="toggle" [for]="'toggle-' + row.key">
+                    <input
+                      type="checkbox"
+                      [id]="'toggle-' + row.key"
+                      [checked]="getToggleValue(row.key.toString())"
+                      (change)="setToggleValue(row.key.toString(), $any($event.target).checked)"
+                      class="toggle__input"
+                      [disabled]="!emailEnabled"
+                    />
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                  </label>
+                </div>
+              }
+            </div>
+
+            <!-- Save bar -->
+            <div class="settings-actions">
+              <div class="settings-feedback">
+                @if (saveSuccess) {
+                  <span class="settings-feedback--success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Configuration e-mail sauvegardée
+                  </span>
+                }
+                @if (saveError) {
+                  <span class="settings-feedback--error">{{ saveError }}</span>
+                }
+              </div>
+              <button class="btn-save" (click)="saveEmail()" [disabled]="saving" id="save-email">
+                @if (saving) { <span class="btn-spinner"></span> }
+                {{ saving ? 'Enregistrement...' : 'Enregistrer les e-mails' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ── NOTIFICATIONS TAB ───────────────────────────────── -->
+        @if (activeTab === 'notifications') {
+          <div class="settings-section" id="panel-notifications">
+            <div class="settings-section__header">
+              <h2 class="settings-section__title">Notifications</h2>
+              <p class="settings-section__desc">Gérez les alertes et notifications de la plateforme</p>
+            </div>
+            <div class="coming-soon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#9CA3AF" stroke-width="1.5"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <p>Notifications — Bientôt disponible</p>
+              <span>Cette section sera disponible dans une prochaine mise à jour</span>
+            </div>
+          </div>
+        }
+
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,257 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <div class="page-header__icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.5 2 5 4 5 7C5 10 8 11.5 8 14H16C16 11.5 19 10 19 7C19 4 15.5 2 12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8 14V16C8 17.1 8.9 18 10 18H14C15.1 18 16 17.1 16 16V14" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 18V20C10 21.1 10.9 22 12 22C13.1 22 14 21.1 14 20V18" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="page-header__title">Packs de Frites</h1>
+        <p class="page-header__subtitle">Gérez les packs de monnaie virtuelle disponibles à l'achat</p>
+      </div>
+    </div>
+    <button class="btn btn--primary" id="create-pack-btn" (click)="openCreate()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Nouveau pack
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && packs.length === 0) {
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.5 2 5 4 5 7C5 10 8 11.5 8 14H16C16 11.5 19 10 19 7C19 4 15.5 2 12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8 14V16C8 17.1 8.9 18 10 18H14C15.1 18 16 17.1 16 16V14" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h3>Aucun pack configuré</h3>
+      <p>Créez votre premier pack de Frites pour l'afficher dans l'application mobile.</p>
+      <button class="btn btn--primary" (click)="openCreate()">Créer un pack</button>
+    </div>
+  }
+
+  <!-- Packs grid — mirrors mobile card layout -->
+  @if (!loading && packs.length > 0) {
+    <div class="packs-grid">
+      @for (pack of packs; track pack.id) {
+        <div class="pack-card" [class.pack-card--inactive]="!pack.isActive">
+
+          <!-- Badge -->
+          @if (pack.badgeLabel) {
+            <span class="pack-badge {{ badgeClass(pack.badgeLabel) }}">{{ pack.badgeLabel }}</span>
+          }
+
+          <!-- Image -->
+          <div class="pack-card__image-wrap">
+            @if (getImageUrl(pack)) {
+              <img [src]="getImageUrl(pack)!" [alt]="pack.name" class="pack-card__img">
+            } @else {
+              <div class="pack-card__img-placeholder">🍟</div>
+            }
+          </div>
+
+          <!-- Body -->
+          <div class="pack-card__body">
+            <h3 class="pack-card__name">{{ pack.name }}</h3>
+            @if (pack.description) {
+              <p class="pack-card__desc">{{ pack.description }}</p>
+            }
+
+            <!-- Frites + Price row -->
+            <div class="pack-card__pricing">
+              <div class="frites-amount">
+                <span class="frites-icon">🍟</span>
+                <span class="frites-amount__value">{{ pack.fritesAmount | number }} Frites</span>
+              </div>
+              <span class="chf-price">{{ formatPrice(pack.priceCentimes) }}</span>
+            </div>
+
+            <!-- Meta -->
+            <div class="pack-card__meta">
+              <span class="sort-tag">Ordre {{ pack.sortOrder + 1 }}</span>
+              <span class="buyers-pill">
+                <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                  <circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M2 17C2 13.7 4.7 11.5 8 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="14" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M18 17C18 13.7 15.3 11.5 12 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                {{ pack.purchaseCount | number }} achat{{ pack.purchaseCount !== 1 ? 's' : '' }}
+              </span>
+              <span class="status-dot" [class.status-dot--active]="pack.isActive">
+                {{ pack.isActive ? 'Actif' : 'Inactif' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pack-card__footer">
+            <button class="btn btn--sm btn--secondary" (click)="openEdit(pack)">
+              <svg width="13" height="13" viewBox="0 0 15 15" fill="none">
+                <path d="M10.5 2L13 4.5L5 12.5L2 13L2.5 10L10.5 2Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Modifier
+            </button>
+
+            @if (confirmDeleteId !== pack.id) {
+              <button class="btn btn--sm btn--danger-outline" (click)="askDelete(pack.id)">
+                <svg width="13" height="13" viewBox="0 0 15 15" fill="none">
+                  <path d="M2 4H13M5 4V3C5 2.4 5.4 2 6 2H9C9.6 2 10 2.4 10 3V4M11 4L10.5 12C10.5 12.6 10 13 9.4 13H5.6C5 13 4.5 12.6 4.5 12L4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+                Supprimer
+              </button>
+            } @else {
+              <div class="confirm-delete">
+                <span>Confirmer ?</span>
+                <button class="btn btn--sm btn--danger" [disabled]="deleting" (click)="confirmDelete(pack.id)">Oui</button>
+                <button class="btn btn--sm btn--secondary" (click)="cancelDelete()">Non</button>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- ── Modal ─────────────────────────────────────────────────────────────── -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <div class="modal__header">
+        <div class="modal__title-group">
+          <h2 class="modal__title">{{ editingPack ? 'Modifier le pack' : 'Nouveau pack de Frites' }}</h2>
+          <p class="modal__subtitle">{{ editingPack ? editingPack.name : 'Configurez l\'offre qui sera affichée dans la boutique' }}</p>
+        </div>
+        <button class="modal__close" (click)="closeModal()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+
+        <!-- Live preview card -->
+        <div class="preview-card">
+          <div class="preview-card__image">
+            @if (imagePreview) {
+              <img [src]="imagePreview" alt="aperçu" class="preview-card__img">
+            } @else {
+              <span class="preview-card__placeholder">🍟</span>
+            }
+          </div>
+          <div class="preview-card__content">
+            <div class="preview-card__top">
+              <strong>{{ form.name || 'Nom du pack' }}</strong>
+              @if (form.badgeLabel) {
+                <span class="pack-badge pack-badge--sm {{ badgeClass(form.badgeLabel) }}">{{ form.badgeLabel }}</span>
+              }
+            </div>
+            <div class="frites-amount frites-amount--preview">
+              <span class="frites-icon">🍟</span>
+              <span>{{ (form.fritesAmount || 0) | number }} Frites</span>
+            </div>
+          </div>
+          <span class="preview-card__price">{{ form.priceCHF ? form.priceCHF.toFixed(2) + ' CHF' : '— CHF' }}</span>
+        </div>
+
+        <!-- Form fields -->
+        <div class="form-cols">
+          <div class="field field--full">
+            <label class="field__label">Image du pack</label>
+            <label class="image-drop" [class.image-drop--filled]="imagePreview">
+              @if (imagePreview) {
+                <img [src]="imagePreview" class="image-drop__preview" alt="aperçu">
+                <span class="image-drop__change">Changer</span>
+              } @else {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M12 8V16M8 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Ajouter une image</span>
+              }
+              <input type="file" accept="image/*" class="image-drop__input" (change)="onFileChange($event)">
+            </label>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Nom <span class="required">*</span></label>
+            <input class="field__input" type="text" [(ngModel)]="form.name" placeholder="Ex: Maxi Portion" id="pack-name-input">
+          </div>
+
+          <div class="field">
+            <label class="field__label">Badge</label>
+            <select class="field__input" [(ngModel)]="form.badgeLabel" id="pack-badge-select">
+              @for (b of badgeOptions; track b) {
+                <option [value]="b">{{ b || 'Aucun badge' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Quantité de Frites <span class="required">*</span></label>
+            <div class="input-with-unit">
+              <input class="field__input" type="number" min="1" [(ngModel)]="form.fritesAmount" id="pack-frites-input">
+              <span class="input-unit">🍟</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Prix <span class="required">*</span></label>
+            <div class="input-with-unit">
+              <input class="field__input" type="number" min="0.01" step="0.01" [(ngModel)]="form.priceCHF" id="pack-price-input">
+              <span class="input-unit">CHF</span>
+            </div>
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label">Description (optionnel)</label>
+            <input class="field__input" type="text" [(ngModel)]="form.description" placeholder="Ex: -20% d'économie" id="pack-desc-input">
+          </div>
+
+          <div class="field">
+            <label class="field__label">Ordre d'affichage</label>
+            <input class="field__input" type="number" min="0" [(ngModel)]="form.sortOrder" id="pack-order-input">
+          </div>
+
+          <div class="field">
+            <label class="field__label">Statut</label>
+            <select class="field__input" [(ngModel)]="form.isActive" id="pack-status-select">
+              <option [ngValue]="true">Actif</option>
+              <option [ngValue]="false">Inactif</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="closeModal()">Annuler</button>
+        <button class="btn btn--primary" id="save-pack-btn" [disabled]="saving || !isFormValid()" (click)="save()">
+          @if (saving) { <div class="btn__spinner"></div> }
+          {{ editingPack ? 'Enregistrer' : 'Créer le pack' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

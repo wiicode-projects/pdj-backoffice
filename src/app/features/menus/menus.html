@@ -1,0 +1,439 @@
+<div class="menus-page">
+  <div class="menus-page__header">
+    <div>
+      <h1 class="menus-page__title">{{ 'MENUS.TITLE' | translate }}</h1>
+      <p class="menus-page__subtitle">{{ 'MENUS.SUBTITLE' | translate }}</p>
+    </div>
+    <button class="menus-page__create-btn" (click)="openCreateForm()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>{{ 'MENUS.CREATE' | translate }}</span>
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="menus-page__loading">
+      <div class="menus-page__spinner"></div>
+    </div>
+  }
+
+  @if (!loading) {
+    <!-- KPI Cards -->
+    <div class="menus-page__kpis">
+      <div class="kpi-card kpi-card--today">
+        <div class="kpi-card__icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 6H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 10H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 14H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__value">{{ todayMenus.length }}</span>
+          <span class="kpi-card__label">{{ 'MENUS.KPI.TODAY' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--upcoming">
+        <div class="kpi-card__icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="3" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 1V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 1V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M2 8H18" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__value">{{ upcomingMenus.length }}</span>
+          <span class="kpi-card__label">{{ 'MENUS.KPI.UPCOMING' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--total">
+        <div class="kpi-card__icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__value">{{ menus.length }}</span>
+          <span class="kpi-card__label">{{ 'MENUS.KPI.TOTAL' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--models">
+        <div class="kpi-card__icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L12.9 7.9L19 8.8L14.5 13.2L15.6 19.3L10 16.4L4.4 19.3L5.5 13.2L1 8.8L7.1 7.9L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__value">{{ modelMenus.length }}</span>
+          <span class="kpi-card__label">{{ 'MENUS.KPI.MODELS' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's menus -->
+    @if (todayMenus.length > 0) {
+      <div class="menus-section">
+        <h2 class="menus-section__title">
+          <span class="menus-section__dot menus-section__dot--today"></span>
+          {{ 'MENUS.TODAY' | translate }}
+        </h2>
+        <div class="menus-grid">
+          @for (menu of todayMenus; track menu.id) {
+            <div class="menu-card menu-card--today" (click)="openPanel(menu)">
+              <div class="menu-card__image-wrap">
+                @if (menu.image) {
+                  <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />
+                } @else {
+                  <div class="menu-card__image-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                }
+                @if (menu.isModele) {
+                  <span class="menu-card__badge menu-card__badge--model">{{ 'MENUS.MODEL' | translate }}</span>
+                }
+              </div>
+              <div class="menu-card__body">
+                <h3 class="menu-card__name">{{ menu.name }}</h3>
+                <p class="menu-card__dish">{{ getDishName(menu.mainCourse) }}</p>
+                <div class="menu-card__meta">
+                  <span class="menu-card__price">{{ formatPrice(menu.price) }}</span>
+                  <span class="menu-card__date">{{ formatShortDate(menu.availableAt) }}</span>
+                </div>
+              </div>
+              <div class="menu-card__actions">
+                <button class="menu-card__action-btn menu-card__action-btn--edit" (click)="openEditForm(menu); $event.stopPropagation()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="menu-card__action-btn menu-card__action-btn--delete" (click)="askDelete(menu.id, $event)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                    <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+                  </svg>
+                </button>
+              </div>
+              @if (confirmDeleteId === menu.id) {
+                <div class="menu-card__delete-confirm" (click)="$event.stopPropagation()">
+                  <p>{{ 'MENUS.DELETE_CONFIRM' | translate }}</p>
+                  <div class="menu-card__delete-actions">
+                    <button class="btn btn--cancel" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+                    <button class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete(menu.id)">
+                      @if (deleting) { <span class="btn__spinner"></span> }
+                      {{ 'COMMON.DELETE' | translate }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Upcoming menus -->
+    @if (upcomingMenus.length > 0) {
+      <div class="menus-section">
+        <h2 class="menus-section__title">
+          <span class="menus-section__dot menus-section__dot--upcoming"></span>
+          {{ 'MENUS.UPCOMING' | translate }}
+        </h2>
+        <div class="menus-grid">
+          @for (menu of upcomingMenus; track menu.id) {
+            <div class="menu-card" (click)="openPanel(menu)">
+              <div class="menu-card__image-wrap">
+                @if (menu.image) {
+                  <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />
+                } @else {
+                  <div class="menu-card__image-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                }
+                @if (menu.isModele) {
+                  <span class="menu-card__badge menu-card__badge--model">{{ 'MENUS.MODEL' | translate }}</span>
+                }
+              </div>
+              <div class="menu-card__body">
+                <h3 class="menu-card__name">{{ menu.name }}</h3>
+                <p class="menu-card__dish">{{ getDishName(menu.mainCourse) }}</p>
+                <div class="menu-card__meta">
+                  <span class="menu-card__price">{{ formatPrice(menu.price) }}</span>
+                  <span class="menu-card__date">{{ formatShortDate(menu.availableAt) }}</span>
+                </div>
+              </div>
+              <div class="menu-card__actions">
+                <button class="menu-card__action-btn menu-card__action-btn--edit" (click)="openEditForm(menu); $event.stopPropagation()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="menu-card__action-btn menu-card__action-btn--delete" (click)="askDelete(menu.id, $event)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                    <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+                  </svg>
+                </button>
+              </div>
+              @if (confirmDeleteId === menu.id) {
+                <div class="menu-card__delete-confirm" (click)="$event.stopPropagation()">
+                  <p>{{ 'MENUS.DELETE_CONFIRM' | translate }}</p>
+                  <div class="menu-card__delete-actions">
+                    <button class="btn btn--cancel" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+                    <button class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete(menu.id)">
+                      @if (deleting) { <span class="btn__spinner"></span> }
+                      {{ 'COMMON.DELETE' | translate }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Past menus -->
+    @if (pastMenus.length > 0) {
+      <div class="menus-section">
+        <h2 class="menus-section__title">
+          <span class="menus-section__dot menus-section__dot--past"></span>
+          {{ 'MENUS.PAST' | translate }}
+        </h2>
+        <div class="menus-grid">
+          @for (menu of pastMenus; track menu.id) {
+            <div class="menu-card menu-card--past" (click)="openPanel(menu)">
+              <div class="menu-card__image-wrap">
+                @if (menu.image) {
+                  <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />
+                } @else {
+                  <div class="menu-card__image-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                }
+              </div>
+              <div class="menu-card__body">
+                <h3 class="menu-card__name">{{ menu.name }}</h3>
+                <p class="menu-card__dish">{{ getDishName(menu.mainCourse) }}</p>
+                <div class="menu-card__meta">
+                  <span class="menu-card__price">{{ formatPrice(menu.price) }}</span>
+                  <span class="menu-card__date">{{ formatShortDate(menu.availableAt) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (menus.length === 0) {
+      <div class="menus-page__empty">
+        <div class="menus-page__empty-icon">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <rect x="10" y="6" width="36" height="44" rx="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 18H36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M20 26H36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M20 34H30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>{{ 'MENUS.EMPTY_TITLE' | translate }}</h3>
+        <p>{{ 'MENUS.EMPTY_HINT' | translate }}</p>
+        <button class="menus-page__create-btn" (click)="openCreateForm()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M3 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>{{ 'MENUS.CREATE' | translate }}</span>
+        </button>
+      </div>
+    }
+  }
+
+  <!-- Detail Panel -->
+  @if (panelOpen && selectedMenu) {
+    <div class="panel-overlay" (click)="closePanel()"></div>
+    <aside class="panel">
+      <div class="panel__header">
+        <h2 class="panel__title">{{ selectedMenu.name }}</h2>
+        <button class="panel__close" (click)="closePanel()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="panel__body">
+        @if (selectedMenu.image) {
+          <img [src]="getImageUrl(selectedMenu.image)" [alt]="selectedMenu.name" class="panel__image" />
+        }
+        <div class="panel__info-group">
+          <span class="panel__label">{{ 'MENUS.AVAILABLE_AT' | translate }}</span>
+          <span class="panel__value">{{ formatDate(selectedMenu.availableAt) }}</span>
+        </div>
+        <div class="panel__info-group">
+          <span class="panel__label">{{ 'MENUS.PRICE' | translate }}</span>
+          <span class="panel__value panel__value--price">{{ formatPrice(selectedMenu.price) }}</span>
+        </div>
+        @if (selectedMenu.isModele) {
+          <div class="panel__badge">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2L12.9 7.9L19 8.8L14.5 13.2L15.6 19.3L10 16.4L4.4 19.3L5.5 13.2L1 8.8L7.1 7.9L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+            {{ 'MENUS.MODEL' | translate }}
+          </div>
+        }
+        <div class="panel__dishes">
+          <h3 class="panel__dishes-title">{{ 'MENUS.COMPOSITION' | translate }}</h3>
+          @if (selectedMenu.appetizer) {
+            <div class="panel__dish-item">
+              <span class="panel__dish-category">{{ 'DISHES.CATEGORIES.ENTREE' | translate }}</span>
+              <span class="panel__dish-name">{{ selectedMenu.appetizer.name }}</span>
+              <span class="panel__dish-price">{{ formatPrice(selectedMenu.appetizer.price) }}</span>
+            </div>
+          }
+          @if (selectedMenu.mainCourse) {
+            <div class="panel__dish-item panel__dish-item--main">
+              <span class="panel__dish-category">{{ 'DISHES.CATEGORIES.PLAT_PRINCIPAL' | translate }}</span>
+              <span class="panel__dish-name">{{ selectedMenu.mainCourse.name }}</span>
+              <span class="panel__dish-price">{{ formatPrice(selectedMenu.mainCourse.price) }}</span>
+            </div>
+          }
+          @if (selectedMenu.dessert) {
+            <div class="panel__dish-item">
+              <span class="panel__dish-category">{{ 'DISHES.CATEGORIES.DESSERT' | translate }}</span>
+              <span class="panel__dish-name">{{ selectedMenu.dessert.name }}</span>
+              <span class="panel__dish-price">{{ formatPrice(selectedMenu.dessert.price) }}</span>
+            </div>
+          }
+        </div>
+        <div class="panel__actions">
+          <button class="btn btn--primary" (click)="openEditForm(selectedMenu); closePanel()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+            {{ 'COMMON.EDIT' | translate }}
+          </button>
+          <button class="btn btn--danger-outline" (click)="askDelete(selectedMenu.id, $event)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </div>
+      </div>
+    </aside>
+  }
+
+  <!-- Create/Edit Modal -->
+  @if (formOpen) {
+    <div class="modal-overlay" (click)="closeForm()"></div>
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ (editingMenu ? 'MENUS.EDIT' : 'MENUS.CREATE') | translate }}
+        </h2>
+        <button class="modal__close" (click)="closeForm()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        @if (formError) {
+          <div class="modal__error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 4.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+            </svg>
+            <span>{{ formError | translate }}</span>
+          </div>
+        }
+        <div class="form-group">
+          <label class="form-label">{{ 'MENUS.NAME' | translate }} *</label>
+          <input type="text" class="form-input" [(ngModel)]="menuName" [placeholder]="'MENUS.NAME_PLACEHOLDER' | translate" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ 'MENUS.AVAILABLE_AT' | translate }} *</label>
+            <input type="date" class="form-input" [(ngModel)]="menuAvailableAt" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ 'MENUS.PRICE' | translate }} (CHF)</label>
+            <input type="number" class="form-input" [(ngModel)]="menuPrice" min="0" step="0.5" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">{{ 'MENUS.MAIN_COURSE' | translate }} *</label>
+          @if (dishesLoading) {
+            <div class="form-input form-input--loading">{{ 'COMMON.LOADING' | translate }}</div>
+          } @else {
+            <select class="form-input form-select" [(ngModel)]="menuMainCourseId">
+              <option value="">{{ 'MENUS.SELECT_DISH' | translate }}</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }} — {{ formatPrice(dish.price) }}</option>
+              }
+            </select>
+          }
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ 'MENUS.APPETIZER' | translate }}</label>
+            <select class="form-input form-select" [(ngModel)]="menuAppetizerId">
+              <option value="">{{ 'MENUS.NONE' | translate }}</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ 'MENUS.DESSERT_LABEL' | translate }}</label>
+            <select class="form-input form-select" [(ngModel)]="menuDessertId">
+              <option value="">{{ 'MENUS.NONE' | translate }}</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-group form-group--toggle">
+          <label class="form-toggle">
+            <input type="checkbox" [(ngModel)]="menuIsModele" />
+            <span class="form-toggle__slider"></span>
+          </label>
+          <span class="form-toggle-label">{{ 'MENUS.SAVE_AS_MODEL' | translate }}</span>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--cancel" (click)="closeForm()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" [disabled]="formSubmitting" (click)="submitForm()">
+          @if (formSubmitting) { <span class="btn__spinner"></span> }
+          {{ 'COMMON.SAVE' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

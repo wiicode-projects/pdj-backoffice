@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -38,36 +39,163 @@ export const routes: Routes = [
       },
       {
         path: 'subscriptions',
+        canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/subscriptions/subscriptions').then((m) => m.Subscriptions),
       },
       {
         path: 'subscriptions/:id',
+        canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/subscriptions/subscription-detail/subscription-detail').then((m) => m.SubscriptionDetail),
       },
       {
         path: 'users',
+        canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/users/users').then((m) => m.Users),
       },
       {
+        path: 'users/:id',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/users/user-detail/user-detail').then((m) => m.UserDetail),
+      },
+      {
         path: 'restaurants',
+        canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/restaurants/restaurants').then((m) => m.Restaurants),
       },
       {
+        path: 'restaurants/:id',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/restaurants/restaurant-detail/restaurant-detail').then((m) => m.RestaurantDetail),
+      },
+      {
+        path: 'payments',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/payments/payments').then((m) => m.Payments),
+      },
+      {
+        path: 'mini-games',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/mini-games/mini-games').then((m) => m.MiniGames),
+      },
+      {
+        path: 'mini-games/:id',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/mini-games/mini-game-detail/mini-game-detail').then((m) => m.MiniGameDetail),
+      },
+      {
+        path: 'ads',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/ads/ads').then((m) => m.Ads),
+      },
+      {
+        path: 'frites-packs',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/frites-packs/frites-packs').then((m) => m.FritesPacks),
+      },
+      {
+        path: 'shop/wallets',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/shop-wallets/shop-wallets').then((m) => m.ShopWallets),
+      },
+      {
+        path: 'shop/transactions',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/shop-transactions/shop-transactions').then((m) => m.ShopTransactions),
+      },
+      {
+        path: 'shop/analytics',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/shop-analytics/shop-analytics').then((m) => m.ShopAnalytics),
+      },
+      {
+        path: 'statistics',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/statistics/statistics').then((m) => m.Statistics),
+      },
+      {
+        path: 'settings',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/settings/settings').then((m) => m.Settings),
+      },
+      {
+        path: 'events',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/events/events').then((m) => m.Events),
+      },
+      {
+        path: 'events/create',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/events/create-event/create-event').then((m) => m.CreateEvent),
+      },
+      {
+        path: 'events/:id',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/events/event-detail/event-detail').then((m) => m.EventDetail),
+      },
+      {
+        path: 'events/:id/edit',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/events/edit-event/edit-event').then((m) => m.EditEvent),
+      },
+      {
+        path: 'my-restaurants',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/my-restaurants/my-restaurants').then((m) => m.MyRestaurants),
+      },
+      {
+        path: 'membership',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/membership/membership').then((m) => m.Membership),
+      },
+      {
+        path: 'dishes/create',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/dishes/create-dish/create-dish').then((m) => m.CreateDish),
+      },
+      {
+        path: 'dishes/:id/edit',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/dishes/edit-dish/edit-dish').then((m) => m.EditDish),
+      },
+      {
         path: 'dishes',
+        canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
           import('./features/dishes/dishes').then((m) => m.Dishes),
       },
       {
         path: 'menus',
+        canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
           import('./features/menus/menus').then((m) => m.Menus),
       },
       {
         path: 'locations',
+        canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
           import('./features/locations/locations').then((m) => m.Locations),
       },

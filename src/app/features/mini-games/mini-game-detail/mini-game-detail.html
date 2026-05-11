@@ -1,0 +1,279 @@
+<div class="detail-page">
+  <!-- Header -->
+  <div class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+      {{ 'COMMON.BACK' | translate }}
+    </button>
+    @if (!loading && game) {
+      <div class="detail-header__title">
+        <h1>{{ game.name }}</h1>
+        <span class="status-pill" [class.status-pill--active]="game.isActive" [class.status-pill--inactive]="!game.isActive">
+          {{ game.isActive ? ('MINI_GAMES.ACTIVE' | translate) : ('MINI_GAMES.INACTIVE' | translate) }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  }
+
+  @if (!loading && game) {
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-card__left">
+        <div class="hero-card__icon" [attr.data-type]="getGameIcon()">
+          @switch (game.slug) {
+            @case ('spin_win') {
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 3V12L18 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 12L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              </svg>
+            }
+            @case ('mystery_box') {
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <path d="M20 7H4C3.4 7 3 7.4 3 8V20C3 20.6 3.4 21 4 21H20C20.6 21 21 20.6 21 20V8C21 7.4 20.6 7 20 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 7V3M12 3L8 7M12 3L16 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 11V17M9 14H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            }
+            @case ('quiz_flash') {
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M9 9C9 7.34 10.34 6 12 6C13.66 6 15 7.34 15 9C15 10.66 13.66 12 12 12V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="currentColor"/>
+              </svg>
+            }
+            @case ('referral') {
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M2 20C2 16.7 5.1 14 9 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="17" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M17 16V22M14 19H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            }
+          }
+        </div>
+        <div class="hero-card__info">
+          <h2 class="hero-card__name">{{ game.name }}</h2>
+          <p class="hero-card__desc">{{ game.description || '—' }}</p>
+          <p class="hero-card__meta">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1"/>
+              <path d="M7 4V7L9 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            {{ 'GAME_DETAIL.CREATED' | translate }}: {{ game.createdAt | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+      </div>
+      <div class="hero-card__actions">
+        <button
+          class="toggle-switch toggle-switch--lg"
+          [class.toggle-switch--on]="game.isActive"
+          [class.toggle-switch--loading]="toggling"
+          [disabled]="toggling"
+          (click)="toggleGame()"
+        >
+          <span class="toggle-switch__thumb"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__value">{{ stats.totalPlays | number }}</span>
+          <span class="kpi-card__label">{{ 'GAME_DETAIL.KPI.TOTAL_PLAYS' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M4 20C4 16 7.5 13.5 12 13.5C16.5 13.5 20 16 20 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__value">{{ stats.uniquePlayers }}</span>
+          <span class="kpi-card__label">{{ 'GAME_DETAIL.KPI.UNIQUE_PLAYERS' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--orange">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 8V12L15 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__value">{{ formatDuration(stats.avgDurationSeconds) }}</span>
+          <span class="kpi-card__label">{{ 'GAME_DETAIL.KPI.AVG_DURATION' | translate }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__value">{{ stats.completionRate }}%</span>
+          <span class="kpi-card__label">{{ 'GAME_DETAIL.KPI.COMPLETION_RATE' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Weekly Activity Chart -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.WEEKLY_ACTIVITY' | translate }}</h3>
+          <span class="detail-card__badge">{{ 'GAME_DETAIL.THIS_WEEK' | translate }}</span>
+        </div>
+        @if (weeklyActivity.length > 0) {
+          <div class="chart">
+            <div class="chart__bars">
+              @for (day of weeklyActivity; track day.date) {
+                <div class="chart__col">
+                  <div class="chart__bar-wrap">
+                    <div class="chart__bar" [style.height.%]="getBarHeight(day.plays)" [attr.data-type]="getGameIcon()">
+                      <span class="chart__tooltip">{{ day.plays }}</span>
+                    </div>
+                  </div>
+                  <span class="chart__label">{{ day.dayLabel }}</span>
+                </div>
+              }
+            </div>
+            <div class="chart__summary">
+              <div class="chart__summary-item">
+                <span class="chart__summary-value">{{ stats.playsToday }}</span>
+                <span class="chart__summary-label">{{ 'GAME_DETAIL.TODAY' | translate }}</span>
+              </div>
+              <div class="chart__summary-item">
+                <span class="chart__summary-value">{{ stats.playsThisWeek }}</span>
+                <span class="chart__summary-label">{{ 'GAME_DETAIL.THIS_WEEK' | translate }}</span>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <p>{{ 'GAME_DETAIL.NO_ACTIVITY' | translate }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Stats Card -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.REWARDS' | translate }}</h3>
+        </div>
+        <div class="stat-rows">
+          <div class="stat-row">
+            <div class="stat-row__icon stat-row__icon--orange">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-row__body">
+              <span class="stat-row__label">{{ 'GAME_DETAIL.POINTS_DISTRIBUTED' | translate }}</span>
+              <span class="stat-row__value">{{ stats.totalPoints | number }}</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-row__icon stat-row__icon--green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M20 12V22H4V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 7H2V12H22V7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 22V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="stat-row__body">
+              <span class="stat-row__label">{{ 'GAME_DETAIL.REWARDS_UNLOCKED' | translate }}</span>
+              <span class="stat-row__value">{{ stats.rewardsUnlocked }}</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-row__icon stat-row__icon--blue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M22 12H18L15 21L9 3L6 12H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-row__body">
+              <span class="stat-row__label">{{ 'GAME_DETAIL.PLAYS_TODAY' | translate }}</span>
+              <span class="stat-row__value">{{ stats.playsToday }}</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-row__icon stat-row__icon--purple">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-row__body">
+              <span class="stat-row__label">{{ 'GAME_DETAIL.PLAYS_WEEK' | translate }}</span>
+              <span class="stat-row__value">{{ stats.playsThisWeek }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Players -->
+    <div class="detail-card detail-card--full">
+      <div class="detail-card__header">
+        <h3>{{ 'GAME_DETAIL.RECENT_PLAYERS' | translate }}</h3>
+      </div>
+      @if (recentPlayers.length > 0) {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'GAME_DETAIL.COL.PLAYER' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.COL.EMAIL' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.COL.TOTAL_PLAYS' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.COL.LAST_PLAYED' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (player of recentPlayers; track player.id) {
+                <tr>
+                  <td>
+                    <div class="player-cell">
+                      <div class="player-cell__avatar">{{ getInitials(player.firstName, player.lastName) }}</div>
+                      <span class="player-cell__name">{{ player.firstName }} {{ player.lastName }}</span>
+                    </div>
+                  </td>
+                  <td class="td-secondary">{{ player.email }}</td>
+                  <td><span class="plays-badge">{{ player.totalPlays }}</span></td>
+                  <td class="td-secondary">{{ player.lastPlayed | date:'dd/MM/yyyy HH:mm' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>{{ 'GAME_DETAIL.NO_PLAYERS' | translate }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

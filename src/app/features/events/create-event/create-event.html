@@ -1,0 +1,352 @@
+<div class="create-event-page">
+
+  <!-- ── Success State ──────────────────────────────────── -->
+  @if (submitted) {
+    <div class="success-container">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#10B981" stroke-width="1.5"/>
+            <path d="M8 12l3 3 5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="success-title">Événement créé avec succès !</h2>
+        <p class="success-sub">Votre événement a été ajouté à la plateforme.</p>
+        <div class="success-actions">
+          <button class="btn btn--outline" (click)="goToEvents()">Retour aux événements</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <div class="page-header">
+      <button class="back-btn" (click)="cancel()" id="btn-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div>
+        <h1 class="page-title">Créer un événement</h1>
+        <p class="page-subtitle">Configurez votre événement en {{ totalSteps }} étapes simples</p>
+      </div>
+    </div>
+
+    <!-- ── Stepper ─────────────────────────────────────────── -->
+    <div class="stepper">
+      @for (step of [1,2,3]; track step) {
+        <div class="stepper__step" [class.stepper__step--active]="currentStep === step" [class.stepper__step--done]="currentStep > step" (click)="goToStep(step)">
+          <div class="stepper__circle">
+            @if (currentStep > step) {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            } @else {
+              {{ step }}
+            }
+          </div>
+          <span class="stepper__label">
+            {{ step === 1 ? 'Informations' : step === 2 ? 'Récompenses' : 'Aperçu' }}
+          </span>
+        </div>
+        @if (step < 3) {
+          <div class="stepper__line" [class.stepper__line--done]="currentStep > step"></div>
+        }
+      }
+    </div>
+
+    <div class="form-container">
+
+      <!-- ═══════════════ STEP 1: Informations ═══════════════ -->
+      @if (currentStep === 1) {
+        <div class="step-content">
+          <h2 class="step-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Informations de l'événement
+          </h2>
+
+          <div class="form-grid">
+            <!-- Title -->
+            <div class="field field--full">
+              <label class="field__label">Titre de l'événement <span class="required">*</span></label>
+              <input type="text" class="field__input" placeholder="Ex: Brunch du Dimanche 🍳" [(ngModel)]="title" [class.field__input--error]="errors['title']"/>
+              @if (errors['title']) { <span class="field__error">{{ errors['title'] }}</span> }
+            </div>
+
+            <!-- Category -->
+            <div class="field">
+              <label class="field__label">Catégorie <span class="required">*</span></label>
+              <div class="pill-group">
+                @for (opt of categoryOptions; track opt.value) {
+                  <button type="button" class="pill" [class.pill--active]="category === opt.value" (click)="category = opt.value">
+                    {{ opt.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Restaurant -->
+            <div class="field">
+              <label class="field__label">Restaurant organisateur</label>
+              <select class="field__input" [(ngModel)]="restaurantId">
+                <option value="">Aucun (événement plateforme)</option>
+                @for (r of restaurants; track r.id) {
+                  <option [value]="r.id">{{ r.name }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Dates -->
+            <div class="field">
+              <label class="field__label">Date de début <span class="required">*</span></label>
+              <input type="datetime-local" class="field__input" [(ngModel)]="startDate" [class.field__input--error]="errors['startDate']"/>
+              @if (errors['startDate']) { <span class="field__error">{{ errors['startDate'] }}</span> }
+            </div>
+            <div class="field">
+              <label class="field__label">Date de fin <span class="required">*</span></label>
+              <input type="datetime-local" class="field__input" [(ngModel)]="endDate" [class.field__input--error]="errors['endDate']"/>
+              @if (errors['endDate']) { <span class="field__error">{{ errors['endDate'] }}</span> }
+            </div>
+
+            <!-- Location -->
+            <div class="field field--full">
+              <label class="field__label">Lieu</label>
+              <input type="text" class="field__input" placeholder="Ex: La Terrasse, Genève" [(ngModel)]="location"/>
+            </div>
+
+            <!-- Max attendees -->
+            <div class="field">
+              <label class="field__label">Places disponibles</label>
+              <input type="number" class="field__input" placeholder="0 = illimité" min="0" [(ngModel)]="maxAttendees"/>
+            </div>
+
+            <!-- Featured -->
+            <div class="field field--toggle">
+              <label class="toggle-label">
+                <input type="checkbox" [(ngModel)]="isFeatured" class="toggle-checkbox"/>
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="toggle-text">Mettre en avant sur l'application</span>
+              </label>
+            </div>
+
+            <!-- Banner color -->
+            <div class="field field--full">
+              <label class="field__label">Couleur de la bannière</label>
+              <div class="color-grid">
+                @for (c of colorPresets; track c.gradient) {
+                  <button type="button" class="color-swatch" [style.background]="c.gradient" [class.color-swatch--active]="imageColor === c.gradient" (click)="imageColor = c.gradient" [title]="c.name">
+                    @if (imageColor === c.gradient) {
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Cover image -->
+            <div class="field field--full">
+              <label class="field__label">Image de couverture</label>
+              @if (coverPreview) {
+                <div class="cover-preview">
+                  <img [src]="coverPreview" alt="Cover preview" class="cover-preview__img"/>
+                  <button class="cover-preview__remove" (click)="removeCover()" title="Supprimer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
+                </div>
+              } @else {
+                <label class="upload-zone" for="cover-input">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span class="upload-zone__text">Cliquez pour télécharger une image</span>
+                  <span class="upload-zone__hint">PNG, JPG ou WebP · Max 5 MB</span>
+                  <input type="file" id="cover-input" accept="image/*" (change)="onCoverSelected($event)" hidden/>
+                </label>
+              }
+            </div>
+
+            <!-- Description -->
+            <div class="field field--full">
+              <label class="field__label">Description</label>
+              <textarea class="field__input field__textarea" rows="4" placeholder="Décrivez l'événement, les activités prévues..." [(ngModel)]="description"></textarea>
+              <span class="field__hint">{{ description.length }} / 500 caractères</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ═══════════════ STEP 2: Récompenses ═══════════════ -->
+      @if (currentStep === 2) {
+        <div class="step-content">
+          <h2 class="step-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Récompenses de l'événement
+          </h2>
+          <p class="step-description">Ajoutez des éléments de personnalisation exclusifs que les participants pourront gagner pendant l'événement.</p>
+
+          @if (rewards.length === 0) {
+            <div class="empty-rewards">
+              <div class="empty-rewards__icon">🎁</div>
+              <p class="empty-rewards__title">Aucune récompense pour le moment</p>
+              <p class="empty-rewards__sub">Les récompenses créent un sentiment d'urgence et un intérêt récurrent.</p>
+              <button class="btn btn--primary" (click)="addReward()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Ajouter une récompense
+              </button>
+            </div>
+          } @else {
+            <div class="rewards-list">
+              @for (reward of rewards; track $index; let i = $index) {
+                <div class="reward-card">
+                  <div class="reward-card__header">
+                    <span class="reward-card__number">#{{ i + 1 }}</span>
+                    <button class="reward-card__remove" (click)="removeReward(i)" title="Supprimer">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="reward-card__body">
+                    <div class="field">
+                      <label class="field__label">Nom <span class="required">*</span></label>
+                      <input type="text" class="field__input" placeholder="Ex: Badge Golden Frites" [(ngModel)]="reward.name" [class.field__input--error]="errors['reward_' + i]"/>
+                      @if (errors['reward_' + i]) { <span class="field__error">{{ errors['reward_' + i] }}</span> }
+                    </div>
+                    <div class="field">
+                      <label class="field__label">Type</label>
+                      <select class="field__input" [(ngModel)]="reward.type">
+                        @for (opt of rewardTypeOptions; track opt.value) {
+                          <option [value]="opt.value">{{ opt.icon }} {{ opt.label }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label class="field__label">Quantité <span class="field__hint">(0 = illimité)</span></label>
+                      <input type="number" class="field__input" min="0" [(ngModel)]="reward.quantity"/>
+                    </div>
+                    <div class="field field--full">
+                      <label class="field__label">Description</label>
+                      <input type="text" class="field__input" placeholder="Description courte..." [(ngModel)]="reward.description"/>
+                    </div>
+                  </div>
+                </div>
+              }
+              <button class="btn btn--outline btn--add" (click)="addReward()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Ajouter une autre récompense
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ═══════════════ STEP 3: Aperçu ═══════════════ -->
+      @if (currentStep === 3) {
+        <div class="step-content">
+          <h2 class="step-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+            Aperçu de l'événement
+          </h2>
+
+          <!-- Preview card -->
+          <div class="preview-card">
+            <div class="preview-card__banner" [style.background]="coverPreview ? 'none' : imageColor">
+              @if (coverPreview) {
+                <img [src]="coverPreview" alt="Cover" class="preview-card__cover-img"/>
+              }
+              @if (isFeatured) {
+                <span class="preview-badge">★ Mis en avant</span>
+              }
+              <span class="preview-status">À venir</span>
+            </div>
+            <div class="preview-card__body">
+              <div class="preview-meta-row">
+                <span class="preview-category">{{ getCategoryLabel(category) }}</span>
+                <span class="preview-restaurant">{{ getRestaurantName() }}</span>
+              </div>
+              <h3 class="preview-title">{{ title }}</h3>
+              @if (description) {
+                <p class="preview-desc">{{ description }}</p>
+              }
+              <div class="preview-info-grid">
+                <div class="preview-info">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <div>
+                    <span class="preview-info__label">Début</span>
+                    <span class="preview-info__value">{{ formatDate(startDate) }}</span>
+                  </div>
+                </div>
+                <div class="preview-info">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <div>
+                    <span class="preview-info__label">Fin</span>
+                    <span class="preview-info__value">{{ formatDate(endDate) }}</span>
+                  </div>
+                </div>
+                @if (location) {
+                  <div class="preview-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                    <div>
+                      <span class="preview-info__label">Lieu</span>
+                      <span class="preview-info__value">{{ location }}</span>
+                    </div>
+                  </div>
+                }
+                @if (maxAttendees) {
+                  <div class="preview-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+                    <div>
+                      <span class="preview-info__label">Places</span>
+                      <span class="preview-info__value">{{ maxAttendees }} max</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Rewards preview -->
+          @if (rewards.length > 0) {
+            <h3 class="rewards-preview-title">🎁 {{ rewards.length }} récompense{{ rewards.length > 1 ? 's' : '' }}</h3>
+            <div class="rewards-preview-grid">
+              @for (r of rewards; track $index) {
+                <div class="reward-preview">
+                  <span class="reward-preview__icon">{{ getRewardTypeIcon(r.type) }}</span>
+                  <div>
+                    <span class="reward-preview__name">{{ r.name }}</span>
+                    <span class="reward-preview__type">{{ getRewardTypeLabel(r.type) }} · {{ r.quantity ? r.quantity + ' dispo.' : 'Illimité' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ── Footer navigation ────────────────────────────── -->
+      <div class="form-footer">
+        <button class="btn btn--ghost" (click)="prevStep()">
+          @if (currentStep === 1) {
+            Annuler
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Précédent
+          }
+        </button>
+        @if (currentStep < totalSteps) {
+          <button class="btn btn--primary" (click)="nextStep()">
+            Suivant
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        } @else {
+          <button class="btn btn--primary btn--submit" (click)="submit()" [disabled]="submitting">
+            @if (submitting) {
+              <span class="spinner"></span> Création...
+            } @else {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Créer l'événement
+            }
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

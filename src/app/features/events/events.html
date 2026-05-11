@@ -1,0 +1,350 @@
+<div class="events-page">
+
+  <!-- ── Page Header ──────────────────────────────────────────── -->
+  <div class="events-page__header">
+    <div>
+      <h1 class="events-page__title">Événements</h1>
+      <p class="events-page__subtitle">Gérez les événements et animations de la plateforme</p>
+    </div>
+    <button class="btn-create" id="btn-create-event" (click)="openCreateModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Créer un événement
+    </button>
+  </div>
+
+  <!-- ── KPI Strip ─────────────────────────────────────────────── -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--blue">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ totalEvents }}</span>
+        <span class="kpi-card__label">Événements</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ ongoingCount }}</span>
+        <span class="kpi-card__label">En cours</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--orange">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ upcomingCount }}</span>
+        <span class="kpi-card__label">À venir</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ totalAttendees }}</span>
+        <span class="kpi-card__label">Participants total</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ───────────────────────────────────────────────── -->
+  <div class="toolbar">
+    <div class="toolbar__left">
+      <!-- Search -->
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          class="search-box__input"
+          placeholder="Rechercher un événement, restaurant..."
+          [(ngModel)]="searchTerm"
+          id="events-search"
+        />
+      </div>
+
+      <!-- Status filter -->
+      <select class="filter-select" [(ngModel)]="statusFilter" id="filter-status">
+        <option value="">Tous les statuts</option>
+        <option value="UPCOMING">À venir</option>
+        <option value="ONGOING">En cours</option>
+        <option value="PAST">Passé</option>
+        <option value="CANCELLED">Annulé</option>
+      </select>
+
+      <!-- Category filter -->
+      <select class="filter-select" [(ngModel)]="categoryFilter" id="filter-category">
+        <option value="">Toutes catégories</option>
+        <option value="PROMOTION">Promotion</option>
+        <option value="FESTIVAL">Festival</option>
+        <option value="WORKSHOP">Atelier</option>
+        <option value="LAUNCH">Lancement</option>
+        <option value="PRIVATE">Privé</option>
+        <option value="CHALLENGE">Challenge</option>
+        <option value="SEASONAL">Saisonnier</option>
+      </select>
+    </div>
+
+    <!-- View toggle -->
+    <div class="view-toggle" role="group">
+      <button
+        class="view-toggle__btn"
+        [class.view-toggle__btn--active]="viewMode === 'grid'"
+        (click)="setView('grid')"
+        id="view-grid"
+        title="Vue grille"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </button>
+      <button
+        class="view-toggle__btn"
+        [class.view-toggle__btn--active]="viewMode === 'list'"
+        (click)="setView('list')"
+        id="view-list"
+        title="Vue liste"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Results count -->
+  <p class="results-count">
+    {{ filteredEvents.length }} événement{{ filteredEvents.length > 1 ? 's' : '' }} trouvé{{ filteredEvents.length > 1 ? 's' : '' }}
+  </p>
+
+  <!-- ── GRID VIEW ─────────────────────────────────────────────── -->
+  @if (viewMode === 'grid') {
+    <div class="events-grid">
+      @for (event of filteredEvents; track event.id) {
+        <div class="event-card" [class.event-card--featured]="event.isFeatured" (click)="openDetails(event)">
+
+          <!-- Banner -->
+          <div class="event-card__banner" [style.background]="event.imageUrl ? 'none' : event.imageColor">
+            @if (event.imageUrl) {
+              <img [src]="event.imageUrl" [alt]="event.title" class="event-card__cover-img"/>
+            }
+            @if (event.isFeatured) {
+              <span class="featured-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Mis en avant
+              </span>
+            }
+            <div class="event-card__status-badge event-card__status-badge--{{ event.status }}">
+              {{ getStatusLabel(event.status) }}
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="event-card__body">
+            <div class="event-card__category-row">
+              <span class="category-pill category-pill--{{ event.category }}">
+                {{ getCategoryLabel(event.category) }}
+              </span>
+              <span class="event-card__restaurant">
+                <span class="restaurant-avatar">{{ getRestaurantInitials(event) }}</span>
+                {{ getRestaurantName(event) }}
+              </span>
+            </div>
+
+            <h3 class="event-card__title">{{ event.title }}</h3>
+            <p class="event-card__desc">{{ event.description }}</p>
+
+            <!-- Meta row -->
+            <div class="event-card__meta">
+              <div class="meta-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                {{ formatDateRange(event.startDate, event.endDate) }}
+              </div>
+              <div class="meta-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                {{ event.location }}
+              </div>
+            </div>
+
+            <!-- Attendee progress -->
+            <div class="attendee-bar">
+              <div class="attendee-bar__labels">
+                <span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                  {{ event.currentAttendees }} / {{ event.maxAttendees }}
+                </span>
+                <span class="attendee-bar__percent" [class.attendee-bar__percent--full]="getAttendeePercent(event) >= 90">
+                  {{ getAttendeePercent(event) }}%
+                </span>
+              </div>
+              <div class="attendee-bar__track">
+                <div
+                  class="attendee-bar__fill"
+                  [class.attendee-bar__fill--full]="getAttendeePercent(event) >= 90"
+                  [style.width.%]="getAttendeePercent(event)"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="event-card__actions">
+              <button class="action-btn action-btn--secondary" [id]="'edit-' + event.id" (click)="$event.stopPropagation(); openEditModal(event)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Modifier
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Empty state -->
+      @if (filteredEvents.length === 0) {
+        <div class="empty-state" style="grid-column: 1/-1">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="#9CA3AF" stroke-width="1.2"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M8 14h8M8 17h5" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <p>Aucun événement trouvé</p>
+          <span>Modifiez vos filtres ou créez un premier événement</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── LIST VIEW ─────────────────────────────────────────────── -->
+  @if (viewMode === 'list') {
+    <div class="table-card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Événement</th>
+              <th>Restaurant</th>
+              <th>Catégorie</th>
+              <th>Date</th>
+              <th>Lieu</th>
+              <th>Participants</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (event of filteredEvents; track event.id) {
+              <tr (click)="openDetails(event)" class="clickable-row">
+                <td>
+                  <div class="list-title-cell">
+                    @if (event.imageUrl) {
+                      <img [src]="event.imageUrl" [alt]="event.title" class="list-cover-thumb"/>
+                    } @else {
+                      <div class="list-color-dot" [style.background]="event.imageColor"></div>
+                    }
+                    <div>
+                      <span class="list-title-cell__name">{{ event.title }}</span>
+                      @if (event.isFeatured) {
+                        <span class="list-featured-pill">★ Mis en avant</span>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="owner-cell">
+                    <div class="restaurant-avatar restaurant-avatar--sm">{{ getRestaurantInitials(event) }}</div>
+                    <span>{{ getRestaurantName(event) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="category-pill category-pill--{{ event.category }}">
+                    {{ getCategoryLabel(event.category) }}
+                  </span>
+                </td>
+                <td class="td-date">{{ formatDateRange(event.startDate, event.endDate) }}</td>
+                <td class="td-secondary">{{ event.location }}</td>
+                <td>
+                  <div class="list-attendee">
+                    <span>{{ event.currentAttendees }}/{{ event.maxAttendees }}</span>
+                    <div class="mini-bar">
+                      <div class="mini-bar__fill" [style.width.%]="getAttendeePercent(event)"></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="event-card__status-badge event-card__status-badge--{{ event.status }}">
+                    {{ getStatusLabel(event.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button class="icon-btn" title="Modifier" [id]="'list-edit-' + event.id" (click)="$event.stopPropagation(); openEditModal(event)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                    <button class="icon-btn icon-btn--danger" title="Supprimer" [id]="'list-del-' + event.id" (click)="$event.stopPropagation(); deleteEvent(event)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (filteredEvents.length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="#9CA3AF" stroke-width="1.2"/>
+              <path d="M16 2v4M8 2v4M3 10h18" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <p>Aucun événement trouvé</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+
+
+</div>

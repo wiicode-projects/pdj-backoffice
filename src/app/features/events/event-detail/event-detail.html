@@ -1,0 +1,154 @@
+<div class="detail-page">
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner-lg"></div>
+      <p>Chargement…</p>
+    </div>
+  } @else if (event) {
+
+    <!-- Header -->
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="page-header__info">
+        <h1 class="page-title">{{ event.title }}</h1>
+        <div class="page-meta">
+          <span class="status-badge status-badge--{{ event.status }}">{{ getStatusLabel() }}</span>
+          <span class="category-pill">{{ getCategoryLabel() }}</span>
+          @if (event.isFeatured) {
+            <span class="featured-pill">★ Mis en avant</span>
+          }
+        </div>
+      </div>
+      <div class="page-header__actions">
+        <button class="btn btn--outline" (click)="goToEdit()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Modifier
+        </button>
+        @if (event.status !== 'CANCELLED' && event.status !== 'PAST') {
+          <button class="btn btn--ghost-danger" (click)="cancelEvent()">Annuler</button>
+        }
+      </div>
+    </div>
+
+    <!-- Banner -->
+    <div class="detail-banner" [style.background]="event.imageUrl ? 'none' : (event.imageColor || 'linear-gradient(135deg,#6366F1,#06B6D4)')">
+      @if (event.imageUrl) {
+        <img [src]="event.imageUrl" [alt]="event.title" class="detail-banner__img"/>
+      }
+    </div>
+
+    <!-- Content grid -->
+    <div class="detail-grid">
+
+      <!-- Main info -->
+      <div class="detail-card">
+        <h3 class="detail-card__title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Informations
+        </h3>
+        <div class="info-rows">
+          <div class="info-row">
+            <span class="info-row__label">Catégorie</span>
+            <span class="info-row__value">{{ getCategoryLabel() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Restaurant</span>
+            <span class="info-row__value">{{ getRestaurantName() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Début</span>
+            <span class="info-row__value">{{ formatDate(event.startDate) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Fin</span>
+            <span class="info-row__value">{{ formatDate(event.endDate) }}</span>
+          </div>
+          @if (event.location) {
+            <div class="info-row">
+              <span class="info-row__label">Lieu</span>
+              <span class="info-row__value">{{ event.location }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Attendees -->
+      <div class="detail-card">
+        <h3 class="detail-card__title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Participants
+        </h3>
+        <div class="attendee-block">
+          <div class="attendee-number">
+            <span class="attendee-number__current">{{ event.currentAttendees }}</span>
+            @if (event.maxAttendees) {
+              <span class="attendee-number__max">/ {{ event.maxAttendees }}</span>
+            } @else {
+              <span class="attendee-number__max">/ illimité</span>
+            }
+          </div>
+          @if (event.maxAttendees) {
+            <div class="attendee-bar">
+              <div class="attendee-bar__fill" [style.width.%]="getAttendeePercent()"></div>
+            </div>
+            <span class="attendee-percent">{{ getAttendeePercent() | number:'1.0-0' }}% rempli</span>
+          }
+        </div>
+      </div>
+
+      <!-- Description -->
+      @if (event.description) {
+        <div class="detail-card detail-card--full">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Description
+          </h3>
+          <p class="detail-description">{{ event.description }}</p>
+        </div>
+      }
+
+      <!-- Rewards -->
+      @if (event.rewards && event.rewards.length > 0) {
+        <div class="detail-card detail-card--full">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            🎁 {{ event.rewards.length }} récompense{{ event.rewards.length > 1 ? 's' : '' }}
+          </h3>
+          <div class="rewards-grid">
+            @for (r of event.rewards; track r.id) {
+              <div class="reward-item">
+                <span class="reward-item__icon">{{ getRewardIcon(r.type) }}</span>
+                <div class="reward-item__info">
+                  <span class="reward-item__name">{{ r.name }}</span>
+                  <span class="reward-item__meta">
+                    {{ getRewardLabel(r.type) }} · {{ r.quantity ? r.quantity + ' dispo.' : 'Illimité' }}
+                    @if (r.claimedCount) {
+                      · {{ r.claimedCount }} réclamé{{ r.claimedCount > 1 ? 's' : '' }}
+                    }
+                  </span>
+                  @if (r.description) {
+                    <span class="reward-item__desc">{{ r.description }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Quick actions footer -->
+    <div class="detail-footer">
+      <button class="btn btn--ghost" (click)="toggleFeatured()">
+        {{ event.isFeatured ? '★ Retirer des favoris' : '☆ Mettre en avant' }}
+      </button>
+      <button class="btn btn--danger-outline" (click)="deleteEvent()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Supprimer
+      </button>
+    </div>
+
+  }
+</div>

@@ -23,7 +23,8 @@
     "RESET": "Réinitialiser",
     "CLOSE": "Fermer",
     "DETAILS": "Détails",
-    "TOTAL": "Total"
+    "TOTAL": "Total",
+    "NEXT": "Suivant"
   },
   "AUTH": {
     "LOGIN": "Connexion",
@@ -76,9 +77,22 @@
     "DASHBOARD": "Tableau de bord",
     "USERS": "Utilisateurs",
     "RESTAURANTS": "Restaurants",
+    "MY_RESTAURANTS": "Mes restaurants",
+    "MEMBERSHIP": "Abonnement",
     "DISHES": "Plats",
     "MENUS": "Menus",
     "SUBSCRIPTIONS": "Abonnements",
+    "PAYMENTS": "Paiements",
+    "MINI_GAMES": "Mini-jeux",
+    "ADS": "Publicités",
+    "FRITES_PACKS": "Packs de Frites",
+    "SHOP_SECTION": "Boutique",
+    "SHOP_WALLETS": "Portefeuilles",
+    "SHOP_TRANSACTIONS": "Transactions",
+    "SHOP_ANALYTICS": "Analytiques",
+    "STATISTICS": "Statistiques",
+    "EVENTS": "Événements",
+    "SETTINGS": "Paramètres",
     "LOCATIONS": "Localisations",
     "SCHEDULES": "Horaires",
     "ROLES": "Rôles",
@@ -160,6 +174,7 @@
     "DELETE_SUCCESS": "Restaurant supprimé avec succès",
     "TYPE": {
       "FIXED": "Fixe",
+      "FIXE": "Fixe",
       "ITINERANT": "Itinérant"
     },
     "KPI": {
@@ -188,6 +203,8 @@
   },
   "DISHES": {
     "TITLE": "Gestion des plats",
+    "SUBTITLE": "Gérez les plats de votre restaurant",
+    "TOTAL": "Total plats",
     "CREATE": "Créer un plat",
     "EDIT": "Modifier le plat",
     "NAME": "Nom",
@@ -197,13 +214,65 @@
     "CALORIES": "Calories",
     "PREPARATION_TIME": "Temps de préparation",
     "AVAILABLE": "Disponible",
+    "UNAVAILABLE": "Indisponible",
     "IMAGE": "Image",
+    "GALLERY": "Galerie",
+    "SEARCH_PLACEHOLDER": "Rechercher un plat...",
+    "DELETE_CONFIRM": "Supprimer ce plat ?",
+    "EMPTY_TITLE": "Aucun plat pour le moment",
+    "EMPTY_HINT": "Ajoutez vos plats depuis l'application mobile",
+    "FILTER": {
+      "ALL": "Tout"
+    },
     "CATEGORIES": {
       "ENTREE": "Entrée",
       "PLAT_PRINCIPAL": "Plat principal",
       "DESSERT": "Dessert",
       "BOISSON": "Boisson",
       "ACCOMPAGNEMENT": "Accompagnement"
+    },
+    "DIETS": {
+      "STANDARD": "Standard",
+      "VEGAN": "Végan",
+      "VEGETARIAN": "Végétarien",
+      "GLUTEN_FREE": "Sans gluten",
+      "HALAL": "Halal"
+    },
+    "CREATE_FORM": {
+      "STEP_1": "Informations",
+      "STEP_2": "Image",
+      "STEP_3": "Aperçu",
+      "INFO_TITLE": "Informations du plat",
+      "INFO_SUBTITLE": "Renseignez les détails de votre nouveau plat",
+      "NAME_PLACEHOLDER": "Ex: Filet de bœuf grillé",
+      "DESC_PLACEHOLDER": "Décrivez votre plat en quelques mots...",
+      "DIET_LABEL": "Régime alimentaire",
+      "IMAGE_TITLE": "Photo du plat",
+      "IMAGE_SUBTITLE": "Ajoutez une belle photo pour mettre en valeur votre plat",
+      "CHOOSE_PHOTO": "Choisir une photo",
+      "IMAGE_SIZE_HINT": "JPG, PNG • Max 5 Mo",
+      "ADD_GALLERY": "Ajouter",
+      "UPGRADE_HINT": "Passez à un abonnement supérieur pour plus d'images",
+      "PRO_TIP_TITLE": "Conseil pro",
+      "PRO_TIP_BODY": "Une photo de qualité avec un bon éclairage naturel augmente de 40% les chances qu'un client choisisse votre plat.",
+      "PREVIEW": "Aperçu",
+      "PREVIEW_TITLE": "Aperçu de votre plat",
+      "PREVIEW_SUBTITLE": "Voici comment votre plat apparaîtra aux utilisateurs",
+      "ERROR_NAME": "Le nom du plat est requis",
+      "ERROR_DESCRIPTION": "La description est requise",
+      "ERROR_PRICE": "Le prix doit être supérieur à 0",
+      "ERROR_IMAGE": "Une photo est requise",
+      "SUCCESS_TITLE": "Plat créé avec succès !",
+      "SUCCESS_SUBTITLE": "Votre plat est maintenant visible par les utilisateurs",
+      "BACK_TO_DISHES": "Retour aux plats"
+    },
+    "EDIT_FORM": {
+      "INFO_TITLE": "Modifier le plat",
+      "INFO_SUBTITLE": "Modifiez les informations de votre plat",
+      "IMAGE_SUBTITLE": "Modifiez la photo de votre plat ou gardez l'actuelle",
+      "CHANGE_PHOTO": "Changer la photo",
+      "SUCCESS_TITLE": "Plat modifié avec succès !",
+      "SUCCESS_SUBTITLE": "Les modifications sont maintenant visibles par les utilisateurs"
     }
   },
   "SUBSCRIPTIONS": {
@@ -285,7 +354,34 @@
     }
   },
   "MENUS": {
-    "TITLE": "Gestion des menus"
+    "TITLE": "Gestion des menus",
+    "SUBTITLE": "Créez et planifiez les menus de votre restaurant",
+    "CREATE": "Créer un menu",
+    "EDIT": "Modifier le menu",
+    "NAME": "Nom du menu",
+    "NAME_PLACEHOLDER": "Ex: Menu du jour",
+    "PRICE": "Prix",
+    "AVAILABLE_AT": "Disponible le",
+    "COMPOSITION": "Composition",
+    "MAIN_COURSE": "Plat principal",
+    "APPETIZER": "Entrée",
+    "DESSERT_LABEL": "Dessert",
+    "SELECT_DISH": "Sélectionner un plat",
+    "NONE": "Aucun",
+    "SAVE_AS_MODEL": "Enregistrer comme modèle",
+    "MODEL": "Modèle",
+    "TODAY": "Aujourd'hui",
+    "UPCOMING": "À venir",
+    "PAST": "Passés",
+    "DELETE_CONFIRM": "Supprimer ce menu ?",
+    "EMPTY_TITLE": "Aucun menu pour le moment",
+    "EMPTY_HINT": "Créez votre premier menu pour commencer",
+    "KPI": {
+      "TODAY": "Aujourd'hui",
+      "UPCOMING": "À venir",
+      "TOTAL": "Total",
+      "MODELS": "Modèles"
+    }
   },
   "ROLES": {
     "TITLE": "Gestion des rôles",
@@ -294,11 +390,58 @@
     "USERS_COUNT": "Nombre d'utilisateurs"
   },
   "LOCATIONS": {
-    "TITLE": "Gestion des localisations",
+    "TITLE": "Géolocalisation",
+    "SUBTITLE": "Gérez l'emplacement et les horaires de votre restaurant",
+    "TYPE_FIXE": "Restaurant fixe",
+    "TYPE_ITINERANT": "Restaurant itinérant",
+    "TYPE_MULTI": "Multi-restaurants",
+    "OPEN_MAPS": "Ouvrir dans Maps",
+    "ADDRESS_TITLE": "Adresse",
     "ADDRESS": "Adresse",
+    "ADDRESS_PLACEHOLDER": "Rue, numéro...",
+    "CITY": "Ville",
+    "POSTAL_CODE": "Code postal",
+    "COUNTRY": "Pays",
+    "PHONE": "Téléphone",
+    "GOOGLE_MAPS_URL": "Lien Google Maps",
     "LONGITUDE": "Longitude",
     "LATITUDE": "Latitude",
-    "SCHEDULES": "Horaires d'ouverture"
+    "HOURS_TITLE": "Horaires d'ouverture",
+    "OPENING_TIME": "Ouverture",
+    "CLOSING_TIME": "Fermeture",
+    "SAVE": "Enregistrer",
+    "SAVE_SUCCESS": "Informations enregistrées avec succès",
+    "DAYS_ACTIVE": "jours actifs",
+    "TOTAL_SLOTS": "créneaux",
+    "SLOT": "créneau",
+    "SLOTS": "créneaux",
+    "NO_SLOTS": "Aucun créneau",
+    "ADD_SLOT": "Ajouter un créneau",
+    "EDIT_SLOT": "Modifier le créneau",
+    "SLOT_ADDRESS": "Adresse",
+    "SLOT_ADDRESS_PLACEHOLDER": "Lieu pour ce créneau...",
+    "SLOT_HOURS": "Horaires",
+    "START": "Début",
+    "END": "Fin",
+    "ADD": "Ajouter",
+    "HOUR": "Heure",
+    "MINUTE": "Minute",
+    "CONFIRM": "Confirmer",
+    "RESET": "Réinitialiser",
+    "SAVE_PLAN": "Enregistrer le planning",
+    "PLAN_SAVE_SUCCESS": "Planning enregistré avec succès",
+    "ERROR_ADDRESS_REQUIRED": "L'adresse est obligatoire",
+    "ERROR_END_BEFORE_START": "L'heure de fin doit être après l'heure de début",
+    "ERROR_OVERLAP": "Ce créneau chevauche un créneau existant",
+    "DAYS": {
+      "MON": "Lundi",
+      "TUE": "Mardi",
+      "WED": "Mercredi",
+      "THU": "Jeudi",
+      "FRI": "Vendredi",
+      "SAT": "Samedi",
+      "SUN": "Dimanche"
+    }
   },
   "SCHEDULES": {
     "TITLE": "Horaires d'ouverture",
@@ -314,5 +457,144 @@
       "5": "Vendredi",
       "6": "Samedi"
     }
+  },
+  "MY_RESTAURANTS": {
+    "TITLE": "Mes restaurants",
+    "SUBTITLE": "Gérez vos restaurants et vos points de vente",
+    "ADDRESS": "Adresse",
+    "PHONE": "Téléphone",
+    "HOURS": "Horaires",
+    "RESERVATION": "Réservation",
+    "TYPE": "Type",
+    "TYPE_FIXED": "Fixe",
+    "TYPE_ITINERANT": "Itinérant",
+    "VIEWS": "Vues",
+    "CLICKS": "Clics",
+    "BRANCHES": "Succursales",
+    "BRANCHES_TITLE": "Vos succursales",
+    "NO_BRANCHES": "Aucune succursale pour le moment"
+  },
+  "MEMBERSHIP": {
+    "TITLE": "Mon abonnement",
+    "SUBTITLE": "Consultez votre abonnement actif et découvrez les offres disponibles",
+    "NO_SUBSCRIPTION": "Aucun abonnement",
+    "NO_ACTIVE_PLAN": "Vous n'avez pas d'abonnement actif pour le moment",
+    "PRICE": "Prix",
+    "START_DATE": "Date de début",
+    "END_DATE": "Date de fin",
+    "REMAINING": "Jours restants",
+    "DAYS": "jours",
+    "INVOICES": "Historique de facturation",
+    "INVOICE_DATE": "Date",
+    "INVOICE_AMOUNT": "Montant",
+    "INVOICE_STATUS": "Statut",
+    "INVOICE_DUE": "Échéance",
+    "NO_INVOICES": "Aucune facture disponible",
+    "AVAILABLE_PLANS": "Forfaits disponibles",
+    "NO_PLANS_AVAILABLE": "Aucun forfait disponible pour le moment",
+    "CURRENT": "Actuel",
+    "CHOOSE_PLAN": "Choisir ce forfait",
+    "ACTIVE_PLAN": "Forfait actif",
+    "SELECT_PLAN": "Choisissez la période de facturation",
+    "SUBSCRIBE": "S'abonner",
+    "SUBSCRIBE_SUCCESS": "Abonnement activé avec succès !",
+    "PERIOD": {
+      "MONTHLY": "mois",
+      "QUARTERLY": "trimestre",
+      "SEMI_ANNUALLY": "semestre",
+      "YEARLY": "an"
+    }
+  },
+  "RESTAURANT_DETAIL": {
+    "DISHES_COUNT": "Plats créés",
+    "MENUS_COUNT": "Menus créés",
+    "INFORMATION": "Informations",
+    "LINKED_USER": "Utilisateur lié",
+    "NO_USER": "Aucun utilisateur lié",
+    "CREATED": "Créé le",
+    "PAYMENT_HISTORY": "Historique des paiements",
+    "NO_PAYMENTS": "Aucun paiement enregistré pour ce restaurant",
+    "INVOICE_DATE": "Date",
+    "INVOICE_STATUS": "Statut",
+    "INVOICE_PLAN": "Plan",
+    "INVOICE_DUE": "Échéance",
+    "NO_IMAGES": "Aucune image"
+  },
+  "PAYMENTS": {
+    "TITLE": "Historique des paiements",
+    "SUBTITLE": "Consultez l'ensemble des factures et paiements",
+    "SEARCH_PLACEHOLDER": "Rechercher par restaurant, utilisateur...",
+    "ALL_STATUSES": "Tous les statuts",
+    "EMPTY": "Aucun paiement enregistré",
+    "KPI": {
+      "TOTAL": "Total factures",
+      "PAID": "Payées",
+      "PENDING": "En attente",
+      "CANCELLED": "Annulées / Remboursées"
+    },
+    "COL": {
+      "DATE": "Date",
+      "OWNER": "Propriétaire",
+      "TYPE": "Type",
+      "SUBSCRIPTION": "Abonnement",
+      "PLAN": "Plan",
+      "STATUS": "Statut",
+      "DUE": "Échéance"
+    },
+    "STATUS": {
+      "PAID": "Payé",
+      "PENDING": "En attente",
+      "CANCELLED": "Annulé",
+      "REFUNDED": "Remboursé"
+    },
+    "TYPE": {
+      "RESTAURANT": "Restaurant",
+      "USER": "Utilisateur"
+    }
+  },
+  "MINI_GAMES": {
+    "TITLE": "Mini-jeux",
+    "SUBTITLE": "Activez ou désactivez les mini-jeux pour les utilisateurs",
+    "ACTIVE": "Actif",
+    "INACTIVE": "Inactif",
+    "ACTIVATE": "Activer",
+    "DEACTIVATE": "Désactiver",
+    "TOGGLE_SUCCESS": "Statut du jeu mis à jour"
+  },
+  "GAME_DETAIL": {
+    "CREATED": "Créé le",
+    "WEEKLY_ACTIVITY": "Activité hebdomadaire",
+    "THIS_WEEK": "Cette semaine",
+    "TODAY": "Aujourd'hui",
+    "REWARDS": "Récompenses & Statistiques",
+    "POINTS_DISTRIBUTED": "Points distribués",
+    "REWARDS_UNLOCKED": "Récompenses débloquées",
+    "PLAYS_TODAY": "Parties aujourd'hui",
+    "PLAYS_WEEK": "Parties cette semaine",
+    "RECENT_PLAYERS": "Joueurs récents",
+    "NO_ACTIVITY": "Aucune activité pour le moment",
+    "NO_PLAYERS": "Aucun joueur pour le moment",
+    "MOCK_DATA": "Données simulées",
+    "KPI": {
+      "TOTAL_PLAYS": "Total parties",
+      "UNIQUE_PLAYERS": "Joueurs uniques",
+      "AVG_DURATION": "Durée moyenne",
+      "COMPLETION_RATE": "Taux de complétion"
+    },
+    "COL": {
+      "PLAYER": "Joueur",
+      "EMAIL": "Email",
+      "TOTAL_PLAYS": "Parties",
+      "LAST_PLAYED": "Dernière partie"
+    }
+  },
+  "BAN": {
+    "BANNED": "Banni",
+    "ACTIVE": "Actif",
+    "BAN": "Bannir",
+    "UNBAN": "Réactiver le compte",
+    "CONFIRM_USER": "Êtes-vous sûr de vouloir bannir cet utilisateur ?",
+    "CONFIRM_RESTAURANT": "Êtes-vous sûr de vouloir bannir ce restaurant ?",
+    "SUCCESS": "Statut mis à jour avec succès"
   }
 }

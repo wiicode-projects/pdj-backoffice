@@ -23,7 +23,8 @@
     "RESET": "Reimpostare",
     "CLOSE": "Chiudere",
     "DETAILS": "Dettagli",
-    "TOTAL": "Totale"
+    "TOTAL": "Totale",
+    "NEXT": "Avanti"
   },
   "AUTH": {
     "LOGIN": "Accesso",
@@ -204,6 +205,14 @@
       "DESSERT": "Dessert",
       "BOISSON": "Bevanda",
       "ACCOMPAGNEMENT": "Contorno"
+    },
+    "EDIT_FORM": {
+      "INFO_TITLE": "Modifica piatto",
+      "INFO_SUBTITLE": "Aggiorna i dettagli del tuo piatto",
+      "IMAGE_SUBTITLE": "Cambia la foto o mantieni quella attuale",
+      "CHANGE_PHOTO": "Cambia foto",
+      "SUCCESS_TITLE": "Piatto aggiornato con successo!",
+      "SUCCESS_SUBTITLE": "Le modifiche sono ora visibili agli utenti"
     }
   },
   "SUBSCRIPTIONS": {
@@ -285,7 +294,34 @@
     }
   },
   "MENUS": {
-    "TITLE": "Gestione menù"
+    "TITLE": "Gestione menù",
+    "SUBTITLE": "Crea e pianifica i menù del tuo ristorante",
+    "CREATE": "Crea menù",
+    "EDIT": "Modifica menù",
+    "NAME": "Nome del menù",
+    "NAME_PLACEHOLDER": "Es: Menù del giorno",
+    "PRICE": "Prezzo",
+    "AVAILABLE_AT": "Disponibile il",
+    "COMPOSITION": "Composizione",
+    "MAIN_COURSE": "Piatto principale",
+    "APPETIZER": "Antipasto",
+    "DESSERT_LABEL": "Dessert",
+    "SELECT_DISH": "Seleziona un piatto",
+    "NONE": "Nessuno",
+    "SAVE_AS_MODEL": "Salva come modello",
+    "MODEL": "Modello",
+    "TODAY": "Oggi",
+    "UPCOMING": "In arrivo",
+    "PAST": "Passati",
+    "DELETE_CONFIRM": "Eliminare questo menù?",
+    "EMPTY_TITLE": "Nessun menù al momento",
+    "EMPTY_HINT": "Crea il tuo primo menù per iniziare",
+    "KPI": {
+      "TODAY": "Oggi",
+      "UPCOMING": "In arrivo",
+      "TOTAL": "Totale",
+      "MODELS": "Modelli"
+    }
   },
   "ROLES": {
     "TITLE": "Gestione ruoli",

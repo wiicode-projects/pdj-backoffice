@@ -23,7 +23,8 @@
     "RESET": "Zurücksetzen",
     "CLOSE": "Schliessen",
     "DETAILS": "Details",
-    "TOTAL": "Gesamt"
+    "TOTAL": "Gesamt",
+    "NEXT": "Weiter"
   },
   "AUTH": {
     "LOGIN": "Anmeldung",
@@ -204,6 +205,14 @@
       "DESSERT": "Dessert",
       "BOISSON": "Getränk",
       "ACCOMPAGNEMENT": "Beilage"
+    },
+    "EDIT_FORM": {
+      "INFO_TITLE": "Gericht bearbeiten",
+      "INFO_SUBTITLE": "Aktualisieren Sie die Details Ihres Gerichts",
+      "IMAGE_SUBTITLE": "Ändern Sie das Foto oder behalten Sie das aktuelle",
+      "CHANGE_PHOTO": "Foto ändern",
+      "SUCCESS_TITLE": "Gericht erfolgreich aktualisiert!",
+      "SUCCESS_SUBTITLE": "Ihre Änderungen sind jetzt sichtbar"
     }
   },
   "SUBSCRIPTIONS": {
@@ -285,7 +294,34 @@
     }
   },
   "MENUS": {
-    "TITLE": "Menüverwaltung"
+    "TITLE": "Menüverwaltung",
+    "SUBTITLE": "Erstellen und planen Sie die Menüs Ihres Restaurants",
+    "CREATE": "Menü erstellen",
+    "EDIT": "Menü bearbeiten",
+    "NAME": "Menüname",
+    "NAME_PLACEHOLDER": "Bsp: Tagesmenü",
+    "PRICE": "Preis",
+    "AVAILABLE_AT": "Verfügbar am",
+    "COMPOSITION": "Zusammensetzung",
+    "MAIN_COURSE": "Hauptgericht",
+    "APPETIZER": "Vorspeise",
+    "DESSERT_LABEL": "Dessert",
+    "SELECT_DISH": "Gericht auswählen",
+    "NONE": "Keines",
+    "SAVE_AS_MODEL": "Als Vorlage speichern",
+    "MODEL": "Vorlage",
+    "TODAY": "Heute",
+    "UPCOMING": "Bevorstehend",
+    "PAST": "Vergangen",
+    "DELETE_CONFIRM": "Dieses Menü löschen?",
+    "EMPTY_TITLE": "Noch keine Menüs",
+    "EMPTY_HINT": "Erstellen Sie Ihr erstes Menü",
+    "KPI": {
+      "TODAY": "Heute",
+      "UPCOMING": "Bevorstehend",
+      "TOTAL": "Gesamt",
+      "MODELS": "Vorlagen"
+    }
   },
   "ROLES": {
     "TITLE": "Rollenverwaltung",

@@ -1,0 +1,469 @@
+$primary-red: #DC2626;
+$navy: #1e3a5f;
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border-color: #E5E7EB;
+$bg-page: #F9FAFB;
+
+.locations-page {
+  font-family: 'PolySans Trial', -apple-system, sans-serif;
+
+  &__header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 28px; animation: fadeSlideDown 0.5s ease both;
+  }
+  &__title { font-size: 1.6rem; font-weight: 700; color: $text-dark; }
+  &__subtitle { font-size: 0.88rem; color: $text-medium; margin-top: 2px; }
+  &__loading { display: flex; justify-content: center; padding: 80px 0; }
+}
+
+.type-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 50px;
+  font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &--fixe { background: rgba(#10B981, 0.1); color: #10B981; }
+  &--itinerant { background: rgba($primary-red, 0.08); color: $primary-red; }
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid $border-color; border-top-color: $primary-red;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+
+// ── MAP PREVIEW ──────────────────────────────────────────────────────
+.map-preview {
+  position: relative; width: 100%; height: 180px; border-radius: 18px;
+  overflow: hidden; background: #dce9f8; cursor: pointer;
+  margin-bottom: 24px; animation: cardSlideUp 0.5s ease both;
+  transition: transform 0.2s ease;
+  &:hover { transform: translateY(-2px); }
+
+  &__grid { position: absolute; inset: 0; }
+  &__line {
+    position: absolute; background: #c1d4eb;
+    &--h { left: 0; right: 0; height: 1px; }
+    &--v { top: 0; bottom: 0; width: 1px; }
+  }
+  &__road {
+    position: absolute; background: rgba(255, 255, 255, 0.75);
+    &--h { left: 0; right: 0; top: 48%; height: 8px; }
+    &--v { top: 0; bottom: 0; left: 32%; width: 8px; }
+  }
+
+  &__pin {
+    position: absolute; top: 28%; left: 47%; display: flex;
+    flex-direction: column; align-items: center;
+  }
+  &__pin-head {
+    background: $primary-red; border-radius: 50%; padding: 8px;
+    box-shadow: 0 4px 12px rgba($primary-red, 0.4);
+    animation: pinBounce 2s ease-in-out infinite;
+  }
+  &__pin-stem { width: 2px; height: 8px; background: $primary-red; }
+  &__pin-shadow {
+    width: 12px; height: 5px; border-radius: 50%;
+    background: rgba($primary-red, 0.18);
+  }
+
+  &__badge {
+    position: absolute; bottom: 12px; right: 12px;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.94); padding: 6px 12px;
+    border-radius: 50px; font-size: 0.72rem; font-weight: 600;
+    color: $text-medium; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ── FIXE CARDS ───────────────────────────────────────────────────────
+.fixe-card {
+  background: $card-bg; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); margin-bottom: 20px;
+  animation: cardSlideUp 0.5s ease both;
+
+  &:nth-child(3) { animation-delay: 0.1s; }
+
+  &__header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 24px; border-bottom: 1px solid $border-color;
+    color: $text-dark;
+    h2 { font-size: 1rem; font-weight: 700; margin: 0; }
+    svg { color: $primary-red; flex-shrink: 0; }
+  }
+  &__body { padding: 20px 24px; }
+}
+
+.form-row {
+  margin-bottom: 16px;
+  &--2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  &:last-child { margin-bottom: 0; }
+}
+
+.form-field {
+  display: flex; flex-direction: column; gap: 4px;
+
+  label {
+    font-size: 0.72rem; font-weight: 600; color: $text-light;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  input {
+    width: 100%; padding: 11px 16px; border: 1.5px solid $border-color;
+    border-radius: 12px; font-size: 0.88rem; color: $text-dark;
+    background: $card-bg; font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    &:focus {
+      outline: none; border-color: $primary-red;
+      box-shadow: 0 0 0 3px rgba($primary-red, 0.08);
+    }
+    &::placeholder { color: $text-light; }
+  }
+}
+
+.fixe-actions {
+  display: flex; justify-content: flex-end; margin-top: 8px;
+  animation: cardSlideUp 0.5s ease 0.2s both;
+}
+
+// ── ITINERANT VIEW ──────────────────────────────────────────────────
+.itinerant-stats {
+  display: flex; gap: 12px; margin-bottom: 24px;
+  animation: fadeSlideDown 0.5s ease both;
+}
+
+.stat-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 18px; border-radius: 14px;
+  background: $card-bg; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  font-size: 0.82rem; color: $text-medium;
+  strong { color: $text-dark; font-weight: 700; }
+  svg { color: $primary-red; }
+}
+
+// ── DAY CARDS ────────────────────────────────────────────────────────
+.day-card {
+  background: $card-bg; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); margin-bottom: 12px;
+  animation: cardSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: box-shadow 0.2s ease;
+
+  @for $i from 1 through 7 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.05}s; }
+  }
+
+  &:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); }
+
+  &--empty {
+    border: 1.5px dashed rgba($primary-red, 0.2);
+    box-shadow: none; background: rgba($primary-red, 0.02);
+  }
+
+  &__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; cursor: pointer; user-select: none;
+    transition: background 0.15s ease;
+    &:hover { background: #FAFAFA; }
+  }
+  &__header-left { display: flex; align-items: center; gap: 12px; }
+  &__header-right { display: flex; align-items: center; gap: 8px; }
+
+  &__day-name { font-size: 0.95rem; font-weight: 700; color: $text-dark; }
+  &__slot-count {
+    font-size: 0.75rem; font-weight: 600; color: #10B981;
+    background: rgba(#10B981, 0.08); padding: 2px 10px;
+    border-radius: 20px;
+  }
+  &__no-slot { font-size: 0.75rem; color: $text-light; font-weight: 500; }
+
+  &__add-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 10px; border: none;
+    background: rgba($primary-red, 0.08); color: $primary-red;
+    cursor: pointer; transition: all 0.2s ease;
+    &:hover { background: $primary-red; color: #fff; }
+  }
+
+  &__chevron {
+    color: $text-light; transition: transform 0.25s ease;
+    .day-card--collapsed & { transform: rotate(-90deg); }
+  }
+
+  &__slots {
+    padding: 0 20px 16px;
+    animation: slotsReveal 0.3s ease both;
+  }
+}
+
+.slot-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; border-radius: 12px;
+  background: #F9FAFB; margin-bottom: 8px;
+  transition: background 0.15s ease;
+  &:last-child { margin-bottom: 0; }
+  &:hover { background: #F3F4F6; }
+
+  &__info { flex: 1; }
+  &__times {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  &__arrow { color: $text-light; font-size: 0.82rem; }
+  &__address {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.82rem; color: $text-medium;
+    svg { flex-shrink: 0; color: $text-light; }
+  }
+  &__actions { display: flex; gap: 4px; }
+}
+
+.time-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 50px;
+  background: rgba($navy, 0.06); color: $navy;
+  font-size: 0.82rem; font-weight: 600;
+  svg { color: $navy; }
+}
+
+.slot-action {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  cursor: pointer; transition: all 0.2s ease;
+
+  &--edit {
+    background: rgba(#3B82F6, 0.08); color: #3B82F6;
+    &:hover { background: #3B82F6; color: #fff; }
+  }
+  &--delete {
+    background: rgba($primary-red, 0.06); color: $primary-red;
+    &:hover { background: $primary-red; color: #fff; }
+  }
+}
+
+.itinerant-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+  margin-top: 8px; animation: cardSlideUp 0.5s ease 0.4s both;
+}
+
+.plan-error {
+  padding: 10px 16px; background: rgba($primary-red, 0.06);
+  border: 1px solid rgba($primary-red, 0.15); border-radius: 12px;
+  color: $primary-red; font-size: 0.82rem; font-weight: 500;
+  margin-top: 12px;
+}
+
+.success-toast {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 18px; border-radius: 12px;
+  background: rgba(#10B981, 0.06); border: 1px solid rgba(#10B981, 0.15);
+  color: #10B981; font-size: 0.85rem; font-weight: 600;
+  margin-top: 12px;
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: $card-bg; border-radius: 20px;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modalPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  overflow: hidden;
+
+  &__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 24px 0;
+  }
+  &__title { font-size: 1.1rem; font-weight: 700; color: $text-dark; }
+  &__close {
+    background: none; border: none; color: $text-light; cursor: pointer;
+    padding: 6px; border-radius: 8px;
+    &:hover { background: #F3F4F6; color: $text-dark; }
+  }
+  &__body { padding: 20px 24px; }
+  &__footer {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 16px 24px 24px; border-top: 1px solid $border-color;
+  }
+}
+
+.modal-field {
+  margin-bottom: 20px;
+  &:last-child { margin-bottom: 0; }
+
+  label {
+    display: block; font-size: 0.72rem; font-weight: 600;
+    color: $text-light; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+}
+
+.modal-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px; border: 1.5px solid $border-color;
+  border-radius: 12px; background: $card-bg;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  &:focus-within {
+    border-color: $primary-red;
+    box-shadow: 0 0 0 3px rgba($primary-red, 0.08);
+  }
+  svg { color: $text-light; flex-shrink: 0; }
+  input {
+    flex: 1; padding: 11px 0; border: none; font-size: 0.88rem;
+    color: $text-dark; font-family: inherit; background: transparent;
+    &:focus { outline: none; }
+    &::placeholder { color: $text-light; }
+  }
+}
+
+.time-range {
+  display: flex; align-items: center; gap: 12px;
+  &__sep { color: $text-light; font-weight: 600; font-size: 1.1rem; }
+}
+
+.time-btn {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; border: 1.5px solid $border-color;
+  border-radius: 12px; background: $card-bg;
+  cursor: pointer; font-family: inherit;
+  transition: border-color 0.2s ease;
+  &:hover { border-color: $text-light; }
+
+  &__label {
+    font-size: 0.68rem; color: $text-light; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  &__value { font-size: 1.05rem; font-weight: 700; color: $text-dark; }
+  svg { margin-left: auto; color: $text-light; }
+}
+
+.modal-error {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px;
+  background: rgba($primary-red, 0.06); color: $primary-red;
+  font-size: 0.78rem; font-weight: 600;
+  margin-top: 16px;
+}
+
+// ── TIME PICKER ──────────────────────────────────────────────────────
+.time-picker {
+  background: $card-bg; border-radius: 20px;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modalPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  overflow: hidden;
+
+  &__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 24px 0;
+    h3 { font-size: 1rem; font-weight: 700; color: $text-dark; }
+  }
+
+  &__body {
+    display: flex; gap: 16px; padding: 20px 24px;
+    align-items: flex-start;
+  }
+
+  &__col { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  &__col-label {
+    font-size: 0.68rem; font-weight: 700; color: $text-light;
+    text-transform: uppercase; letter-spacing: 1px;
+    text-align: center; margin-bottom: 4px;
+  }
+  &__scroll {
+    max-height: 200px; overflow-y: auto; display: flex;
+    flex-direction: column; gap: 2px;
+    scrollbar-width: thin; scrollbar-color: $border-color transparent;
+    &--short { max-height: none; }
+  }
+
+  &__cell {
+    padding: 10px; border-radius: 12px; border: none;
+    font-size: 1rem; font-weight: 500; color: $text-dark;
+    background: transparent; cursor: pointer; text-align: center;
+    font-family: inherit; transition: all 0.15s ease;
+
+    &:hover { background: #F3F4F6; }
+    &--active {
+      background: $primary-red !important; color: #fff; font-weight: 700;
+      box-shadow: 0 2px 8px rgba($primary-red, 0.3);
+    }
+  }
+
+  &__divider {
+    font-size: 1.5rem; font-weight: 700; color: $text-dark;
+    align-self: center; margin-top: 28px;
+  }
+
+  &__confirm {
+    margin: 0 24px 24px; width: calc(100% - 48px);
+    text-align: center; justify-content: center;
+  }
+}
+
+// ── BUTTONS ──────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: 12px;
+  font-size: 0.88rem; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+
+  &--primary {
+    background: $primary-red; color: #fff;
+    box-shadow: 0 2px 8px rgba($primary-red, 0.25);
+    &:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+  &--secondary {
+    background: #F3F4F6; color: $text-medium;
+    &:hover { background: #E5E7EB; color: $text-dark; }
+  }
+  &__spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(#fff, 0.3); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+  }
+}
+
+// ── ANIMATIONS ───────────────────────────────────────────────────────
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes pinBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes slotsReveal {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in { animation: cardSlideUp 0.5s ease both; }
+
+// ── RESPONSIVE ───────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .form-row--2col { grid-template-columns: 1fr; }
+  .time-range { flex-direction: column; align-items: stretch; }
+  .time-range__sep { text-align: center; }
+  .itinerant-stats { flex-direction: column; }
+}

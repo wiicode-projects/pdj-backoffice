@@ -1,0 +1,405 @@
+<div class="locations-page">
+  <!-- Header -->
+  <div class="locations-page__header">
+    <div class="locations-page__header-left">
+      <h1 class="locations-page__title">{{ 'LOCATIONS.TITLE' | translate }}</h1>
+      <p class="locations-page__subtitle">{{ 'LOCATIONS.SUBTITLE' | translate }}</p>
+    </div>
+    @if (restaurant) {
+      <span class="type-badge" [class.type-badge--fixe]="isFixe" [class.type-badge--itinerant]="isItinerant">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          @if (isFixe) {
+            <path d="M7 1C4.8 1 3 2.8 3 5c0 3 4 7.5 4 7.5s4-4.5 4-7.5C11 2.8 9.2 1 7 1z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="7" cy="5" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+          } @else {
+            <path d="M2 5h10M4 1v3M10 1v3M3 5h8v6a1 1 0 01-1 1H4a1 1 0 01-1-1V5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          }
+        </svg>
+        {{ typeLabel | translate }}
+      </span>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="locations-page__loading">
+      <div class="spinner"></div>
+    </div>
+  }
+
+  <!-- ═══════════ FIXE VIEW ═══════════ -->
+  @if (!loading && isFixe) {
+    <div class="fixe-view animate-in">
+      <!-- Map preview -->
+      <div class="map-preview" (click)="openInMaps()">
+        <div class="map-preview__grid">
+          @for (i of [1,2,3]; track i) {
+            <div class="map-preview__line map-preview__line--h" [style.top.%]="i * 25"></div>
+            <div class="map-preview__line map-preview__line--v" [style.left.%]="i * 25"></div>
+          }
+        </div>
+        <div class="map-preview__road map-preview__road--h"></div>
+        <div class="map-preview__road map-preview__road--v"></div>
+        <!-- Pin -->
+        <div class="map-preview__pin">
+          <div class="map-preview__pin-head">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2C5.8 2 4 3.8 4 6c0 3.5 4 8 4 8s4-4.5 4-8c0-2.2-1.8-4-4-4z" fill="white"/>
+            </svg>
+          </div>
+          <div class="map-preview__pin-stem"></div>
+          <div class="map-preview__pin-shadow"></div>
+        </div>
+        <!-- Badge -->
+        <div class="map-preview__badge">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <path d="M2 9L9 2M9 2H4M9 2v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ 'LOCATIONS.OPEN_MAPS' | translate }}
+        </div>
+      </div>
+
+      <!-- Address card -->
+      <div class="fixe-card">
+        <div class="fixe-card__header">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2C7.2 2 5 4.2 5 7c0 4 5 10 5 10s5-6 5-10c0-2.8-2.2-5-5-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <h2>{{ 'LOCATIONS.ADDRESS_TITLE' | translate }}</h2>
+        </div>
+        <div class="fixe-card__body">
+          <div class="form-row">
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.ADDRESS' | translate }}</label>
+              <input type="text" [(ngModel)]="fixeAddress" [placeholder]="'LOCATIONS.ADDRESS_PLACEHOLDER' | translate" />
+            </div>
+          </div>
+          <div class="form-row form-row--2col">
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.CITY' | translate }}</label>
+              <input type="text" [(ngModel)]="fixeCity" placeholder="Genève" />
+            </div>
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.POSTAL_CODE' | translate }}</label>
+              <input type="text" [(ngModel)]="fixePostalCode" placeholder="1201" />
+            </div>
+          </div>
+          <div class="form-row form-row--2col">
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.COUNTRY' | translate }}</label>
+              <input type="text" [(ngModel)]="fixeCountry" placeholder="Suisse" />
+            </div>
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.PHONE' | translate }}</label>
+              <input type="tel" [(ngModel)]="fixePhone" placeholder="+41 22 000 00 00" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.GOOGLE_MAPS_URL' | translate }}</label>
+              <input type="url" [(ngModel)]="fixeGoogleMapsUrl" placeholder="https://maps.google.com/..." />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opening hours card -->
+      <div class="fixe-card">
+        <div class="fixe-card__header">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2>{{ 'LOCATIONS.HOURS_TITLE' | translate }}</h2>
+        </div>
+        <div class="fixe-card__body">
+          <div class="form-row form-row--2col">
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.OPENING_TIME' | translate }}</label>
+              <input type="time" [(ngModel)]="fixeOpeningTime" />
+            </div>
+            <div class="form-field">
+              <label>{{ 'LOCATIONS.CLOSING_TIME' | translate }}</label>
+              <input type="time" [(ngModel)]="fixeClosingTime" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success message -->
+      @if (saveSuccess) {
+        <div class="success-toast animate-in">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7" stroke="#10B981" stroke-width="1.5"/>
+            <path d="M6 9l2 2 4-4.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ 'LOCATIONS.SAVE_SUCCESS' | translate }}
+        </div>
+      }
+
+      <!-- Save button -->
+      <div class="fixe-actions">
+        <button class="btn btn--primary" [disabled]="saving" (click)="saveFixe()">
+          @if (saving) {
+            <span class="btn__spinner"></span>
+          }
+          {{ 'LOCATIONS.SAVE' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ═══════════ ITINERANT VIEW ═══════════ -->
+  @if (!loading && isItinerant) {
+    <div class="itinerant-view animate-in">
+      <!-- Stats bar -->
+      <div class="itinerant-stats">
+        <div class="stat-chip">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="4" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M5 2v3M11 2v3M2 8h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <strong>{{ activeDays }}</strong> {{ 'LOCATIONS.DAYS_ACTIVE' | translate }}
+        </div>
+        <div class="stat-chip">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <strong>{{ totalSlots }}</strong> {{ 'LOCATIONS.TOTAL_SLOTS' | translate }}
+        </div>
+      </div>
+
+      <!-- Day cards -->
+      @for (day of weeklyPlan; track day.dayIndex) {
+        <div class="day-card" [class.day-card--empty]="day.slots.length === 0" [class.day-card--collapsed]="day.collapsed">
+          <!-- Day header -->
+          <div class="day-card__header" (click)="toggleDay(day.dayIndex)">
+            <div class="day-card__header-left">
+              <span class="day-card__day-name">{{ 'LOCATIONS.DAYS.' + day.dayKey | translate }}</span>
+              @if (day.slots.length > 0) {
+                <span class="day-card__slot-count">{{ day.slots.length }} {{ (day.slots.length === 1 ? 'LOCATIONS.SLOT' : 'LOCATIONS.SLOTS') | translate }}</span>
+              } @else {
+                <span class="day-card__no-slot">{{ 'LOCATIONS.NO_SLOTS' | translate }}</span>
+              }
+            </div>
+            <div class="day-card__header-right">
+              <button class="day-card__add-btn" (click)="openAddSlot(day.dayIndex); $event.stopPropagation()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <svg class="day-card__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Slots -->
+          @if (!day.collapsed && day.slots.length > 0) {
+            <div class="day-card__slots">
+              @for (slot of day.slots; track $index; let i = $index) {
+                <div class="slot-row">
+                  <div class="slot-row__info">
+                    <div class="slot-row__times">
+                      <span class="time-pill">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1"/>
+                          <path d="M6 3.5v2.5l1.5 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                        {{ slot.startTime }}
+                      </span>
+                      <span class="slot-row__arrow">→</span>
+                      <span class="time-pill">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1"/>
+                          <path d="M6 3.5v2.5l1.5 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                        {{ slot.endTime }}
+                      </span>
+                    </div>
+                    <div class="slot-row__address">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M6 1.5C4.3 1.5 3 2.8 3 4.5 3 7 6 10 6 10s3-3 3-5.5C9 2.8 7.7 1.5 6 1.5z" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <circle cx="6" cy="4.5" r="1" stroke="currentColor" stroke-width="1"/>
+                      </svg>
+                      {{ slot.address }}
+                    </div>
+                  </div>
+                  <div class="slot-row__actions">
+                    <button class="slot-action slot-action--edit" (click)="openEditSlot(day.dayIndex, i)">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M10 1.5l2.5 2.5L4.5 12H2v-2.5L10 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                    <button class="slot-action slot-action--delete" (click)="deleteSlot(day.dayIndex, i)">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M3 4h8M5.5 4V3a1 1 0 011-1h1a1 1 0 011 1v1M4.5 4v7a1 1 0 001 1h3a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Plan errors / success -->
+      @if (planError) {
+        <div class="plan-error">{{ planError }}</div>
+      }
+      @if (planSaveSuccess) {
+        <div class="success-toast animate-in">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7" stroke="#10B981" stroke-width="1.5"/>
+            <path d="M6 9l2 2 4-4.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ 'LOCATIONS.PLAN_SAVE_SUCCESS' | translate }}
+        </div>
+      }
+
+      <!-- Action bar -->
+      <div class="itinerant-actions">
+        <button class="btn btn--secondary" (click)="resetWeeklyPlan()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8a6 6 0 1111.5-2.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M14 3v3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ 'LOCATIONS.RESET' | translate }}
+        </button>
+        <button class="btn btn--primary" [disabled]="savingPlan" (click)="saveWeeklyPlan()">
+          @if (savingPlan) {
+            <span class="btn__spinner"></span>
+          }
+          {{ 'LOCATIONS.SAVE_PLAN' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ═══════════ SLOT MODAL ═══════════ -->
+@if (slotModalOpen) {
+  <div class="modal-overlay" (click)="closeSlotModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">
+          {{ (isEditingSlot ? 'LOCATIONS.EDIT_SLOT' : 'LOCATIONS.ADD_SLOT') | translate }} — {{ slotModalDayLabel }}
+        </h3>
+        <button class="modal__close" (click)="closeSlotModal()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <!-- Address -->
+        <div class="modal-field">
+          <label>{{ 'LOCATIONS.SLOT_ADDRESS' | translate }}</label>
+          <div class="modal-input-wrap">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2C5.8 2 4 3.8 4 6c0 3.5 4 8 4 8s4-4.5 4-8c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <circle cx="8" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+            <input type="text" [(ngModel)]="slotAddress" [placeholder]="'LOCATIONS.SLOT_ADDRESS_PLACEHOLDER' | translate" />
+          </div>
+        </div>
+
+        <!-- Time range -->
+        <div class="modal-field">
+          <label>{{ 'LOCATIONS.SLOT_HOURS' | translate }}</label>
+          <div class="time-range">
+            <button class="time-btn" (click)="openTimePicker('start')">
+              <div class="time-btn__label">{{ 'LOCATIONS.START' | translate }}</div>
+              <div class="time-btn__value">{{ slotStartTime || '--:--' }}</div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <span class="time-range__sep">→</span>
+            <button class="time-btn" (click)="openTimePicker('end')">
+              <div class="time-btn__label">{{ 'LOCATIONS.END' | translate }}</div>
+              <div class="time-btn__value">{{ slotEndTime || '--:--' }}</div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error -->
+        @if (slotError) {
+          <div class="modal-error">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M7 4v3M7 9v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            {{ slotError | translate }}
+          </div>
+        }
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="closeSlotModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" (click)="saveSlot()">
+          {{ (isEditingSlot ? 'COMMON.SAVE' : 'LOCATIONS.ADD') | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════ TIME PICKER MODAL ═══════════ -->
+@if (timePickerOpen) {
+  <div class="modal-overlay time-picker-overlay" (click)="closeTimePicker()">
+    <div class="time-picker" (click)="$event.stopPropagation()">
+      <div class="time-picker__header">
+        <h3>{{ (timePickerTarget === 'start' ? 'LOCATIONS.START' : 'LOCATIONS.END') | translate }}</h3>
+        <button class="modal__close" (click)="closeTimePicker()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="time-picker__body">
+        <!-- Hours -->
+        <div class="time-picker__col">
+          <span class="time-picker__col-label">{{ 'LOCATIONS.HOUR' | translate }}</span>
+          <div class="time-picker__scroll">
+            @for (h of hours; track h) {
+              <button class="time-picker__cell"
+                [class.time-picker__cell--active]="timePickerHour === h"
+                (click)="selectHour(h)">
+                {{ padNum(h) }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <span class="time-picker__divider">:</span>
+
+        <!-- Minutes -->
+        <div class="time-picker__col">
+          <span class="time-picker__col-label">{{ 'LOCATIONS.MINUTE' | translate }}</span>
+          <div class="time-picker__scroll time-picker__scroll--short">
+            @for (m of minutes; track m) {
+              <button class="time-picker__cell"
+                [class.time-picker__cell--active]="timePickerMinute === m"
+                (click)="selectMinute(m)">
+                {{ padNum(m) }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <button class="time-picker__confirm btn btn--primary" (click)="confirmTimePicker()">
+        {{ 'LOCATIONS.CONFIRM' | translate }} — {{ timePickerPreview }}
+      </button>
+    </div>
+  </div>
+}

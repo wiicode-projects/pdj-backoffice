@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { MenuService, Menu, CreateMenuPayload } from '../../core/services/menu.service';
@@ -50,6 +51,7 @@ export class Menus implements OnInit {
     private dishService: DishService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -256,6 +258,10 @@ export class Menus implements OnInit {
     this.panelOpen = true;
     this.confirmDeleteId = null;
     this.cdr.detectChanges();
+  }
+
+  navigateToDetail(menu: Menu): void {
+    this.router.navigate(['/app/menus', menu.id]);
   }
 
   closePanel(): void {

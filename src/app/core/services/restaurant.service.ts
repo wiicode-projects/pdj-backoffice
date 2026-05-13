@@ -75,4 +75,12 @@ export class RestaurantService {
   findInvoices(restaurantId: string): Observable<{ status: number; invoices: Invoice[] }> {
     return this.http.get<{ status: number; invoices: Invoice[] }>(`${this.apiUrl}/${restaurantId}/invoices`);
   }
+
+  update(id: string, formData: FormData): Observable<{ status: number; restaurant: AdminRestaurant }> {
+    return this.http.patch<{ status: number; restaurant: AdminRestaurant }>(`${this.apiUrl}/${id}`, formData);
+  }
+
+  create(formData: FormData): Observable<{ status: number; restaurant: AdminRestaurant }> {
+    return this.http.post<{ status: number; restaurant: AdminRestaurant }>(this.apiUrl, formData);
+  }
 }

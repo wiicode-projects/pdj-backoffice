@@ -164,6 +164,12 @@ export const routes: Routes = [
           import('./features/my-restaurants/my-restaurants').then((m) => m.MyRestaurants),
       },
       {
+        path: 'manage-restaurant',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/my-restaurants/manage-restaurant/manage-restaurant').then((m) => m.ManageRestaurant),
+      },
+      {
         path: 'membership',
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
@@ -182,10 +188,22 @@ export const routes: Routes = [
           import('./features/dishes/edit-dish/edit-dish').then((m) => m.EditDish),
       },
       {
+        path: 'dishes/:id',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/dishes/dish-detail/dish-detail').then((m) => m.DishDetail),
+      },
+      {
         path: 'dishes',
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
           import('./features/dishes/dishes').then((m) => m.Dishes),
+      },
+      {
+        path: 'menus/:id',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/menus/menu-detail/menu-detail').then((m) => m.MenuDetail),
       },
       {
         path: 'menus',

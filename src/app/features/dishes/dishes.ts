@@ -64,6 +64,10 @@ export class Dishes implements OnInit {
     this.router.navigate(['/app/dishes', id, 'edit']);
   }
 
+  navigateToDetail(dish: Dish): void {
+    this.router.navigate(['/app/dishes', dish.id]);
+  }
+
   ngOnInit(): void {
     this.loadDishes();
   }

@@ -27,7 +27,48 @@
         <span class="main-card__type-badge">{{ getTypeLabel(restaurant.type) | translate }}</span>
       </div>
       <div class="main-card__body">
-        <h2 class="main-card__name">{{ restaurant.name }}</h2>
+        <div class="main-card__top-row">
+          <h2 class="main-card__name">{{ restaurant.name }}</h2>
+          <button class="manage-btn" (click)="navigateToManage()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+            Gérer
+          </button>
+        </div>
+
+        <!-- Type display section (like mobile) -->
+        <div class="type-section">
+          <div class="type-display">
+            <div class="type-display__icon" [class.type-display__icon--itinerant]="restaurant.type === 'ITINERANT'" [class.type-display__icon--multi]="restaurant.type === 'MULTI'">
+              @if (restaurant.type === 'ITINERANT') {
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <rect x="2" y="7" width="18" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="6.5" cy="16" r="1.8" stroke="currentColor" stroke-width="1.3"/>
+                  <circle cx="15.5" cy="16" r="1.8" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M14 7V5H8v2" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+              } @else if (restaurant.type === 'MULTI') {
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="12" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="3" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              } @else {
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <rect x="3" y="5" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 18V12l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+              }
+            </div>
+            <div class="type-display__info">
+              <span class="type-display__label">Type de restaurant</span>
+              <span class="type-display__value">{{ getTypeLabelDirect(restaurant.type) }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="main-card__info-grid">
           <div class="main-card__info">
             <span class="main-card__label">{{ 'MY_RESTAURANTS.ADDRESS' | translate }}</span>
@@ -82,8 +123,8 @@
     </div>
 
     <!-- Branches section -->
-    @if (branches.length > 0) {
-      <div class="branches-section">
+    <div class="branches-section">
+      <div class="branches-section__header">
         <h2 class="branches-section__title">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
@@ -92,7 +133,20 @@
             <rect x="11" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
           </svg>
           {{ 'MY_RESTAURANTS.BRANCHES_TITLE' | translate }}
+          @if (branches.length > 0) {
+            <span class="branches-section__count">{{ branches.length }}</span>
+          }
         </h2>
+        <button class="create-branch-btn" (click)="openCreateModal()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Créer une succursale
+        </button>
+      </div>
+
+      @if (branches.length > 0) {
         <div class="branches-grid">
           @for (branch of branches; track branch.id) {
             <div class="branch-card" (click)="openPanel(branch)">
@@ -107,12 +161,12 @@
                     </svg>
                   </div>
                 }
+                <span class="branch-card__type-tag">{{ getTypeLabelDirect(branch.type) }}</span>
               </div>
               <div class="branch-card__body">
                 <h3 class="branch-card__name">{{ branch.name }}</h3>
                 <p class="branch-card__address">{{ getFullAddress(branch) }}</p>
                 <div class="branch-card__meta">
-                  <span class="branch-card__type">{{ getTypeLabel(branch.type) | translate }}</span>
                   <span class="branch-card__stats">
                     <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4C6 4 2.7 6.7 1 10c1.7 3.3 5 6 9 6s7.3-2.7 9-6c-1.7-3.3-5-6-9-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
                     {{ branch.viewCount }}
@@ -122,18 +176,27 @@
             </div>
           }
         </div>
-      </div>
-    }
+      }
 
-    @if (branches.length === 0) {
-      <div class="branches-empty">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-          <rect x="6" y="6" width="28" height="28" rx="4" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M14 28V18l6-6 6 6v10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
-        <p>{{ 'MY_RESTAURANTS.NO_BRANCHES' | translate }}</p>
-      </div>
-    }
+      @if (branches.length === 0) {
+        <div class="branches-empty">
+          <div class="branches-empty__icon">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <rect x="6" y="6" width="28" height="28" rx="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M14 28V18l6-6 6 6v10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p>{{ 'MY_RESTAURANTS.NO_BRANCHES' | translate }}</p>
+          <button class="create-branch-btn create-branch-btn--secondary" (click)="openCreateModal()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Créer votre première succursale
+          </button>
+        </div>
+      }
+    </div>
   }
 
   <!-- Branch Detail Panel -->
@@ -164,8 +227,12 @@
           </div>
         }
         <div class="panel__info-group">
-          <span class="panel__label">{{ 'MY_RESTAURANTS.TYPE' | translate }}</span>
-          <span class="panel__value">{{ getTypeLabel(selectedBranch.type) | translate }}</span>
+          <span class="panel__label">Type</span>
+          <span class="panel__value panel__value--type">
+            <span class="type-mini-badge" [class.type-mini-badge--itinerant]="selectedBranch.type === 'ITINERANT'">
+              {{ getTypeLabelDirect(selectedBranch.type) }}
+            </span>
+          </span>
         </div>
         <div class="panel__info-group">
           <span class="panel__label">{{ 'MY_RESTAURANTS.VIEWS' | translate }} / {{ 'MY_RESTAURANTS.CLICKS' | translate }}</span>
@@ -179,5 +246,78 @@
         }
       </div>
     </aside>
+  }
+
+  <!-- Create Branch Modal -->
+  @if (showCreateModal) {
+    <div class="modal-overlay" (click)="closeCreateModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal__header">
+          <h2>Créer une succursale</h2>
+          <button class="modal__close" (click)="closeCreateModal()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal__body">
+          @if (createError) {
+            <div class="modal__error">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M8 5V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="8" cy="11" r="0.6" fill="currentColor"/>
+              </svg>
+              {{ createError }}
+            </div>
+          }
+
+          <div class="modal__form-group">
+            <label class="modal__label">Nom de la succursale *</label>
+            <input type="text" class="modal__input" [(ngModel)]="branchName" placeholder="Ex: Sham — Lausanne" />
+          </div>
+
+          <div class="modal__form-group">
+            <label class="modal__label">Type de restaurant *</label>
+            <div class="modal__type-selector">
+              <button class="modal__type-option" [class.modal__type-option--active]="branchType === 'FIXE'" (click)="branchType = 'FIXE'">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 16V10l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+                Fixe
+              </button>
+              <button class="modal__type-option" [class.modal__type-option--active]="branchType === 'ITINERANT'" (click)="branchType = 'ITINERANT'">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="6" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="6" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+                  <circle cx="14" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M13 6V4H7v2" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+                Itinérant
+              </button>
+            </div>
+          </div>
+
+          <div class="modal__form-row">
+            <div class="modal__form-group">
+              <label class="modal__label">Ville *</label>
+              <input type="text" class="modal__input" [(ngModel)]="branchCity" placeholder="Lausanne" />
+            </div>
+            <div class="modal__form-group">
+              <label class="modal__label">Adresse</label>
+              <input type="text" class="modal__input" [(ngModel)]="branchAddress" placeholder="Rue et numéro" />
+            </div>
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--cancel" (click)="closeCreateModal()">Annuler</button>
+          <button class="btn btn--primary" [disabled]="creating" (click)="createBranch()">
+            @if (creating) { <span class="btn__spinner"></span> }
+            Créer la succursale
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </div>

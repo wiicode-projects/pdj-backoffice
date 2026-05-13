@@ -85,7 +85,7 @@
         </h2>
         <div class="menus-grid">
           @for (menu of todayMenus; track menu.id) {
-            <div class="menu-card menu-card--today" (click)="openPanel(menu)">
+            <div class="menu-card menu-card--today" (click)="navigateToDetail(menu)">
               <div class="menu-card__image-wrap">
                 @if (menu.image) {
                   <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />
@@ -151,7 +151,7 @@
         </h2>
         <div class="menus-grid">
           @for (menu of upcomingMenus; track menu.id) {
-            <div class="menu-card" (click)="openPanel(menu)">
+            <div class="menu-card" (click)="navigateToDetail(menu)">
               <div class="menu-card__image-wrap">
                 @if (menu.image) {
                   <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />
@@ -217,7 +217,7 @@
         </h2>
         <div class="menus-grid">
           @for (menu of pastMenus; track menu.id) {
-            <div class="menu-card menu-card--past" (click)="openPanel(menu)">
+            <div class="menu-card menu-card--past" (click)="navigateToDetail(menu)">
               <div class="menu-card__image-wrap">
                 @if (menu.image) {
                   <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="menu-card__image" />

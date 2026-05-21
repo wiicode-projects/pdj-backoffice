@@ -109,6 +109,12 @@ export const routes: Routes = [
           import('./features/frites-packs/frites-packs').then((m) => m.FritesPacks),
       },
       {
+        path: 'shop/customizations',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/shop-customizations/shop-customizations').then((m) => m.ShopCustomizations),
+      },
+      {
         path: 'shop/wallets',
         canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>

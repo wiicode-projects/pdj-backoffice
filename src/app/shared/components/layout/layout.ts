@@ -49,6 +49,7 @@ export class Layout {
       icon: 'shop', label: 'NAV.SHOP_SECTION', route: '', roles: ['ADMIN'],
       children: [
         { icon: 'frites',    label: 'NAV.FRITES_PACKS',       route: '/app/frites-packs' },
+        { icon: 'customize', label: 'NAV.SHOP_CUSTOMIZATIONS', route: '/app/shop/customizations' },
         { icon: 'wallet',    label: 'NAV.SHOP_WALLETS',        route: '/app/shop/wallets' },
         { icon: 'tx',        label: 'NAV.SHOP_TRANSACTIONS',   route: '/app/shop/transactions' },
         { icon: 'analytics', label: 'NAV.SHOP_ANALYTICS',      route: '/app/shop/analytics' },

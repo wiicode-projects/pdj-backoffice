@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   EventService,
   PlatformEvent,
-  EventRewardType,
 } from '../../../core/services/event.service';
 import { environment } from '../../../../environments/environment';
 
@@ -26,14 +25,6 @@ export class EventDetail implements OnInit {
     PROMOTION: 'Promotion', FESTIVAL: 'Festival', WORKSHOP: 'Atelier',
     LAUNCH: 'Lancement', PRIVATE: 'Privé', CHALLENGE: 'Challenge', SEASONAL: 'Saisonnier',
   };
-  readonly rewardTypeLabels: Record<string, { label: string; icon: string }> = {
-    LIMITED_EDITION: { label: 'Édition limitée', icon: '💎' },
-    SEASONAL_THEME: { label: 'Thème saisonnier', icon: '🎨' },
-    EXCLUSIVE_EFFECT: { label: 'Effet exclusif', icon: '✨' },
-    BADGE: { label: 'Badge', icon: '🏅' },
-    POINTS_BONUS: { label: 'Bonus de points', icon: '🎯' },
-  };
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -81,9 +72,6 @@ export class EventDetail implements OnInit {
   getStatusLabel(): string { return this.statusLabels[this.event?.status ?? ''] ?? ''; }
   getCategoryLabel(): string { return this.categoryLabels[this.event?.category ?? ''] ?? ''; }
   getRestaurantName(): string { return this.event?.restaurant?.name ?? 'Plat du Jour'; }
-
-  getRewardIcon(type: EventRewardType): string { return this.rewardTypeLabels[type]?.icon ?? '🎁'; }
-  getRewardLabel(type: EventRewardType): string { return this.rewardTypeLabels[type]?.label ?? type; }
 
   getAttendeePercent(): number {
     if (!this.event || !this.event.maxAttendees) return 0;

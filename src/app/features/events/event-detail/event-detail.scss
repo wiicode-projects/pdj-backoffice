@@ -114,18 +114,6 @@ $blue: #3B82F6;
   font-size: 0.88rem; color: $text-mid; line-height: 1.65; margin: 0; white-space: pre-wrap;
 }
 
-// ── Rewards ──────────────────────────────────
-.rewards-grid { display: flex; flex-direction: column; gap: 12px; }
-.reward-item {
-  display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px;
-  background: $bg; border-radius: 12px; border: 1px solid $border;
-  &__icon { font-size: 1.6rem; flex-shrink: 0; }
-  &__info { flex: 1; }
-  &__name { display: block; font-size: 0.9rem; font-weight: 600; color: $text-dark; margin-bottom: 2px; }
-  &__meta { display: block; font-size: 0.78rem; color: $text-mid; }
-  &__desc { display: block; font-size: 0.8rem; color: $text-light; margin-top: 4px; }
-}
-
 // ── Footer ───────────────────────────────────
 .detail-footer {
   display: flex; align-items: center; justify-content: space-between;

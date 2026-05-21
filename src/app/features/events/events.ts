@@ -124,7 +124,6 @@ export class Events implements OnInit {
   get upcomingCount(): number { return this.stats?.upcoming ?? this.events.filter(e => e.status === 'UPCOMING').length; }
   get ongoingCount(): number { return this.stats?.ongoing ?? this.events.filter(e => e.status === 'ONGOING').length; }
   get totalAttendees(): number { return this.stats?.totalAttendees ?? this.events.reduce((s, e) => s + e.currentAttendees, 0); }
-  get totalRewards(): number { return this.stats?.totalRewards ?? 0; }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 

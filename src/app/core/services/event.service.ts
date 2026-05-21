@@ -5,20 +5,6 @@ import { environment } from '../../../environments/environment';
 
 export type EventStatus = 'UPCOMING' | 'ONGOING' | 'PAST' | 'CANCELLED';
 export type EventCategory = 'PROMOTION' | 'FESTIVAL' | 'WORKSHOP' | 'LAUNCH' | 'PRIVATE' | 'CHALLENGE' | 'SEASONAL';
-export type EventRewardType = 'LIMITED_EDITION' | 'SEASONAL_THEME' | 'EXCLUSIVE_EFFECT' | 'BADGE' | 'POINTS_BONUS';
-
-export interface EventReward {
-  id: string;
-  name: string;
-  description: string | null;
-  type: EventRewardType;
-  quantity: number;
-  claimedCount: number;
-  assetUrl: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface PlatformEvent {
   id: string;
@@ -39,7 +25,6 @@ export interface PlatformEvent {
     id: string;
     name: string;
   } | null;
-  rewards: EventReward[];
   createdAt: string;
   updatedAt: string;
 }
@@ -51,7 +36,6 @@ export interface EventStats {
   past: number;
   cancelled: number;
   totalAttendees: number;
-  totalRewards: number;
 }
 
 export interface CreateEventPayload {
@@ -66,13 +50,6 @@ export interface CreateEventPayload {
   imageUrl?: string;
   imageColor?: string;
   restaurantId?: string;
-  rewards?: {
-    name: string;
-    description?: string;
-    type: EventRewardType;
-    quantity?: number;
-    assetUrl?: string;
-  }[];
 }
 
 export type UpdateEventPayload = Partial<CreateEventPayload> & {

@@ -7,6 +7,25 @@
       <p class="stats-page__subtitle">Vision globale du chiffre d'affaires et de la croissance</p>
     </div>
 
+    <button
+      class="btn-export-pdf"
+      (click)="exportPdf()"
+      [disabled]="exporting || loading"
+      id="btn-export-pdf"
+      title="Exporter en PDF"
+    >
+      @if (exporting) {
+        <span class="btn-export-pdf__spinner"></span>
+        Export en cours…
+      } @else {
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Exporter PDF
+      }
+    </button>
+
     <div class="stats-filters">
       <div class="filter-toggle">
         <button
@@ -24,6 +43,33 @@
           id="filter-yearly"
         >
           Annuel
+        </button>
+      </div>
+
+      <div class="filter-toggle filter-toggle--source">
+        <button
+          class="filter-toggle__btn"
+          [class.filter-toggle__btn--active]="selectedSource === 'all'"
+          (click)="selectedSource = 'all'; onFilterChange()"
+          id="filter-source-all"
+        >
+          Tout
+        </button>
+        <button
+          class="filter-toggle__btn"
+          [class.filter-toggle__btn--active]="selectedSource === 'subscriptions'"
+          (click)="selectedSource = 'subscriptions'; onFilterChange()"
+          id="filter-source-subs"
+        >
+          Abonnements
+        </button>
+        <button
+          class="filter-toggle__btn"
+          [class.filter-toggle__btn--active]="selectedSource === 'packs'"
+          (click)="selectedSource = 'packs'; onFilterChange()"
+          id="filter-source-packs"
+        >
+          Packs
         </button>
       </div>
 
@@ -48,6 +94,25 @@
     </div>
   </div>
 
+  <!-- Export Warning -->
+  @if (showExportWarning && !loading) {
+    <div class="export-warning" id="export-warning-banner">
+      <div class="export-warning__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="export-warning__text">
+        <strong>Aucun export ce mois-ci</strong>
+        <span>Vous n'avez pas encore exporté le rapport statistiques pour le mois en cours. Pensez à archiver vos données mensuellement.</span>
+      </div>
+      <button class="export-warning__btn" (click)="exportPdf()" [disabled]="exporting">
+        Exporter maintenant
+      </button>
+    </div>
+  }
+
   <!-- Loading -->
   @if (loading) {
     <div class="stats-loading">
@@ -64,6 +129,10 @@
   <div class="kpi-grid">
     @for (card of kpiCards; track card.label; let i = $index) {
       <div class="kpi-card" [style.--accent]="card.color">
+        <div class="kpi-card__tooltip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          {{ card.tooltip }}
+        </div>
         <div class="kpi-card__icon-wrap" [style.background]="card.color + card.bgAlpha">
           @switch (card.icon) {
             @case ('revenue') {
@@ -88,6 +157,13 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" [style.color]="card.color">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
                 <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            }
+            @case ('packs') {
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" [style.color]="card.color">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 6h18" stroke="currentColor" stroke-width="2"/>
+                <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             }
           }

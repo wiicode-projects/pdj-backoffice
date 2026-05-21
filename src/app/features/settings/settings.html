@@ -133,87 +133,52 @@
           </div>
         }
 
-        <!-- ── PAYMENT TAB ─────────────────────────────────────── -->
         @if (activeTab === 'payment') {
           <div class="settings-section" id="panel-payment">
             <div class="settings-section__header">
               <h2 class="settings-section__title">Fournisseurs de paiement</h2>
-              <p class="settings-section__desc">Configurez les intégrations Twint et MyPos pour la gestion des paiements</p>
+              <p class="settings-section__desc">Configurez vos intégrations de paiement : MyPos/TWINT, PayPal et virement bancaire</p>
             </div>
 
-            <!-- TWINT Card -->
-            <div class="provider-card" [class.provider-card--active]="twintEnabled" id="twint-card">
+            <!-- MYPOS / TWINT Combined Card -->
+            <div class="provider-card" [class.provider-card--active]="myposTwintEnabled" id="mypos-twint-card">
               <div class="provider-card__header">
                 <div class="provider-logo provider-logo--twint">
-                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="12" fill="#0C1B33"/>
-                    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
-                          font-family="Arial, sans-serif" font-weight="800" font-size="14" fill="white">TWINT</text>
-                  </svg>
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#0C1B33"/><text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="10" fill="white">myPOS</text><text x="50%" y="68%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="#4FC3F7">TWINT</text></svg>
                 </div>
                 <div class="provider-card__title-group">
-                  <h3 class="provider-card__name">Twint</h3>
-                  <p class="provider-card__desc">Paiement mobile suisse — QR Code & NFC</p>
+                  <h3 class="provider-card__name">MyPos / TWINT</h3>
+                  <p class="provider-card__desc">Terminal de paiement, carte, QR Code &amp; NFC</p>
                 </div>
                 <div class="provider-toggle">
-                  <label class="toggle" [for]="'toggle-twint'">
-                    <input
-                      type="checkbox"
-                      id="toggle-twint"
-                      [(ngModel)]="twintEnabled"
-                      class="toggle__input"
-                    />
-                    <span class="toggle__track">
-                      <span class="toggle__thumb"></span>
-                    </span>
+                  <label class="toggle" for="toggle-mypos-twint">
+                    <input type="checkbox" id="toggle-mypos-twint" [(ngModel)]="myposTwintEnabled" class="toggle__input"/>
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
                   </label>
-                  <span class="provider-status" [class.provider-status--on]="twintEnabled">
-                    {{ twintEnabled ? 'Activé' : 'Désactivé' }}
-                  </span>
+                  <span class="provider-status" [class.provider-status--on]="myposTwintEnabled">{{ myposTwintEnabled ? 'Activé' : 'Désactivé' }}</span>
                 </div>
               </div>
 
-              @if (twintEnabled) {
+              @if (myposTwintEnabled) {
                 <div class="provider-card__fields">
+                  <h4 class="provider-card__sub">Configuration TWINT</h4>
                   <div class="form-field">
-                    <label class="form-label" for="twint-webhook">URL Webhook</label>
+                    <label class="form-label" for="twint-webhook">URL Webhook TWINT</label>
                     <div class="input-with-copy">
-                      <input
-                        id="twint-webhook"
-                        class="form-input"
-                        type="url"
-                        [(ngModel)]="twintWebhookUrl"
-                        placeholder="https://api.leplatdujour.ch/webhooks/twint"
-                      />
+                      <input id="twint-webhook" class="form-input" type="url" [(ngModel)]="twintWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/twint"/>
                       <button class="copy-btn" (click)="copyToClipboard(twintWebhookUrl)" title="Copier" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
                       </button>
                     </div>
-                    <span class="form-hint">URL appelée par Twint lors d'un événement de paiement</span>
                   </div>
-
                   <div class="form-field">
-                    <label class="form-label" for="twint-merchant-id">Merchant ID</label>
-                    <input
-                      id="twint-merchant-id"
-                      class="form-input"
-                      type="text"
-                      [(ngModel)]="twintMerchantId"
-                      placeholder="TWINT-MERCHANT-XXXXX"
-                    />
+                    <label class="form-label" for="twint-merchant-id">Merchant ID TWINT</label>
+                    <input id="twint-merchant-id" class="form-input" type="text" [(ngModel)]="twintMerchantId" placeholder="TWINT-MERCHANT-XXXXX"/>
                   </div>
-
                   <div class="form-field">
-                    <label class="form-label" for="twint-api-key">Clé API secrète</label>
+                    <label class="form-label" for="twint-api-key">Clé API TWINT</label>
                     <div class="input-with-copy">
-                      <input
-                        id="twint-api-key"
-                        class="form-input form-input--secret"
-                        [type]="showTwintKey ? 'text' : 'password'"
-                        [(ngModel)]="twintApiKey"
-                        placeholder="sk_live_••••••••••••••••"
-                        autocomplete="new-password"
-                      />
+                      <input id="twint-api-key" class="form-input form-input--secret" [type]="showTwintKey ? 'text' : 'password'" [(ngModel)]="twintApiKey" placeholder="sk_live_••••••••••••••••" autocomplete="new-password"/>
                       <button class="copy-btn" (click)="showTwintKey = !showTwintKey" title="Afficher/masquer" type="button">
                         @if (!showTwintKey) {
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
@@ -227,88 +192,25 @@
                       Ne partagez jamais votre clé API secrète
                     </span>
                   </div>
-                </div>
-              } @else {
-                <div class="provider-card__disabled-hint">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                  Activez Twint pour configurer les paramètres d'intégration
-                </div>
-              }
-            </div>
 
-            <!-- MYPOS Card -->
-            <div class="provider-card" [class.provider-card--active]="myposEnabled" id="mypos-card">
-              <div class="provider-card__header">
-                <div class="provider-logo provider-logo--mypos">
-                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-                    <rect width="48" height="48" rx="12" fill="#E63946"/>
-                    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
-                          font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="white">myPOS</text>
-                  </svg>
-                </div>
-                <div class="provider-card__title-group">
-                  <h3 class="provider-card__name">MyPos</h3>
-                  <p class="provider-card__desc">Terminal de paiement carte & lien de paiement</p>
-                </div>
-                <div class="provider-toggle">
-                  <label class="toggle" [for]="'toggle-mypos'">
-                    <input
-                      type="checkbox"
-                      id="toggle-mypos"
-                      [(ngModel)]="myposEnabled"
-                      class="toggle__input"
-                    />
-                    <span class="toggle__track">
-                      <span class="toggle__thumb"></span>
-                    </span>
-                  </label>
-                  <span class="provider-status" [class.provider-status--on]="myposEnabled">
-                    {{ myposEnabled ? 'Activé' : 'Désactivé' }}
-                  </span>
-                </div>
-              </div>
-
-              @if (myposEnabled) {
-                <div class="provider-card__fields">
+                  <h4 class="provider-card__sub" style="margin-top:20px;">Configuration MyPos</h4>
                   <div class="form-field">
-                    <label class="form-label" for="mypos-webhook">URL Webhook</label>
+                    <label class="form-label" for="mypos-webhook">URL Webhook MyPos</label>
                     <div class="input-with-copy">
-                      <input
-                        id="mypos-webhook"
-                        class="form-input"
-                        type="url"
-                        [(ngModel)]="myposWebhookUrl"
-                        placeholder="https://api.leplatdujour.ch/webhooks/mypos"
-                      />
+                      <input id="mypos-webhook" class="form-input" type="url" [(ngModel)]="myposWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/mypos"/>
                       <button class="copy-btn" (click)="copyToClipboard(myposWebhookUrl)" title="Copier" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
                       </button>
                     </div>
-                    <span class="form-hint">URL de notification pour les événements de paiement MyPos</span>
                   </div>
-
                   <div class="form-field">
-                    <label class="form-label" for="mypos-merchant-id">Merchant ID</label>
-                    <input
-                      id="mypos-merchant-id"
-                      class="form-input"
-                      type="text"
-                      [(ngModel)]="myposMerchantId"
-                      placeholder="MYPOS-XXXXXXXXXX"
-                    />
+                    <label class="form-label" for="mypos-merchant-id">Merchant ID MyPos</label>
+                    <input id="mypos-merchant-id" class="form-input" type="text" [(ngModel)]="myposMerchantId" placeholder="MYPOS-XXXXXXXXXX"/>
                   </div>
-
                   <div class="form-field">
-                    <label class="form-label" for="mypos-api-key">Clé API secrète</label>
+                    <label class="form-label" for="mypos-api-key">Clé API MyPos</label>
                     <div class="input-with-copy">
-                      <input
-                        id="mypos-api-key"
-                        class="form-input form-input--secret"
-                        [type]="showMyposKey ? 'text' : 'password'"
-                        [(ngModel)]="myposApiKey"
-                        placeholder="mp_live_••••••••••••••••"
-                        autocomplete="new-password"
-                      />
+                      <input id="mypos-api-key" class="form-input form-input--secret" [type]="showMyposKey ? 'text' : 'password'" [(ngModel)]="myposApiKey" placeholder="mp_live_••••••••••••••••" autocomplete="new-password"/>
                       <button class="copy-btn" (click)="showMyposKey = !showMyposKey" title="Afficher/masquer" type="button">
                         @if (!showMyposKey) {
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
@@ -326,7 +228,134 @@
               } @else {
                 <div class="provider-card__disabled-hint">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                  Activez MyPos pour configurer les paramètres d'intégration
+                  Activez MyPos/TWINT pour configurer les paramètres d'intégration
+                </div>
+              }
+            </div>
+
+            <!-- PAYPAL Card -->
+            <div class="provider-card" [class.provider-card--active]="paypalEnabled" id="paypal-card">
+              <div class="provider-card__header">
+                <div class="provider-logo provider-logo--paypal">
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#003087"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="11" fill="white">PayPal</text></svg>
+                </div>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">PayPal</h3>
+                  <p class="provider-card__desc">Paiement en ligne international — carte &amp; solde PayPal</p>
+                </div>
+                <div class="provider-toggle">
+                  <label class="toggle" for="toggle-paypal">
+                    <input type="checkbox" id="toggle-paypal" [(ngModel)]="paypalEnabled" class="toggle__input"/>
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="paypalEnabled">{{ paypalEnabled ? 'Activé' : 'Désactivé' }}</span>
+                </div>
+              </div>
+
+              @if (paypalEnabled) {
+                <div class="provider-card__fields">
+                  <div class="form-field">
+                    <label class="form-label" for="paypal-client-id">Client ID</label>
+                    <input id="paypal-client-id" class="form-input" type="text" [(ngModel)]="paypalClientId" placeholder="AaBbCc123..."/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="paypal-secret-key">Clé secrète</label>
+                    <div class="input-with-copy">
+                      <input id="paypal-secret-key" class="form-input form-input--secret" [type]="showPaypalKey ? 'text' : 'password'" [(ngModel)]="paypalSecretKey" placeholder="EFg456..." autocomplete="new-password"/>
+                      <button class="copy-btn" (click)="showPaypalKey = !showPaypalKey" title="Afficher/masquer" type="button">
+                        @if (!showPaypalKey) {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                        } @else {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                        }
+                      </button>
+                    </div>
+                    <span class="form-hint form-hint--warn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
+                      Ne partagez jamais votre clé secrète
+                    </span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="paypal-webhook">URL Webhook</label>
+                    <div class="input-with-copy">
+                      <input id="paypal-webhook" class="form-input" type="url" [(ngModel)]="paypalWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/paypal"/>
+                      <button class="copy-btn" (click)="copyToClipboard(paypalWebhookUrl)" title="Copier" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label">Mode Sandbox</label>
+                    <div class="provider-toggle" style="margin-top:6px;">
+                      <label class="toggle" for="toggle-paypal-sandbox">
+                        <input type="checkbox" id="toggle-paypal-sandbox" [(ngModel)]="paypalSandbox" class="toggle__input"/>
+                        <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      </label>
+                      <span class="provider-status" [class.provider-status--on]="paypalSandbox">{{ paypalSandbox ? 'Sandbox (test)' : 'Production' }}</span>
+                    </div>
+                    <span class="form-hint">Activez le mode sandbox pour les tests sans transactions réelles</span>
+                  </div>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  Activez PayPal pour configurer les paramètres d'intégration
+                </div>
+              }
+            </div>
+
+            <!-- VIREMENT BANCAIRE Card -->
+            <div class="provider-card" [class.provider-card--active]="bankTransferEnabled" id="bank-transfer-card">
+              <div class="provider-card__header">
+                <div class="provider-logo provider-logo--bank">
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#065F46"/><path d="M24 12l12 7v2H12v-2l12-7z" fill="white" opacity=".9"/><rect x="15" y="23" width="4" height="9" rx="1" fill="white" opacity=".7"/><rect x="22" y="23" width="4" height="9" rx="1" fill="white" opacity=".7"/><rect x="29" y="23" width="4" height="9" rx="1" fill="white" opacity=".7"/><rect x="12" y="33" width="24" height="3" rx="1" fill="white" opacity=".9"/></svg>
+                </div>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">Virement bancaire</h3>
+                  <p class="provider-card__desc">Transfert direct vers votre compte — IBAN &amp; BIC</p>
+                </div>
+                <div class="provider-toggle">
+                  <label class="toggle" for="toggle-bank">
+                    <input type="checkbox" id="toggle-bank" [(ngModel)]="bankTransferEnabled" class="toggle__input"/>
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="bankTransferEnabled">{{ bankTransferEnabled ? 'Activé' : 'Désactivé' }}</span>
+                </div>
+              </div>
+
+              @if (bankTransferEnabled) {
+                <div class="provider-card__fields">
+                  <div class="form-field">
+                    <label class="form-label" for="bank-name">Nom de la banque</label>
+                    <input id="bank-name" class="form-input" type="text" [(ngModel)]="bankName" placeholder="UBS, Credit Suisse, PostFinance..."/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-account-holder">Titulaire du compte</label>
+                    <input id="bank-account-holder" class="form-input" type="text" [(ngModel)]="bankAccountHolder" placeholder="Le Plat du Jour SA"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-iban">IBAN</label>
+                    <div class="input-with-copy">
+                      <input id="bank-iban" class="form-input" type="text" [(ngModel)]="bankIban" placeholder="CH93 0076 2011 6238 5295 7"/>
+                      <button class="copy-btn" (click)="copyToClipboard(bankIban)" title="Copier" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-bic">BIC / SWIFT</label>
+                    <input id="bank-bic" class="form-input" type="text" [(ngModel)]="bankBic" placeholder="UBSWCHZH80A"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-reference">Référence de paiement</label>
+                    <input id="bank-reference" class="form-input" type="text" [(ngModel)]="bankReference" placeholder="PDJ-XXXXXX"/>
+                    <span class="form-hint">Référence ajoutée automatiquement aux instructions de virement</span>
+                  </div>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  Activez le virement bancaire pour configurer vos coordonnées
                 </div>
               }
             </div>

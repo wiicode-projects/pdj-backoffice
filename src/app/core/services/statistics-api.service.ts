@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type RevenueSource = 'all' | 'subscriptions' | 'packs';
+
 export interface RevenueKpis {
   revenuePaidCurrentPeriod: number;
   totalRevenuePaid: number;
@@ -10,6 +12,13 @@ export interface RevenueKpis {
   pendingInvoicesCount: number;
   pendingInvoicesTotal: number;
   totalActiveSubscribers: number;
+  // Pack-specific
+  packRevenuePeriod: number;
+  packRevenueTotal: number;
+  packPurchaseCount: number;
+  // Subscription-specific
+  subRevenuePeriod: number;
+  subRevenueTotal: number;
 }
 
 export interface SubscriberBreakdown {
@@ -34,6 +43,7 @@ export interface YearlyComparison {
 
 export interface RevenueStatisticsResponse {
   status: number;
+  source: RevenueSource;
   kpis: RevenueKpis;
   subscriberBreakdown: SubscriberBreakdown[];
   monthlyComparison: MonthlyComparison[];
@@ -50,8 +60,9 @@ export class StatisticsApiService {
     period: 'monthly' | 'yearly',
     year: number,
     month?: number,
+    source: RevenueSource = 'all',
   ): Observable<RevenueStatisticsResponse> {
-    let url = `${this.base}/revenue?period=${period}&year=${year}`;
+    let url = `${this.base}/revenue?period=${period}&year=${year}&source=${source}`;
     if (period === 'monthly' && month) url += `&month=${month}`;
     return this.http.get<RevenueStatisticsResponse>(url);
   }

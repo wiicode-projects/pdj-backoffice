@@ -95,6 +95,137 @@ $amber: #F59E0B;
     color: $text-mid;
     margin: 0;
   }
+
+  // During PDF export: hide interactive elements
+  &--exporting {
+    .kpi-card__tooltip,
+    .btn-export-pdf,
+    .stats-filters,
+    .export-warning {
+      display: none !important;
+    }
+  }
+}
+
+// ── Export PDF Button ──────────────────────
+.btn-export-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: $card;
+  color: $text-dark;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $red;
+    color: $red;
+    box-shadow: 0 2px 10px rgba($red, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid $border;
+    border-top-color: $red;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+}
+
+// ==========================================
+// Export Warning Banner
+// ==========================================
+.export-warning {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  animation: slideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 10px;
+    color: #D97706;
+  }
+
+  &__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 0.85rem;
+      color: #92400E;
+      font-weight: 700;
+    }
+
+    span {
+      font-size: 0.78rem;
+      color: #A16207;
+      line-height: 1.4;
+    }
+  }
+
+  &__btn {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    background: #F59E0B;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: #D97706;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
 
 // ==========================================
@@ -156,16 +287,24 @@ $amber: #F59E0B;
   }
 }
 
+.filter-toggle--source {
+  .filter-toggle__btn--active {
+    background: $violet;
+    box-shadow: 0 2px 8px rgba($violet, 0.3);
+  }
+}
+
 // ==========================================
 // KPI Grid
 // ==========================================
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 18px;
   margin-bottom: 24px;
 
-  @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 1400px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 600px)  { grid-template-columns: 1fr; }
 }
 
@@ -178,11 +317,10 @@ $amber: #F59E0B;
   flex-direction: column;
   gap: 12px;
   position: relative;
-  overflow: hidden;
   transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
   animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
 
-  @for $i from 1 through 4 {
+  @for $i from 1 through 5 {
     &:nth-child(#{$i}) { animation-delay: #{$i * 0.1}s; }
   }
 
@@ -199,6 +337,57 @@ $amber: #F59E0B;
   &:hover {
     transform: translateY(-4px) scale(1.015);
     box-shadow: 0 10px 28px rgba(0,0,0,0.09);
+
+    .kpi-card__tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  &__tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 12px;
+    right: 12px;
+    background: rgba($text-dark, 0.95);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 20;
+    pointer-events: none;
+    margin-bottom: 8px;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    // Arrow pointing down
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 24px;
+      width: 12px;
+      height: 12px;
+      background: rgba($text-dark, 0.95);
+      transform: rotate(45deg);
+      border-radius: 0 0 3px 0;
+    }
   }
 
   &__icon-wrap {

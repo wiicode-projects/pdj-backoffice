@@ -5,17 +5,10 @@ import { Router } from '@angular/router';
 import {
   EventService,
   EventCategory,
-  EventRewardType,
   CreateEventPayload,
 } from '../../../core/services/event.service';
 import { RestaurantService, AdminRestaurant } from '../../../core/services/restaurant.service';
-
-interface RewardFormItem {
-  name: string;
-  description: string;
-  type: EventRewardType;
-  quantity: number;
-}
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'pdj-create-event',
@@ -25,9 +18,9 @@ interface RewardFormItem {
   styleUrl: './create-event.scss',
 })
 export class CreateEvent implements OnInit {
-  // Steps: 1 = info, 2 = rewards, 3 = preview
+  // Steps: 1 = info, 2 = preview
   currentStep = 1;
-  readonly totalSteps = 3;
+  readonly totalSteps = 2;
 
   // Form
   title = '';
@@ -40,7 +33,6 @@ export class CreateEvent implements OnInit {
   isFeatured = false;
   imageColor = 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)';
   restaurantId = '';
-  rewards: RewardFormItem[] = [];
 
   // Cover image
   coverFile: File | null = null;
@@ -52,6 +44,9 @@ export class CreateEvent implements OnInit {
   submitted = false;
   errors: Record<string, string> = {};
 
+  // Created event ID for sharing
+  createdEventId: string | null = null;
+
   readonly categoryOptions: { value: EventCategory; label: string }[] = [
     { value: 'PROMOTION', label: 'Promotion' },
     { value: 'FESTIVAL', label: 'Festival' },
@@ -60,14 +55,6 @@ export class CreateEvent implements OnInit {
     { value: 'PRIVATE', label: 'Privé' },
     { value: 'CHALLENGE', label: 'Challenge' },
     { value: 'SEASONAL', label: 'Saisonnier' },
-  ];
-
-  readonly rewardTypeOptions: { value: EventRewardType; label: string; icon: string }[] = [
-    { value: 'LIMITED_EDITION', label: 'Édition limitée', icon: '💎' },
-    { value: 'SEASONAL_THEME', label: 'Thème saisonnier', icon: '🎨' },
-    { value: 'EXCLUSIVE_EFFECT', label: 'Effet exclusif', icon: '✨' },
-    { value: 'BADGE', label: 'Badge', icon: '🏅' },
-    { value: 'POINTS_BONUS', label: 'Bonus de points', icon: '🎯' },
   ];
 
   readonly colorPresets: { gradient: string; name: string }[] = [
@@ -101,7 +88,6 @@ export class CreateEvent implements OnInit {
 
   goToStep(step: number): void {
     if (step === 2 && !this.validateStep1()) return;
-    if (step === 3 && !this.validateStep2()) return;
     this.currentStep = step;
   }
 
@@ -123,32 +109,6 @@ export class CreateEvent implements OnInit {
     if (this.startDate && this.endDate && new Date(this.startDate) >= new Date(this.endDate))
       this.errors['endDate'] = 'La date de fin doit être après la date de début';
     return Object.keys(this.errors).length === 0;
-  }
-
-  validateStep2(): boolean {
-    this.errors = {};
-    for (let i = 0; i < this.rewards.length; i++) {
-      if (!this.rewards[i].name.trim()) {
-        this.errors[`reward_${i}`] = 'Le nom de la récompense est requis';
-      }
-    }
-    return Object.keys(this.errors).length === 0;
-  }
-
-  // ── Rewards ────────────────────────────────────────────────────────────
-
-  addReward(): void {
-    this.rewards.push({ name: '', description: '', type: 'LIMITED_EDITION', quantity: 0 });
-  }
-
-  removeReward(i: number): void { this.rewards.splice(i, 1); }
-
-  getRewardTypeLabel(type: EventRewardType): string {
-    return this.rewardTypeOptions.find(o => o.value === type)?.label ?? type;
-  }
-
-  getRewardTypeIcon(type: EventRewardType): string {
-    return this.rewardTypeOptions.find(o => o.value === type)?.icon ?? '🎁';
   }
 
   // ── Cover image ────────────────────────────────────────────────────────
@@ -189,21 +149,11 @@ export class CreateEvent implements OnInit {
     if (this.restaurantId) fd.append('restaurantId', this.restaurantId);
     if (this.coverFile) fd.append('coverImage', this.coverFile, this.coverFile.name);
 
-    if (this.rewards.length) {
-      fd.append('rewards', JSON.stringify(
-        this.rewards.map(r => ({
-          name: r.name.trim(),
-          description: r.description.trim() || undefined,
-          type: r.type,
-          quantity: r.quantity || undefined,
-        }))
-      ));
-    }
-
     this.eventService.createWithFormData(fd).subscribe({
-      next: () => {
+      next: (res) => {
         this.submitting = false;
         this.submitted = true;
+        this.createdEventId = res.event?.id ?? null;
         this.cdr.detectChanges();
       },
       error: () => {
@@ -214,6 +164,66 @@ export class CreateEvent implements OnInit {
   }
 
   goToEvents(): void { this.router.navigate(['/app/events']); }
+
+  // ── Social sharing ────────────────────────────────────────────────────
+
+  getShareUrl(): string {
+    const baseUrl = window.location.origin;
+    return this.createdEventId
+      ? `${baseUrl}/events/${this.createdEventId}`
+      : `${baseUrl}/events`;
+  }
+
+  getSocialShareUrl(): string {
+    if (!this.createdEventId) return this.getShareUrl();
+    const apiBase = environment.apiUrl.replace(/\/api\/v1\/?$/, '');
+    return `${apiBase}/api/v1/events/${this.createdEventId}/share`;
+  }
+
+  getShareText(): string {
+    let text = `🎉 Découvrez notre événement « ${this.title} » sur Le Plat du Jour !`;
+    if (this.description) {
+      const desc = this.description.length > 120
+        ? this.description.substring(0, 120) + '…'
+        : this.description;
+      text += `\n\n${desc}`;
+    }
+    return text;
+  }
+
+  shareOnFacebook(): void {
+    const url = encodeURIComponent(this.getSocialShareUrl());
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+  }
+
+  shareOnTwitter(): void {
+    const url = encodeURIComponent(this.getSocialShareUrl());
+    const text = encodeURIComponent(this.getShareText());
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
+  }
+
+  shareOnInstagram(): void {
+    // Instagram doesn't have a direct web share URL; open Instagram with a prompt
+    window.open('https://www.instagram.com/', '_blank');
+  }
+
+  shareOnTikTok(): void {
+    // TikTok doesn't have a direct web share URL; open TikTok
+    window.open('https://www.tiktok.com/', '_blank');
+  }
+
+  copyShareLink(): void {
+    navigator.clipboard.writeText(this.getShareUrl()).then(() => {
+      this.linkCopied = true;
+      setTimeout(() => {
+        this.linkCopied = false;
+        this.cdr.detectChanges();
+      }, 2000);
+      this.cdr.detectChanges();
+    });
+  }
+
+  linkCopied = false;
 
   // ── Helpers ────────────────────────────────────────────────────────────
 

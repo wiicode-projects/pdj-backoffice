@@ -143,51 +143,8 @@
             <textarea class="field__input field__textarea" rows="4" [(ngModel)]="description"></textarea>
           </div>
         </div>
-
-        <!-- Rewards section -->
-        <div class="rewards-section">
-          <h3 class="rewards-section__title">🎁 Récompenses</h3>
-          @if (rewards.length === 0) {
-            <p class="rewards-section__empty">Aucune récompense. <button class="link-btn" (click)="addReward()">Ajouter</button></p>
-          } @else {
-            <div class="rewards-list">
-              @for (reward of rewards; track $index; let i = $index) {
-                <div class="reward-card">
-                  <div class="reward-card__header">
-                    <span class="reward-card__number">#{{ i + 1 }}</span>
-                    <button class="reward-card__remove" (click)="removeReward(i)">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                  </div>
-                  <div class="reward-card__body">
-                    <div class="field">
-                      <label class="field__label">Nom</label>
-                      <input type="text" class="field__input" [(ngModel)]="reward.name"/>
-                    </div>
-                    <div class="field">
-                      <label class="field__label">Type</label>
-                      <select class="field__input" [(ngModel)]="reward.type">
-                        @for (opt of rewardTypeOptions; track opt.value) {
-                          <option [value]="opt.value">{{ opt.icon }} {{ opt.label }}</option>
-                        }
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label class="field__label">Quantité</label>
-                      <input type="number" class="field__input" min="0" [(ngModel)]="reward.quantity"/>
-                    </div>
-                    <div class="field">
-                      <label class="field__label">Description</label>
-                      <input type="text" class="field__input" [(ngModel)]="reward.description"/>
-                    </div>
-                  </div>
-                </div>
-              }
-              <button class="btn btn--outline btn--add" (click)="addReward()">+ Ajouter une récompense</button>
-            </div>
-          }
-        </div>
       </div>
+
 
       <!-- Footer -->
       <div class="form-footer">

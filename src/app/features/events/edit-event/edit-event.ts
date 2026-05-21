@@ -7,17 +7,11 @@ import {
   PlatformEvent,
   EventCategory,
   EventStatus,
-  EventRewardType,
   UpdateEventPayload,
 } from '../../../core/services/event.service';
 import { RestaurantService, AdminRestaurant } from '../../../core/services/restaurant.service';
 
-interface RewardFormItem {
-  name: string;
-  description: string;
-  type: EventRewardType;
-  quantity: number;
-}
+
 
 @Component({
   selector: 'pdj-edit-event',
@@ -44,7 +38,7 @@ export class EditEvent implements OnInit {
   isFeatured = false;
   imageColor = '';
   restaurantId = '';
-  rewards: RewardFormItem[] = [];
+
 
   // Cover image
   coverFile: File | null = null;
@@ -71,13 +65,7 @@ export class EditEvent implements OnInit {
     { value: 'CANCELLED', label: 'Annulé' },
   ];
 
-  readonly rewardTypeOptions: { value: EventRewardType; label: string; icon: string }[] = [
-    { value: 'LIMITED_EDITION', label: 'Édition limitée', icon: '💎' },
-    { value: 'SEASONAL_THEME', label: 'Thème saisonnier', icon: '🎨' },
-    { value: 'EXCLUSIVE_EFFECT', label: 'Effet exclusif', icon: '✨' },
-    { value: 'BADGE', label: 'Badge', icon: '🏅' },
-    { value: 'POINTS_BONUS', label: 'Bonus de points', icon: '🎯' },
-  ];
+
 
   readonly colorPresets: { gradient: string; name: string }[] = [
     { gradient: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 100%)', name: 'Sunset' },
@@ -126,12 +114,7 @@ export class EditEvent implements OnInit {
     this.imageColor = e.imageColor ?? this.colorPresets[0].gradient;
     this.restaurantId = e.restaurant?.id ?? '';
     this.existingCoverUrl = e.imageUrl;
-    this.rewards = (e.rewards ?? []).map(r => ({
-      name: r.name,
-      description: r.description ?? '',
-      type: r.type,
-      quantity: r.quantity,
-    }));
+
   }
 
   private toLocalDatetime(iso: string): string {
@@ -167,11 +150,7 @@ export class EditEvent implements OnInit {
     return null;
   }
 
-  // ── Rewards ────────────────────────────────────────────────────────────
-  addReward(): void {
-    this.rewards.push({ name: '', description: '', type: 'LIMITED_EDITION', quantity: 0 });
-  }
-  removeReward(i: number): void { this.rewards.splice(i, 1); }
+
 
   // ── Validation ─────────────────────────────────────────────────────────
   validate(): boolean {
@@ -201,12 +180,7 @@ export class EditEvent implements OnInit {
       isFeatured: this.isFeatured,
       imageColor: this.imageColor || undefined,
       restaurantId: this.restaurantId || undefined,
-      rewards: this.rewards.map(r => ({
-        name: r.name.trim(),
-        description: r.description.trim() || undefined,
-        type: r.type,
-        quantity: r.quantity || undefined,
-      })),
+
     };
 
     this.eventService.update(this.eventId, payload).subscribe({

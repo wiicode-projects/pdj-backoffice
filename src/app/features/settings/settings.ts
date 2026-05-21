@@ -35,20 +35,34 @@ export class Settings implements OnInit {
     supportPhone: '',
   };
 
-  // ── Payment ────────────────────────────────────────────────────────────
-  twintEnabled = false;
+  // ── Payment: MyPos / TWINT (combined) ───────────────────────────────
+  myposTwintEnabled = false;
   twintWebhookUrl = '';
   twintMerchantId = '';
   twintApiKey = '';
   showTwintKey = false;
-
-  myposEnabled = false;
   myposWebhookUrl = '';
   myposMerchantId = '';
   myposApiKey = '';
   showMyposKey = false;
 
-  // ── Email ──────────────────────────────────────────────────────────────
+  // ── Payment: PayPal ────────────────────────────────────────────────
+  paypalEnabled = false;
+  paypalClientId = '';
+  paypalSecretKey = '';
+  paypalWebhookUrl = '';
+  paypalSandbox = true;
+  showPaypalKey = false;
+
+  // ── Payment: Virement bancaire ─────────────────────────────────────
+  bankTransferEnabled = false;
+  bankName = '';
+  bankIban = '';
+  bankBic = '';
+  bankAccountHolder = '';
+  bankReference = '';
+
+  // ── Email ──────────────────────────────────────────────────────────
   emailEnabled = true;
   brevoApiKey = '';
   showBrevoKey = false;
@@ -106,15 +120,27 @@ export class Settings implements OnInit {
       supportEmail: data?.supportEmail ?? '',
       supportPhone: data?.supportPhone ?? '',
     };
-    // Payment
-    this.twintEnabled    = data?.twintEnabled    ?? false;
-    this.twintWebhookUrl = data?.twintWebhookUrl ?? '';
-    this.twintMerchantId = data?.twintMerchantId ?? '';
-    this.twintApiKey     = data?.twintApiKey     ?? '';
-    this.myposEnabled    = data?.myposEnabled    ?? false;
-    this.myposWebhookUrl = data?.myposWebhookUrl ?? '';
-    this.myposMerchantId = data?.myposMerchantId ?? '';
-    this.myposApiKey     = data?.myposApiKey     ?? '';
+    // Payment: MyPos / TWINT (combined — both enabled together)
+    this.myposTwintEnabled = (data?.twintEnabled ?? false) || (data?.myposEnabled ?? false);
+    this.twintWebhookUrl   = data?.twintWebhookUrl ?? '';
+    this.twintMerchantId   = data?.twintMerchantId ?? '';
+    this.twintApiKey       = data?.twintApiKey     ?? '';
+    this.myposWebhookUrl   = data?.myposWebhookUrl ?? '';
+    this.myposMerchantId   = data?.myposMerchantId ?? '';
+    this.myposApiKey       = data?.myposApiKey     ?? '';
+    // Payment: PayPal
+    this.paypalEnabled     = data?.paypalEnabled   ?? false;
+    this.paypalClientId    = data?.paypalClientId   ?? '';
+    this.paypalSecretKey   = data?.paypalSecretKey   ?? '';
+    this.paypalWebhookUrl  = data?.paypalWebhookUrl  ?? '';
+    this.paypalSandbox     = data?.paypalSandbox     ?? true;
+    // Payment: Bank transfer
+    this.bankTransferEnabled = data?.bankTransferEnabled ?? false;
+    this.bankName            = data?.bankName           ?? '';
+    this.bankIban            = data?.bankIban            ?? '';
+    this.bankBic             = data?.bankBic             ?? '';
+    this.bankAccountHolder   = data?.bankAccountHolder   ?? '';
+    this.bankReference       = data?.bankReference       ?? '';
     // Email
     this.emailEnabled               = data?.emailEnabled               ?? true;
     this.brevoApiKey                = data?.brevoApiKey                ?? '';
@@ -139,10 +165,19 @@ export class Settings implements OnInit {
 
   savePayment(): void {
     const dto: UpdatePaymentSettingsDto = {
-      twintEnabled: this.twintEnabled, twintWebhookUrl: this.twintWebhookUrl,
+      // MyPos / TWINT (combined)
+      twintEnabled: this.myposTwintEnabled, twintWebhookUrl: this.twintWebhookUrl,
       twintMerchantId: this.twintMerchantId, twintApiKey: this.twintApiKey,
-      myposEnabled: this.myposEnabled, myposWebhookUrl: this.myposWebhookUrl,
+      myposEnabled: this.myposTwintEnabled, myposWebhookUrl: this.myposWebhookUrl,
       myposMerchantId: this.myposMerchantId, myposApiKey: this.myposApiKey,
+      // PayPal
+      paypalEnabled: this.paypalEnabled, paypalClientId: this.paypalClientId,
+      paypalSecretKey: this.paypalSecretKey, paypalWebhookUrl: this.paypalWebhookUrl,
+      paypalSandbox: this.paypalSandbox,
+      // Bank transfer
+      bankTransferEnabled: this.bankTransferEnabled, bankName: this.bankName,
+      bankIban: this.bankIban, bankBic: this.bankBic,
+      bankAccountHolder: this.bankAccountHolder, bankReference: this.bankReference,
     };
     this.doSave(this.settingsService.updatePayment(dto));
   }

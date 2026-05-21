@@ -27,6 +27,11 @@ export const routes: Routes = [
       import('./features/auth/verify-otp/verify-otp').then((m) => m.VerifyOtp),
   },
   {
+    path: 'events/:id',
+    loadComponent: () =>
+      import('./features/events/public-event/public-event').then((m) => m.PublicEvent),
+  },
+  {
     path: 'app',
     canActivate: [authGuard],
     loadComponent: () =>

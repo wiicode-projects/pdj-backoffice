@@ -5,16 +5,28 @@ import { environment } from '../../../environments/environment';
 
 export interface PlatformSettings {
   id: string;
-  // Twint
+  // MyPos / TWINT (combined)
   twintWebhookUrl: string | null;
   twintMerchantId: string | null;
   twintApiKey: string | null;
   twintEnabled: boolean;
-  // MyPos
   myposWebhookUrl: string | null;
   myposMerchantId: string | null;
   myposApiKey: string | null;
   myposEnabled: boolean;
+  // PayPal
+  paypalEnabled: boolean;
+  paypalClientId: string | null;
+  paypalSecretKey: string | null;
+  paypalWebhookUrl: string | null;
+  paypalSandbox: boolean;
+  // Virement bancaire
+  bankTransferEnabled: boolean;
+  bankName: string | null;
+  bankIban: string | null;
+  bankBic: string | null;
+  bankAccountHolder: string | null;
+  bankReference: string | null;
   // General
   platformName: string | null;
   supportEmail: string | null;
@@ -33,6 +45,7 @@ export interface PlatformSettings {
 }
 
 export interface UpdatePaymentSettingsDto {
+  // MyPos / TWINT (combined)
   twintWebhookUrl?: string;
   twintMerchantId?: string;
   twintApiKey?: string;
@@ -41,6 +54,19 @@ export interface UpdatePaymentSettingsDto {
   myposMerchantId?: string;
   myposApiKey?: string;
   myposEnabled?: boolean;
+  // PayPal
+  paypalEnabled?: boolean;
+  paypalClientId?: string;
+  paypalSecretKey?: string;
+  paypalWebhookUrl?: string;
+  paypalSandbox?: boolean;
+  // Virement bancaire
+  bankTransferEnabled?: boolean;
+  bankName?: string;
+  bankIban?: string;
+  bankBic?: string;
+  bankAccountHolder?: string;
+  bankReference?: string;
 }
 
 export interface UpdateGeneralSettingsDto {

@@ -1,23 +1,24 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   EventService,
   PlatformEvent,
-  EventRewardType,
 } from '../../../core/services/event.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
-  selector: 'pdj-event-detail',
+  selector: 'pdj-public-event',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './event-detail.html',
-  styleUrl: './event-detail.scss',
+  templateUrl: './public-event.html',
+  styleUrl: './public-event.scss',
 })
-export class EventDetail implements OnInit {
+export class PublicEvent implements OnInit {
   event: PlatformEvent | null = null;
   loading = true;
+  notFound = false;
+  readonly currentYear = new Date().getFullYear();
 
   readonly statusLabels: Record<string, string> = {
     UPCOMING: 'À venir', ONGOING: 'En cours', PAST: 'Passé', CANCELLED: 'Annulé',
@@ -26,17 +27,9 @@ export class EventDetail implements OnInit {
     PROMOTION: 'Promotion', FESTIVAL: 'Festival', WORKSHOP: 'Atelier',
     LAUNCH: 'Lancement', PRIVATE: 'Privé', CHALLENGE: 'Challenge', SEASONAL: 'Saisonnier',
   };
-  readonly rewardTypeLabels: Record<string, { label: string; icon: string }> = {
-    LIMITED_EDITION: { label: 'Édition limitée', icon: '💎' },
-    SEASONAL_THEME: { label: 'Thème saisonnier', icon: '🎨' },
-    EXCLUSIVE_EFFECT: { label: 'Effet exclusif', icon: '✨' },
-    BADGE: { label: 'Badge', icon: '🏅' },
-    POINTS_BONUS: { label: 'Bonus de points', icon: '🎯' },
-  };
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private eventService: EventService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -51,39 +44,15 @@ export class EventDetail implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.router.navigate(['/app/events']);
+        this.notFound = true;
+        this.cdr.detectChanges();
       },
-    });
-  }
-
-  goBack(): void { this.router.navigate(['/app/events']); }
-  goToEdit(): void { this.router.navigate(['/app/events', this.event!.id, 'edit']); }
-
-  deleteEvent(): void {
-    if (!this.event || !confirm(`Supprimer l'événement « ${this.event.title} » ?`)) return;
-    this.eventService.remove(this.event.id).subscribe({ next: () => this.goBack() });
-  }
-
-  cancelEvent(): void {
-    if (!this.event || !confirm(`Annuler l'événement « ${this.event.title} » ?`)) return;
-    this.eventService.cancel(this.event.id).subscribe({
-      next: (res) => { this.event = res.event; this.cdr.detectChanges(); },
-    });
-  }
-
-  toggleFeatured(): void {
-    if (!this.event) return;
-    this.eventService.toggleFeatured(this.event.id, !this.event.isFeatured).subscribe({
-      next: (res) => { this.event = res.event; this.cdr.detectChanges(); },
     });
   }
 
   getStatusLabel(): string { return this.statusLabels[this.event?.status ?? ''] ?? ''; }
   getCategoryLabel(): string { return this.categoryLabels[this.event?.category ?? ''] ?? ''; }
-  getRestaurantName(): string { return this.event?.restaurant?.name ?? 'Plat du Jour'; }
-
-  getRewardIcon(type: EventRewardType): string { return this.rewardTypeLabels[type]?.icon ?? '🎁'; }
-  getRewardLabel(type: EventRewardType): string { return this.rewardTypeLabels[type]?.label ?? type; }
+  getRestaurantName(): string { return this.event?.restaurant?.name ?? 'Le Plat du Jour'; }
 
   getAttendeePercent(): number {
     if (!this.event || !this.event.maxAttendees) return 0;
@@ -101,10 +70,12 @@ export class EventDetail implements OnInit {
 
   linkCopied = false;
 
+  /** Public page URL (for copy link / display) */
   getShareUrl(): string {
     return `${window.location.origin}/events/${this.event?.id ?? ''}`;
   }
 
+  /** API share endpoint URL (serves OG meta tags for crawlers, then redirects) */
   getSocialShareUrl(): string {
     const apiBase = environment.apiUrl.replace(/\/api\/v1\/?$/, '');
     return `${apiBase}/api/v1/events/${this.event?.id ?? ''}/share`;
@@ -150,5 +121,5 @@ export class EventDetail implements OnInit {
       this.cdr.detectChanges();
     });
   }
-
 }
+

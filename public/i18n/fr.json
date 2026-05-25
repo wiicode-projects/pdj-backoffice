@@ -587,6 +587,57 @@
       "EMAIL": "Email",
       "TOTAL_PLAYS": "Parties",
       "LAST_PLAYED": "Dernière partie"
+    },
+    "LIMITS": {
+      "TITLE": "Limites de jeu",
+      "ENABLED": "Limiter le nombre de parties",
+      "MAX_PLAYS": "Parties max.",
+      "PERIOD": "Période",
+      "PERIOD_DAY": "Par jour",
+      "PERIOD_WEEK": "Par semaine",
+      "UNLIMITED_HINT": "Aucune limite appliquée pour ce jeu.",
+      "SAVE": "Enregistrer les limites",
+      "SAVING": "Enregistrement…"
+    },
+    "SPIN": {
+      "CONFIG_TITLE": "Configuration de la roue",
+      "SEGMENT_COUNT": "Nombre de segments",
+      "SEGMENT_COUNT_HINT": "Minimum 2 segments. Ajouter un segment peut augmenter le nombre automatiquement. Réduire le nombre nécessite de supprimer ou réassigner les segments au-delà de la nouvelle limite.",
+      "SAVE_CONFIG": "Enregistrer la configuration",
+      "SAVING": "Enregistrement…",
+      "REWARDS_TITLE": "Catalogue des récompenses",
+      "SEGMENTS_TITLE": "Segments de la roue",
+      "ADD_REWARD": "Ajouter une récompense",
+      "EDIT_REWARD": "Modifier la récompense",
+      "ADD_SEGMENT": "Ajouter un segment",
+      "EDIT_SEGMENT": "Modifier le segment",
+      "NO_REWARDS": "Aucune récompense configurée.",
+      "NO_SEGMENTS": "Aucun segment configuré.",
+      "TICKET_AMOUNT": "Nombre de tickets",
+      "CUSTOMIZATION_ITEM": "Article de personnalisation",
+      "SELECT_CUSTOMIZATION": "Sélectionner un article…",
+      "REWARD_SOURCE": "Source de la récompense",
+      "REWARD_EXISTING": "Récompense existante",
+      "REWARD_INLINE": "Créer une nouvelle récompense",
+      "REWARD_PICK": "Récompense",
+      "DELETE_REWARD": "Supprimer la récompense",
+      "DELETE_REWARD_CONFIRM": "Supprimer cette récompense ? Elle ne doit pas être assignée à un segment.",
+      "DELETE_SEGMENT": "Supprimer le segment",
+      "DELETE_SEGMENT_CONFIRM": "Supprimer ce segment de la roue ?",
+      "TYPE": {
+        "NONE": "Rien",
+        "TOMBOLA": "Tickets tombola",
+        "CUSTOMIZATION": "Customisation ID Card"
+      },
+      "COL": {
+        "INDEX": "Index",
+        "COLOR": "Couleur",
+        "LABEL": "Libellé",
+        "REWARD_TYPE": "Type",
+        "REWARD_DETAIL": "Détail",
+        "WEIGHT": "Poids",
+        "ACTIVE": "Actif"
+      }
     }
   },
   "BAN": {

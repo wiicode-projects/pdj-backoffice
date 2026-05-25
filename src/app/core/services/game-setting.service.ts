@@ -3,14 +3,29 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type GameLimitPeriod = 'day' | 'week';
+
 export interface GameSetting {
   id: string;
   slug: string;
   name: string;
   description: string | null;
   isActive: boolean;
+  maxPlaysPerPeriod: number | null;
+  limitPeriod: GameLimitPeriod;
+  limitEnabled: boolean;
+  wheelSegmentCount?: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UpdateGameSettingPayload {
+  isActive?: boolean;
+  name?: string;
+  description?: string;
+  limitEnabled?: boolean;
+  limitPeriod?: GameLimitPeriod;
+  maxPlaysPerPeriod?: number | null;
 }
 
 export interface GameStats {
@@ -56,7 +71,17 @@ export class GameSettingService {
   }
 
   toggle(id: string, isActive: boolean): Observable<{ status: number; game: GameSetting }> {
-    return this.http.patch<{ status: number; game: GameSetting }>(`${this.apiUrl}/settings/${id}`, { isActive });
+    return this.updateSettings(id, { isActive });
+  }
+
+  updateSettings(
+    id: string,
+    payload: UpdateGameSettingPayload,
+  ): Observable<{ status: number; game: GameSetting }> {
+    return this.http.patch<{ status: number; game: GameSetting }>(
+      `${this.apiUrl}/settings/${id}`,
+      payload,
+    );
   }
 
   getStats(gameId: string): Observable<{ status: number; stats: GameStats }> {

@@ -622,6 +622,101 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 // ==============================
+// PLAY LIMITS
+// ==============================
+.limits-card {
+  margin-bottom: 24px;
+}
+
+.limits-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-dark;
+    cursor: pointer;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $text-medium;
+  }
+
+  &__input {
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-family: $font;
+    color: $text-dark;
+    background: $card-bg;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: $text-medium;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.btn {
+  border: none;
+  border-radius: $radius-sm;
+  padding: 10px 16px;
+  font-family: $font;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &--primary {
+    background: $primary;
+    color: white;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &--sm {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+// ==============================
 // ANIMATIONS
 // ==============================
 @keyframes fadeIn {
@@ -632,6 +727,200 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+// ==============================
+// SPIN WHEEL ADMIN
+// ==============================
+.spin-card {
+  margin-bottom: 20px;
+
+  .detail-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+.limits-form__field--narrow {
+  max-width: 160px;
+}
+
+.loading--inline {
+  padding: 24px;
+  justify-content: center;
+}
+
+.td-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.row--inactive {
+  opacity: 0.55;
+}
+
+.btn {
+  &--ghost {
+    background: transparent;
+    border: 1px solid $border;
+    color: $text-medium;
+
+    &:hover {
+      background: $border-light;
+      color: $text-dark;
+    }
+  }
+
+  &--danger {
+    background: $red-light;
+    color: $red;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  background: $card-bg;
+  border-radius: $radius-lg;
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+  &--sm {
+    width: min(360px, 100%);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: $text-dark;
+  }
+
+  &__close {
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: $text-medium;
+  }
+
+  &__body {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 24px 24px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: $text-dark;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $text-medium;
+  }
+
+  &__input {
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-family: $font;
+    color: $text-dark;
+    background: $card-bg;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+  }
+}
+
+.color-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &__picker {
+    width: 40px;
+    height: 40px;
+    border: 2px solid $border;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    padding: 2px;
+    background: $card-bg;
+    flex-shrink: 0;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 4px;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.segment-color-swatch {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid $border;
+  vertical-align: middle;
 }
 
 @keyframes spin {

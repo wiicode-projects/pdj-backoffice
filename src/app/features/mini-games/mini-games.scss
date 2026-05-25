@@ -214,6 +214,19 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1.4;
   }
 
+  &__limit {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: $blue-light;
+    color: $blue;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
   &__status {
     display: inline-block;
     padding: 3px 10px;

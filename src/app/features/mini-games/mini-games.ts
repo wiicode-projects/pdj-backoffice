@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { GameSettingService, GameSetting } from '../../core/services/game-setting.service';
+import { formatGameLimitDescription } from '../../core/utils/game-limit-label';
 
 @Component({
   selector: 'pdj-mini-games',
@@ -92,5 +93,9 @@ export class MiniGames implements OnInit {
 
   navigateToGame(game: GameSetting): void {
     this.router.navigate(['/app/mini-games', game.id]);
+  }
+
+  getLimitDescription(game: GameSetting): string {
+    return formatGameLimitDescription(game);
   }
 }

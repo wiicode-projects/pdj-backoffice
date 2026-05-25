@@ -65,7 +65,7 @@
           <!-- Info -->
           <div class="game-card__body">
             <h3 class="game-card__name">{{ game.name }}</h3>
-            <p class="game-card__desc">{{ game.description || '—' }}</p>
+            <p class="game-card__desc">{{ getLimitDescription(game) }}</p>
             <span class="game-card__status" [class.game-card__status--active]="game.isActive" [class.game-card__status--inactive]="!game.isActive">
               {{ game.isActive ? ('MINI_GAMES.ACTIVE' | translate) : ('MINI_GAMES.INACTIVE' | translate) }}
             </span>

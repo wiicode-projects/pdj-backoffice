@@ -66,7 +66,7 @@
         </div>
         <div class="hero-card__info">
           <h2 class="hero-card__name">{{ game.name }}</h2>
-          <p class="hero-card__desc">{{ game.description || '—' }}</p>
+          <p class="hero-card__desc">{{ getLimitDescription() }}</p>
           <p class="hero-card__meta">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1"/>
@@ -86,6 +86,206 @@
         >
           <span class="toggle-switch__thumb"></span>
         </button>
+      </div>
+    </div>
+
+    @if (isSpinWin) {
+      <!-- Spin wheel config -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.SPIN.CONFIG_TITLE' | translate }}</h3>
+        </div>
+        <div class="limits-form">
+          <div class="limits-form__field limits-form__field--narrow">
+            <label class="limits-form__label">{{ 'GAME_DETAIL.SPIN.SEGMENT_COUNT' | translate }}</label>
+            <input
+              class="limits-form__input"
+              type="number"
+              min="2"
+              [(ngModel)]="wheelSegmentCount"
+            />
+          </div>
+          <p class="limits-form__hint">{{ 'GAME_DETAIL.SPIN.SEGMENT_COUNT_HINT' | translate }}</p>
+          <div class="limits-form__actions">
+            <button
+              class="btn btn--primary btn--sm"
+              type="button"
+              [disabled]="savingWheelConfig"
+              (click)="saveWheelConfig()"
+            >
+              {{ savingWheelConfig ? ('GAME_DETAIL.SPIN.SAVING' | translate) : ('GAME_DETAIL.SPIN.SAVE_CONFIG' | translate) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wheel rewards catalog -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.SPIN.REWARDS_TITLE' | translate }}</h3>
+          <button class="btn btn--primary btn--sm" type="button" (click)="openCreateReward()">
+            {{ 'GAME_DETAIL.SPIN.ADD_REWARD' | translate }}
+          </button>
+        </div>
+
+        @if (loadingWheel) {
+          <div class="loading loading--inline">
+            <div class="loading__spinner"></div>
+          </div>
+        } @else if (wheelRewards.length === 0) {
+          <div class="empty-state">
+            <p>{{ 'GAME_DETAIL.SPIN.NO_REWARDS' | translate }}</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.LABEL' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.REWARD_TYPE' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.REWARD_DETAIL' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.ACTIVE' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (reward of wheelRewards; track reward.id) {
+                  <tr [class.row--inactive]="!reward.isActive">
+                    <td>{{ reward.label }}</td>
+                    <td>{{ rewardTypeLabel(reward.rewardType) }}</td>
+                    <td>{{ rewardDetail(reward) }}</td>
+                    <td>{{ reward.isActive ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}</td>
+                    <td class="td-actions">
+                      <button class="btn btn--ghost btn--sm" type="button" (click)="openEditReward(reward)">
+                        {{ 'COMMON.EDIT' | translate }}
+                      </button>
+                      <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="askDeleteReward(reward.id)">
+                        {{ 'COMMON.DELETE' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <!-- Wheel segments -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.SPIN.SEGMENTS_TITLE' | translate }}</h3>
+          <button class="btn btn--primary btn--sm" type="button" (click)="openCreateSegment()">
+            {{ 'GAME_DETAIL.SPIN.ADD_SEGMENT' | translate }}
+          </button>
+        </div>
+
+        @if (loadingWheel) {
+          <div class="loading loading--inline">
+            <div class="loading__spinner"></div>
+          </div>
+        } @else if (wheelSegments.length === 0) {
+          <div class="empty-state">
+            <p>{{ 'GAME_DETAIL.SPIN.NO_SEGMENTS' | translate }}</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.INDEX' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.COLOR' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.LABEL' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.REWARD_TYPE' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.REWARD_DETAIL' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.WEIGHT' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.SPIN.COL.ACTIVE' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (segment of wheelSegments; track segment.id) {
+                  <tr [class.row--inactive]="!segment.isActive">
+                    <td>{{ segment.segmentIndex }}</td>
+                    <td>
+                      <span
+                        class="segment-color-swatch"
+                        [style.background]="segment.color ?? getDefaultSegmentColor(segment.segmentIndex)"
+                        [title]="segment.color ?? getDefaultSegmentColor(segment.segmentIndex)"
+                      ></span>
+                    </td>
+                    <td>{{ segment.reward?.label ?? '—' }}</td>
+                    <td>{{ segment.reward ? rewardTypeLabel(segment.reward.rewardType) : '—' }}</td>
+                    <td>{{ rewardDetail(segment.reward) }}</td>
+                    <td>{{ segment.weight }}</td>
+                    <td>{{ segment.isActive ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}</td>
+                    <td class="td-actions">
+                      <button class="btn btn--ghost btn--sm" type="button" (click)="openEditSegment(segment)">
+                        {{ 'COMMON.EDIT' | translate }}
+                      </button>
+                      <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="askDeleteSegment(segment.id)">
+                        {{ 'COMMON.DELETE' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Play limits -->
+    <div class="detail-card limits-card">
+      <div class="detail-card__header">
+        <h3>{{ 'GAME_DETAIL.LIMITS.TITLE' | translate }}</h3>
+        <span class="detail-card__badge">{{ getLimitSummary() }}</span>
+      </div>
+
+      <div class="limits-form">
+        <label class="limits-form__row">
+          <input
+            type="checkbox"
+            [(ngModel)]="limitForm.limitEnabled"
+            (ngModelChange)="onLimitEnabledChange()"
+          />
+          <span>{{ 'GAME_DETAIL.LIMITS.ENABLED' | translate }}</span>
+        </label>
+
+        @if (limitForm.limitEnabled) {
+          <div class="limits-form__grid">
+            <div class="limits-form__field">
+              <label class="limits-form__label">{{ 'GAME_DETAIL.LIMITS.MAX_PLAYS' | translate }}</label>
+              <input
+                class="limits-form__input"
+                type="number"
+                min="1"
+                [(ngModel)]="limitForm.maxPlaysPerPeriod"
+              />
+            </div>
+            <div class="limits-form__field">
+              <label class="limits-form__label">{{ 'GAME_DETAIL.LIMITS.PERIOD' | translate }}</label>
+              <select class="limits-form__input" [(ngModel)]="limitForm.limitPeriod">
+                <option value="day">{{ 'GAME_DETAIL.LIMITS.PERIOD_DAY' | translate }}</option>
+                <option value="week">{{ 'GAME_DETAIL.LIMITS.PERIOD_WEEK' | translate }}</option>
+              </select>
+            </div>
+          </div>
+        } @else {
+          <p class="limits-form__hint">{{ 'GAME_DETAIL.LIMITS.UNLIMITED_HINT' | translate }}</p>
+        }
+
+        <div class="limits-form__actions">
+          <button
+            class="btn btn--primary btn--sm"
+            type="button"
+            [disabled]="savingLimits"
+            (click)="saveLimits()"
+          >
+            {{ savingLimits ? ('GAME_DETAIL.LIMITS.SAVING' | translate) : ('GAME_DETAIL.LIMITS.SAVE' | translate) }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -277,3 +477,184 @@
     </div>
   }
 </div>
+
+@if (showRewardModal) {
+  <div class="modal-overlay" (click)="closeRewardModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ editingReward ? ('GAME_DETAIL.SPIN.EDIT_REWARD' | translate) : ('GAME_DETAIL.SPIN.ADD_REWARD' | translate) }}
+        </h2>
+        <button class="modal__close" type="button" (click)="closeRewardModal()">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.LABEL' | translate }}</label>
+          <input class="field__input" [(ngModel)]="rewardForm.label" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.REWARD_TYPE' | translate }}</label>
+          <select class="field__input" [(ngModel)]="rewardForm.rewardType" (ngModelChange)="onRewardTypeChange()">
+            <option value="none">{{ 'GAME_DETAIL.SPIN.TYPE.NONE' | translate }}</option>
+            <option value="tombola_tickets">{{ 'GAME_DETAIL.SPIN.TYPE.TOMBOLA' | translate }}</option>
+            <option value="id_card_customization">{{ 'GAME_DETAIL.SPIN.TYPE.CUSTOMIZATION' | translate }}</option>
+          </select>
+        </div>
+        @if (rewardForm.rewardType === 'tombola_tickets') {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.TICKET_AMOUNT' | translate }}</label>
+            <input class="field__input" type="number" min="1" [(ngModel)]="rewardForm.ticketAmount" />
+          </div>
+        }
+        @if (rewardForm.rewardType === 'id_card_customization') {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.CUSTOMIZATION_ITEM' | translate }}</label>
+            <select class="field__input" [(ngModel)]="rewardForm.customizationItemId">
+              <option value="">{{ 'GAME_DETAIL.SPIN.SELECT_CUSTOMIZATION' | translate }}</option>
+              @for (item of activeCustomizationItems; track item.id) {
+                <option [value]="item.id">{{ item.name }} ({{ item.itemKey }})</option>
+              }
+            </select>
+          </div>
+        }
+        <label class="field field--checkbox">
+          <input type="checkbox" [(ngModel)]="rewardForm.isActive" />
+          <span>{{ 'GAME_DETAIL.SPIN.COL.ACTIVE' | translate }}</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="closeRewardModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" type="button" [disabled]="savingReward || !rewardForm.label.trim()" (click)="saveReward()">
+          {{ savingReward ? ('GAME_DETAIL.SPIN.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmDeleteRewardId) {
+  <div class="modal-overlay" (click)="cancelDeleteReward()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ 'GAME_DETAIL.SPIN.DELETE_REWARD' | translate }}</h2>
+      </div>
+      <div class="modal__body">
+        <p>{{ 'GAME_DETAIL.SPIN.DELETE_REWARD_CONFIRM' | translate }}</p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="cancelDeleteReward()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--danger" type="button" [disabled]="deletingReward" (click)="confirmDeleteReward()">
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showSegmentModal) {
+  <div class="modal-overlay" (click)="closeSegmentModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ editingSegment ? ('GAME_DETAIL.SPIN.EDIT_SEGMENT' | translate) : ('GAME_DETAIL.SPIN.ADD_SEGMENT' | translate) }}
+        </h2>
+        <button class="modal__close" type="button" (click)="closeSegmentModal()">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.INDEX' | translate }}</label>
+          <input class="field__input" type="number" min="0" [(ngModel)]="segmentForm.segmentIndex" (ngModelChange)="onSegmentIndexChange()" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.COLOR' | translate }}</label>
+          <div class="color-input">
+            <input type="color" [(ngModel)]="segmentForm.color" class="color-input__picker" />
+            <input class="field__input color-input__text" type="text" [(ngModel)]="segmentForm.color" placeholder="#DC2626" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.WEIGHT' | translate }}</label>
+          <input class="field__input" type="number" min="1" [(ngModel)]="segmentForm.weight" />
+        </div>
+        @if (!editingSegment) {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.REWARD_SOURCE' | translate }}</label>
+            <select class="field__input" [(ngModel)]="segmentForm.rewardMode">
+              <option value="existing">{{ 'GAME_DETAIL.SPIN.REWARD_EXISTING' | translate }}</option>
+              <option value="inline">{{ 'GAME_DETAIL.SPIN.REWARD_INLINE' | translate }}</option>
+            </select>
+          </div>
+        }
+        @if (segmentForm.rewardMode === 'existing' || editingSegment) {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.REWARD_PICK' | translate }}</label>
+            <select class="field__input" [(ngModel)]="segmentForm.rewardId">
+              @for (reward of wheelRewards; track reward.id) {
+                <option [value]="reward.id">{{ reward.label }} — {{ rewardTypeLabel(reward.rewardType) }}</option>
+              }
+            </select>
+          </div>
+        } @else {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.LABEL' | translate }}</label>
+            <input class="field__input" [(ngModel)]="segmentForm.inlineReward.label" />
+          </div>
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.SPIN.COL.REWARD_TYPE' | translate }}</label>
+            <select class="field__input" [(ngModel)]="segmentForm.inlineReward.rewardType">
+              <option value="none">{{ 'GAME_DETAIL.SPIN.TYPE.NONE' | translate }}</option>
+              <option value="tombola_tickets">{{ 'GAME_DETAIL.SPIN.TYPE.TOMBOLA' | translate }}</option>
+              <option value="id_card_customization">{{ 'GAME_DETAIL.SPIN.TYPE.CUSTOMIZATION' | translate }}</option>
+            </select>
+          </div>
+          @if (segmentForm.inlineReward.rewardType === 'tombola_tickets') {
+            <div class="field">
+              <label class="field__label">{{ 'GAME_DETAIL.SPIN.TICKET_AMOUNT' | translate }}</label>
+              <input class="field__input" type="number" min="1" [(ngModel)]="segmentForm.inlineReward.ticketAmount" />
+            </div>
+          }
+          @if (segmentForm.inlineReward.rewardType === 'id_card_customization') {
+            <div class="field">
+              <label class="field__label">{{ 'GAME_DETAIL.SPIN.CUSTOMIZATION_ITEM' | translate }}</label>
+              <select class="field__input" [(ngModel)]="segmentForm.inlineReward.customizationItemId">
+                <option value="">{{ 'GAME_DETAIL.SPIN.SELECT_CUSTOMIZATION' | translate }}</option>
+                @for (item of activeCustomizationItems; track item.id) {
+                  <option [value]="item.id">{{ item.name }} ({{ item.itemKey }})</option>
+                }
+              </select>
+            </div>
+          }
+        }
+        <label class="field field--checkbox">
+          <input type="checkbox" [(ngModel)]="segmentForm.isActive" />
+          <span>{{ 'GAME_DETAIL.SPIN.COL.ACTIVE' | translate }}</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="closeSegmentModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" type="button" [disabled]="savingSegment" (click)="saveSegment()">
+          {{ savingSegment ? ('GAME_DETAIL.SPIN.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmDeleteSegmentId) {
+  <div class="modal-overlay" (click)="cancelDeleteSegment()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ 'GAME_DETAIL.SPIN.DELETE_SEGMENT' | translate }}</h2>
+      </div>
+      <div class="modal__body">
+        <p>{{ 'GAME_DETAIL.SPIN.DELETE_SEGMENT_CONFIRM' | translate }}</p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="cancelDeleteSegment()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--danger" type="button" [disabled]="deletingSegment" (click)="confirmDeleteSegment()">
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

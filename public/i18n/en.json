@@ -587,6 +587,57 @@
       "EMAIL": "Email",
       "TOTAL_PLAYS": "Plays",
       "LAST_PLAYED": "Last played"
+    },
+    "LIMITS": {
+      "TITLE": "Play limits",
+      "ENABLED": "Limit number of plays",
+      "MAX_PLAYS": "Max plays",
+      "PERIOD": "Period",
+      "PERIOD_DAY": "Per day",
+      "PERIOD_WEEK": "Per week",
+      "UNLIMITED_HINT": "No limit applied for this game.",
+      "SAVE": "Save limits",
+      "SAVING": "Saving…"
+    },
+    "SPIN": {
+      "CONFIG_TITLE": "Wheel configuration",
+      "SEGMENT_COUNT": "Segment count",
+      "SEGMENT_COUNT_HINT": "Minimum 2 segments. Adding a segment can grow the count automatically. Reducing the count requires removing or reassigning segments beyond the new limit.",
+      "SAVE_CONFIG": "Save configuration",
+      "SAVING": "Saving…",
+      "REWARDS_TITLE": "Rewards catalog",
+      "SEGMENTS_TITLE": "Wheel segments",
+      "ADD_REWARD": "Add reward",
+      "EDIT_REWARD": "Edit reward",
+      "ADD_SEGMENT": "Add segment",
+      "EDIT_SEGMENT": "Edit segment",
+      "NO_REWARDS": "No rewards configured.",
+      "NO_SEGMENTS": "No segments configured.",
+      "TICKET_AMOUNT": "Ticket amount",
+      "CUSTOMIZATION_ITEM": "Customization item",
+      "SELECT_CUSTOMIZATION": "Select an item…",
+      "REWARD_SOURCE": "Reward source",
+      "REWARD_EXISTING": "Existing reward",
+      "REWARD_INLINE": "Create new reward",
+      "REWARD_PICK": "Reward",
+      "DELETE_REWARD": "Delete reward",
+      "DELETE_REWARD_CONFIRM": "Delete this reward? It must not be assigned to any segment.",
+      "DELETE_SEGMENT": "Delete segment",
+      "DELETE_SEGMENT_CONFIRM": "Remove this segment from the wheel?",
+      "TYPE": {
+        "NONE": "Nothing",
+        "TOMBOLA": "Tombola tickets",
+        "CUSTOMIZATION": "ID Card customization"
+      },
+      "COL": {
+        "INDEX": "Index",
+        "COLOR": "Color",
+        "LABEL": "Label",
+        "REWARD_TYPE": "Type",
+        "REWARD_DETAIL": "Detail",
+        "WEIGHT": "Weight",
+        "ACTIVE": "Active"
+      }
     }
   },
   "BAN": {

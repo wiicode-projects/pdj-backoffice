@@ -638,6 +638,37 @@
         "WEIGHT": "Poids",
         "ACTIVE": "Actif"
       }
+    },
+    "QUIZ": {
+      "CONFIG_TITLE": "Configuration du quiz",
+      "QUESTIONS_PER_SESSION": "Questions par session",
+      "SECONDS_PER_QUESTION": "Secondes par question",
+      "CONFIG_HINT": "Chaque session pioche ce nombre de questions aléatoires parmi la banque active.",
+      "SAVE_CONFIG": "Enregistrer la configuration",
+      "SAVING": "Enregistrement…",
+      "REWARDS_TITLE": "Paliers de récompense",
+      "QUESTIONS_TITLE": "Banque de questions",
+      "ADD_REWARD": "Ajouter un palier",
+      "EDIT_REWARD": "Modifier le palier",
+      "ADD_QUESTION": "Ajouter une question",
+      "EDIT_QUESTION": "Modifier la question",
+      "NO_REWARDS": "Aucun palier configuré.",
+      "NO_QUESTIONS": "Aucune question configurée.",
+      "ANSWER": "Réponse",
+      "CORRECT": "Correcte",
+      "DELETE_QUESTION": "Supprimer la question",
+      "DELETE_QUESTION_CONFIRM": "Supprimer cette question de la banque ?",
+      "DELETE_REWARD": "Supprimer le palier",
+      "DELETE_REWARD_CONFIRM": "Supprimer ce palier de récompense ?",
+      "COL": {
+        "CATEGORY": "Catégorie",
+        "QUESTION": "Question",
+        "CORRECT_ANSWER": "Bonne réponse",
+        "MIN_CORRECT": "Min. bonnes réponses",
+        "TICKETS": "Tickets",
+        "LABEL": "Libellé",
+        "ACTIVE": "Actif"
+      }
     }
   },
   "BAN": {

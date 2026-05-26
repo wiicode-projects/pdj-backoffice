@@ -923,6 +923,25 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   vertical-align: middle;
 }
 
+.modal--lg {
+  max-width: 640px;
+}
+
+.quiz-answer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .field__input {
+    flex: 1;
+  }
+
+  .field--checkbox {
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

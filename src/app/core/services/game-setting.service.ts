@@ -15,6 +15,8 @@ export interface GameSetting {
   limitPeriod: GameLimitPeriod;
   limitEnabled: boolean;
   wheelSegmentCount?: number | null;
+  quizQuestionsPerSession?: number | null;
+  quizSecondsPerQuestion?: number | null;
   createdAt: string;
   updatedAt: string;
 }

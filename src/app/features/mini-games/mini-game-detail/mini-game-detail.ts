@@ -21,6 +21,13 @@ import {
   CreateGameWheelRewardPayload,
 } from '../../../core/services/game-wheel.service';
 import {
+  GameQuizService,
+  GameQuizQuestion,
+  GameQuizRewardTier,
+  CreateGameQuizQuestionPayload,
+  CreateGameQuizRewardTierPayload,
+} from '../../../core/services/game-quiz.service';
+import {
   CustomizationItem,
   CustomizationItemService,
 } from '../../../core/services/customization-item.service';
@@ -103,6 +110,46 @@ export class MiniGameDetail implements OnInit {
   confirmDeleteSegmentId: string | null = null;
   deletingSegment = false;
 
+  quizQuestionsPerSession = 3;
+  quizSecondsPerQuestion = 10;
+  savingQuizConfig = false;
+  quizQuestions: GameQuizQuestion[] = [];
+  quizRewardTiers: GameQuizRewardTier[] = [];
+  loadingQuiz = false;
+
+  showQuestionModal = false;
+  editingQuestion: GameQuizQuestion | null = null;
+  savingQuestion = false;
+  questionForm = {
+    category: '',
+    question: '',
+    isActive: true,
+    sortOrder: 0,
+    answers: [
+      { label: '', isCorrect: true },
+      { label: '', isCorrect: false },
+      { label: '', isCorrect: false },
+      { label: '', isCorrect: false },
+    ],
+  };
+  confirmDeleteQuestionId: string | null = null;
+  deletingQuestion = false;
+
+  showTierModal = false;
+  editingTier: GameQuizRewardTier | null = null;
+  savingTier = false;
+  tierForm = {
+    minCorrectAnswers: 0,
+    ticketAmount: 1,
+    label: '',
+    isActive: true,
+    sortOrder: 0,
+  };
+  confirmDeleteTierId: string | null = null;
+  deletingTier = false;
+
+  readonly correctAnswerLabel = GameQuizService.correctAnswerLabel;
+
   readonly defaultSegmentColors = [
     '#DC2626',
     '#F59E0B',
@@ -128,6 +175,7 @@ export class MiniGameDetail implements OnInit {
     private router: Router,
     private gameSettingService: GameSettingService,
     private gameWheelService: GameWheelService,
+    private gameQuizService: GameQuizService,
     private customizationItemService: CustomizationItemService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -141,6 +189,10 @@ export class MiniGameDetail implements OnInit {
 
   get isSpinWin(): boolean {
     return this.game?.slug === 'spin_win';
+  }
+
+  get isQuizFlash(): boolean {
+    return this.game?.slug === 'quiz_flash';
   }
 
   loadGame(): void {
@@ -172,8 +224,13 @@ export class MiniGameDetail implements OnInit {
           this.weeklyActivity = result.activity.activity;
           this.recentPlayers = result.players.players;
           this.wheelSegmentCount = this.game?.wheelSegmentCount ?? 4;
+          this.quizQuestionsPerSession = this.game?.quizQuestionsPerSession ?? 3;
+          this.quizSecondsPerQuestion = this.game?.quizSecondsPerQuestion ?? 10;
           if (this.isSpinWin) {
             this.loadWheelData();
+          }
+          if (this.isQuizFlash) {
+            this.loadQuizData();
           }
           this.cdr.detectChanges();
         },
@@ -598,6 +655,274 @@ export class MiniGameDetail implements OnInit {
         error: () => {
           alert('Enregistrement des limites échoué.');
         },
+      });
+  }
+
+  loadQuizData(): void {
+    if (!this.gameId) return;
+    this.loadingQuiz = true;
+
+    forkJoin({
+      questions: this.gameQuizService.listQuestions(this.gameId).pipe(
+        catchError(() =>
+          of({
+            status: 200,
+            quizQuestionsPerSession: 3,
+            quizSecondsPerQuestion: 10,
+            questions: [] as GameQuizQuestion[],
+          }),
+        ),
+      ),
+      tiers: this.gameQuizService.listRewardTiers(this.gameId).pipe(
+        catchError(() => of({ status: 200, tiers: [] as GameQuizRewardTier[] })),
+      ),
+    })
+      .pipe(
+        finalize(() => {
+          this.loadingQuiz = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          this.quizQuestions = result.questions.questions;
+          this.quizRewardTiers = result.tiers.tiers;
+          this.quizQuestionsPerSession =
+            result.questions.quizQuestionsPerSession ?? this.quizQuestionsPerSession;
+          this.quizSecondsPerQuestion =
+            result.questions.quizSecondsPerQuestion ?? this.quizSecondsPerQuestion;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  saveQuizConfig(): void {
+    if (!this.game || this.savingQuizConfig) return;
+
+    this.savingQuizConfig = true;
+    this.gameQuizService
+      .updateQuizConfig(
+        this.game.id,
+        Math.max(1, this.quizQuestionsPerSession),
+        Math.max(5, this.quizSecondsPerQuestion),
+      )
+      .pipe(
+        finalize(() => {
+          this.savingQuizConfig = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          this.quizQuestionsPerSession = result.game.quizQuestionsPerSession;
+          this.quizSecondsPerQuestion = result.game.quizSecondsPerQuestion;
+          if (this.game) {
+            this.game.quizQuestionsPerSession = result.game.quizQuestionsPerSession;
+            this.game.quizSecondsPerQuestion = result.game.quizSecondsPerQuestion;
+          }
+        },
+        error: () => alert('Enregistrement de la configuration quiz échoué.'),
+      });
+  }
+
+  openCreateQuestion(): void {
+    this.editingQuestion = null;
+    this.questionForm = {
+      category: '',
+      question: '',
+      isActive: true,
+      sortOrder: this.quizQuestions.length,
+      answers: [
+        { label: '', isCorrect: true },
+        { label: '', isCorrect: false },
+        { label: '', isCorrect: false },
+        { label: '', isCorrect: false },
+      ],
+    };
+    this.showQuestionModal = true;
+  }
+
+  openEditQuestion(question: GameQuizQuestion): void {
+    this.editingQuestion = question;
+    const answers = [...(question.answers ?? [])]
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .slice(0, 4)
+      .map((answer) => ({ label: answer.label, isCorrect: answer.isCorrect }));
+
+    while (answers.length < 4) {
+      answers.push({ label: '', isCorrect: false });
+    }
+
+    this.questionForm = {
+      category: question.category,
+      question: question.question,
+      isActive: question.isActive,
+      sortOrder: question.sortOrder,
+      answers,
+    };
+    this.showQuestionModal = true;
+  }
+
+  closeQuestionModal(): void {
+    this.showQuestionModal = false;
+    this.editingQuestion = null;
+  }
+
+  setCorrectAnswer(index: number): void {
+    this.questionForm.answers = this.questionForm.answers.map((answer, i) => ({
+      ...answer,
+      isCorrect: i === index,
+    }));
+  }
+
+  saveQuestion(): void {
+    if (!this.game || this.savingQuestion) return;
+
+    const payload: CreateGameQuizQuestionPayload = {
+      category: this.questionForm.category.trim(),
+      question: this.questionForm.question.trim(),
+      isActive: this.questionForm.isActive,
+      sortOrder: this.questionForm.sortOrder,
+      answers: this.questionForm.answers.map((answer, index) => ({
+        label: answer.label.trim(),
+        isCorrect: answer.isCorrect,
+        sortOrder: index,
+      })),
+    };
+
+    this.savingQuestion = true;
+    const request$ = this.editingQuestion
+      ? this.gameQuizService.updateQuestion(this.game.id, this.editingQuestion.id, payload)
+      : this.gameQuizService.createQuestion(this.game.id, payload);
+
+    request$
+      .pipe(
+        finalize(() => {
+          this.savingQuestion = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.closeQuestionModal();
+          this.loadQuizData();
+        },
+        error: () => alert('Enregistrement de la question échoué.'),
+      });
+  }
+
+  askDeleteQuestion(questionId: string): void {
+    this.confirmDeleteQuestionId = questionId;
+  }
+
+  cancelDeleteQuestion(): void {
+    this.confirmDeleteQuestionId = null;
+  }
+
+  confirmDeleteQuestion(): void {
+    if (!this.game || !this.confirmDeleteQuestionId || this.deletingQuestion) return;
+
+    this.deletingQuestion = true;
+    this.gameQuizService
+      .deleteQuestion(this.game.id, this.confirmDeleteQuestionId)
+      .pipe(
+        finalize(() => {
+          this.deletingQuestion = false;
+          this.confirmDeleteQuestionId = null;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => this.loadQuizData(),
+        error: () => alert('Suppression de la question échouée.'),
+      });
+  }
+
+  openCreateTier(): void {
+    this.editingTier = null;
+    this.tierForm = {
+      minCorrectAnswers: 0,
+      ticketAmount: 1,
+      label: '',
+      isActive: true,
+      sortOrder: this.quizRewardTiers.length,
+    };
+    this.showTierModal = true;
+  }
+
+  openEditTier(tier: GameQuizRewardTier): void {
+    this.editingTier = tier;
+    this.tierForm = {
+      minCorrectAnswers: tier.minCorrectAnswers,
+      ticketAmount: tier.ticketAmount,
+      label: tier.label ?? '',
+      isActive: tier.isActive,
+      sortOrder: tier.sortOrder,
+    };
+    this.showTierModal = true;
+  }
+
+  closeTierModal(): void {
+    this.showTierModal = false;
+    this.editingTier = null;
+  }
+
+  saveTier(): void {
+    if (!this.game || this.savingTier) return;
+
+    const payload: CreateGameQuizRewardTierPayload = {
+      minCorrectAnswers: this.tierForm.minCorrectAnswers,
+      ticketAmount: Math.max(0, this.tierForm.ticketAmount),
+      label: this.tierForm.label.trim() || undefined,
+      isActive: this.tierForm.isActive,
+      sortOrder: this.tierForm.sortOrder,
+    };
+
+    this.savingTier = true;
+    const request$ = this.editingTier
+      ? this.gameQuizService.updateRewardTier(this.game.id, this.editingTier.id, payload)
+      : this.gameQuizService.createRewardTier(this.game.id, payload);
+
+    request$
+      .pipe(
+        finalize(() => {
+          this.savingTier = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.closeTierModal();
+          this.loadQuizData();
+        },
+        error: () => alert('Enregistrement de la récompense échoué.'),
+      });
+  }
+
+  askDeleteTier(tierId: string): void {
+    this.confirmDeleteTierId = tierId;
+  }
+
+  cancelDeleteTier(): void {
+    this.confirmDeleteTierId = null;
+  }
+
+  confirmDeleteTier(): void {
+    if (!this.game || !this.confirmDeleteTierId || this.deletingTier) return;
+
+    this.deletingTier = true;
+    this.gameQuizService
+      .deleteRewardTier(this.game.id, this.confirmDeleteTierId)
+      .pipe(
+        finalize(() => {
+          this.deletingTier = false;
+          this.confirmDeleteTierId = null;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => this.loadQuizData(),
+        error: () => alert('Suppression de la récompense échouée.'),
       });
   }
 

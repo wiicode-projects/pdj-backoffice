@@ -236,6 +236,154 @@
       </div>
     }
 
+    @if (isQuizFlash) {
+      <!-- Quiz config -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.QUIZ.CONFIG_TITLE' | translate }}</h3>
+        </div>
+        <div class="limits-form">
+          <div class="limits-form__grid">
+            <div class="limits-form__field limits-form__field--narrow">
+              <label class="limits-form__label">{{ 'GAME_DETAIL.QUIZ.QUESTIONS_PER_SESSION' | translate }}</label>
+              <input
+                class="limits-form__input"
+                type="number"
+                min="1"
+                max="20"
+                [(ngModel)]="quizQuestionsPerSession"
+              />
+            </div>
+            <div class="limits-form__field limits-form__field--narrow">
+              <label class="limits-form__label">{{ 'GAME_DETAIL.QUIZ.SECONDS_PER_QUESTION' | translate }}</label>
+              <input
+                class="limits-form__input"
+                type="number"
+                min="5"
+                max="120"
+                [(ngModel)]="quizSecondsPerQuestion"
+              />
+            </div>
+          </div>
+          <p class="limits-form__hint">{{ 'GAME_DETAIL.QUIZ.CONFIG_HINT' | translate }}</p>
+          <div class="limits-form__actions">
+            <button
+              class="btn btn--primary btn--sm"
+              type="button"
+              [disabled]="savingQuizConfig"
+              (click)="saveQuizConfig()"
+            >
+              {{ savingQuizConfig ? ('GAME_DETAIL.QUIZ.SAVING' | translate) : ('GAME_DETAIL.QUIZ.SAVE_CONFIG' | translate) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reward tiers -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.QUIZ.REWARDS_TITLE' | translate }}</h3>
+          <button class="btn btn--primary btn--sm" type="button" (click)="openCreateTier()">
+            {{ 'GAME_DETAIL.QUIZ.ADD_REWARD' | translate }}
+          </button>
+        </div>
+
+        @if (loadingQuiz) {
+          <div class="loading loading--inline">
+            <div class="loading__spinner"></div>
+          </div>
+        } @else if (quizRewardTiers.length === 0) {
+          <div class="empty-state">
+            <p>{{ 'GAME_DETAIL.QUIZ.NO_REWARDS' | translate }}</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.MIN_CORRECT' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.TICKETS' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.LABEL' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.ACTIVE' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (tier of quizRewardTiers; track tier.id) {
+                  <tr [class.row--inactive]="!tier.isActive">
+                    <td>{{ tier.minCorrectAnswers }}</td>
+                    <td>+{{ tier.ticketAmount }}</td>
+                    <td>{{ tier.label || '—' }}</td>
+                    <td>{{ tier.isActive ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}</td>
+                    <td class="td-actions">
+                      <button class="btn btn--ghost btn--sm" type="button" (click)="openEditTier(tier)">
+                        {{ 'COMMON.EDIT' | translate }}
+                      </button>
+                      <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="askDeleteTier(tier.id)">
+                        {{ 'COMMON.DELETE' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <!-- Question bank -->
+      <div class="detail-card spin-card">
+        <div class="detail-card__header">
+          <h3>{{ 'GAME_DETAIL.QUIZ.QUESTIONS_TITLE' | translate }}</h3>
+          <button class="btn btn--primary btn--sm" type="button" (click)="openCreateQuestion()">
+            {{ 'GAME_DETAIL.QUIZ.ADD_QUESTION' | translate }}
+          </button>
+        </div>
+
+        @if (loadingQuiz) {
+          <div class="loading loading--inline">
+            <div class="loading__spinner"></div>
+          </div>
+        } @else if (quizQuestions.length === 0) {
+          <div class="empty-state">
+            <p>{{ 'GAME_DETAIL.QUIZ.NO_QUESTIONS' | translate }}</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.CATEGORY' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.QUESTION' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.CORRECT_ANSWER' | translate }}</th>
+                  <th>{{ 'GAME_DETAIL.QUIZ.COL.ACTIVE' | translate }}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (question of quizQuestions; track question.id) {
+                  <tr [class.row--inactive]="!question.isActive">
+                    <td>{{ question.category }}</td>
+                    <td>{{ question.question }}</td>
+                    <td>{{ correctAnswerLabel(question) }}</td>
+                    <td>{{ question.isActive ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}</td>
+                    <td class="td-actions">
+                      <button class="btn btn--ghost btn--sm" type="button" (click)="openEditQuestion(question)">
+                        {{ 'COMMON.EDIT' | translate }}
+                      </button>
+                      <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="askDeleteQuestion(question.id)">
+                        {{ 'COMMON.DELETE' | translate }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
     <!-- Play limits -->
     <div class="detail-card limits-card">
       <div class="detail-card__header">
@@ -652,6 +800,136 @@
       <div class="modal__footer">
         <button class="btn btn--ghost" type="button" (click)="cancelDeleteSegment()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn btn--danger" type="button" [disabled]="deletingSegment" (click)="confirmDeleteSegment()">
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showQuestionModal) {
+  <div class="modal-overlay" (click)="closeQuestionModal()">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ editingQuestion ? ('GAME_DETAIL.QUIZ.EDIT_QUESTION' | translate) : ('GAME_DETAIL.QUIZ.ADD_QUESTION' | translate) }}
+        </h2>
+        <button class="modal__close" type="button" (click)="closeQuestionModal()">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.QUIZ.COL.CATEGORY' | translate }}</label>
+          <input class="field__input" [(ngModel)]="questionForm.category" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.QUIZ.COL.QUESTION' | translate }}</label>
+          <textarea class="field__input" rows="3" [(ngModel)]="questionForm.question"></textarea>
+        </div>
+        @for (answer of questionForm.answers; track $index) {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.QUIZ.ANSWER' | translate }} {{ ['A','B','C','D'][$index] }}</label>
+            <div class="quiz-answer-row">
+              <input class="field__input" [(ngModel)]="answer.label" />
+              <label class="field field--checkbox">
+                <input
+                  type="radio"
+                  name="correctAnswer"
+                  [checked]="answer.isCorrect"
+                  (change)="setCorrectAnswer($index)"
+                />
+                <span>{{ 'GAME_DETAIL.QUIZ.CORRECT' | translate }}</span>
+              </label>
+            </div>
+          </div>
+        }
+        <label class="field field--checkbox">
+          <input type="checkbox" [(ngModel)]="questionForm.isActive" />
+          <span>{{ 'GAME_DETAIL.QUIZ.COL.ACTIVE' | translate }}</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="closeQuestionModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button
+          class="btn btn--primary"
+          type="button"
+          [disabled]="savingQuestion || !questionForm.category.trim() || !questionForm.question.trim()"
+          (click)="saveQuestion()"
+        >
+          {{ savingQuestion ? ('GAME_DETAIL.QUIZ.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmDeleteQuestionId) {
+  <div class="modal-overlay" (click)="cancelDeleteQuestion()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ 'GAME_DETAIL.QUIZ.DELETE_QUESTION' | translate }}</h2>
+      </div>
+      <div class="modal__body">
+        <p>{{ 'GAME_DETAIL.QUIZ.DELETE_QUESTION_CONFIRM' | translate }}</p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="cancelDeleteQuestion()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--danger" type="button" [disabled]="deletingQuestion" (click)="confirmDeleteQuestion()">
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showTierModal) {
+  <div class="modal-overlay" (click)="closeTierModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ editingTier ? ('GAME_DETAIL.QUIZ.EDIT_REWARD' | translate) : ('GAME_DETAIL.QUIZ.ADD_REWARD' | translate) }}
+        </h2>
+        <button class="modal__close" type="button" (click)="closeTierModal()">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.QUIZ.COL.MIN_CORRECT' | translate }}</label>
+          <input class="field__input" type="number" min="0" max="20" [(ngModel)]="tierForm.minCorrectAnswers" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.QUIZ.COL.TICKETS' | translate }}</label>
+          <input class="field__input" type="number" min="0" [(ngModel)]="tierForm.ticketAmount" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.QUIZ.COL.LABEL' | translate }}</label>
+          <input class="field__input" [(ngModel)]="tierForm.label" />
+        </div>
+        <label class="field field--checkbox">
+          <input type="checkbox" [(ngModel)]="tierForm.isActive" />
+          <span>{{ 'GAME_DETAIL.QUIZ.COL.ACTIVE' | translate }}</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="closeTierModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" type="button" [disabled]="savingTier" (click)="saveTier()">
+          {{ savingTier ? ('GAME_DETAIL.QUIZ.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmDeleteTierId) {
+  <div class="modal-overlay" (click)="cancelDeleteTier()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ 'GAME_DETAIL.QUIZ.DELETE_REWARD' | translate }}</h2>
+      </div>
+      <div class="modal__body">
+        <p>{{ 'GAME_DETAIL.QUIZ.DELETE_REWARD_CONFIRM' | translate }}</p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="cancelDeleteTier()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--danger" type="button" [disabled]="deletingTier" (click)="confirmDeleteTier()">
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>

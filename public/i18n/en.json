@@ -638,6 +638,37 @@
         "WEIGHT": "Weight",
         "ACTIVE": "Active"
       }
+    },
+    "QUIZ": {
+      "CONFIG_TITLE": "Quiz configuration",
+      "QUESTIONS_PER_SESSION": "Questions per session",
+      "SECONDS_PER_QUESTION": "Seconds per question",
+      "CONFIG_HINT": "Each session draws this many random questions from the active question bank.",
+      "SAVE_CONFIG": "Save configuration",
+      "SAVING": "Saving…",
+      "REWARDS_TITLE": "Reward tiers",
+      "QUESTIONS_TITLE": "Question bank",
+      "ADD_REWARD": "Add reward tier",
+      "EDIT_REWARD": "Edit reward tier",
+      "ADD_QUESTION": "Add question",
+      "EDIT_QUESTION": "Edit question",
+      "NO_REWARDS": "No reward tiers configured.",
+      "NO_QUESTIONS": "No questions configured.",
+      "ANSWER": "Answer",
+      "CORRECT": "Correct",
+      "DELETE_QUESTION": "Delete question",
+      "DELETE_QUESTION_CONFIRM": "Delete this question from the bank?",
+      "DELETE_REWARD": "Delete reward tier",
+      "DELETE_REWARD_CONFIRM": "Delete this reward tier?",
+      "COL": {
+        "CATEGORY": "Category",
+        "QUESTION": "Question",
+        "CORRECT_ANSWER": "Correct answer",
+        "MIN_CORRECT": "Min. correct",
+        "TICKETS": "Tickets",
+        "LABEL": "Label",
+        "ACTIVE": "Active"
+      }
     }
   },
   "BAN": {

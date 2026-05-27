@@ -12,6 +12,7 @@ export interface NavChild {
   icon: string;
   label: string;
   route: string;
+  exact?: boolean;
 }
 
 export interface NavItem {
@@ -42,7 +43,14 @@ export class Layout {
     { icon: 'users',    label: 'NAV.USERS',         route: '/app/users',        roles: ['ADMIN'] },
     { icon: 'restaurants', label: 'NAV.RESTAURANTS',route: '/app/restaurants',  roles: ['ADMIN'] },
     { icon: 'subscriptions', label: 'NAV.PAYMENTS', route: '/app/payments',     roles: ['ADMIN'] },
-    { icon: 'restaurants', label: 'NAV.MINI_GAMES', route: '/app/mini-games',   roles: ['ADMIN'] },
+    // ── Mini-jeux submenu ───────────────────────────────────────────────────
+    {
+      icon: 'restaurants', label: 'NAV.MINI_GAMES_SECTION', route: '', roles: ['ADMIN'],
+      children: [
+        { icon: 'games',   label: 'NAV.MINI_GAMES_LIST',    route: '/app/mini-games',         exact: true },
+        { icon: 'rewards', label: 'NAV.MINI_GAMES_REWARDS', route: '/app/mini-games/rewards' },
+      ],
+    },
     { icon: 'ads',     label: 'NAV.ADS',            route: '/app/ads',          roles: ['ADMIN'] },
     // ── Boutique submenu ────────────────────────────────────────────────────
     {
@@ -56,6 +64,7 @@ export class Layout {
       ],
     },
     // ── Other ────────────────────────────────────────────────────────────────
+    { icon: 'tombola',    label: 'NAV.TOMBOLA',    route: '/app/tombola',    roles: ['ADMIN'] },
     { icon: 'statistics', label: 'NAV.STATISTICS', route: '/app/statistics', roles: ['ADMIN'] },
     { icon: 'events',     label: 'NAV.EVENTS',     route: '/app/events',     roles: ['ADMIN'] },
     { icon: 'settings',   label: 'NAV.SETTINGS',   route: '/app/settings',   roles: ['ADMIN'] },

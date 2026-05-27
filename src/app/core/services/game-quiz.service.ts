@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { GameReward } from './game-reward.service';
 
 export interface GameQuizAnswer {
   id: string;
@@ -24,7 +25,8 @@ export interface GameQuizQuestion {
 export interface GameQuizRewardTier {
   id: string;
   minCorrectAnswers: number;
-  ticketAmount: number;
+  rewardId: string;
+  reward: GameReward | null;
   label: string | null;
   isActive: boolean;
   sortOrder: number;
@@ -48,7 +50,7 @@ export interface CreateGameQuizQuestionPayload {
 
 export interface CreateGameQuizRewardTierPayload {
   minCorrectAnswers: number;
-  ticketAmount: number;
+  rewardId: string;
   label?: string;
   isActive?: boolean;
   sortOrder?: number;

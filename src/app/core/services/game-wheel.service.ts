@@ -76,6 +76,14 @@ export interface UpdateGameWheelSegmentPayload {
   color?: string;
 }
 
+export interface SegmentPayloadFallbacks {
+  rewardId?: string;
+  color?: string | null;
+  segmentIndex?: number;
+}
+
+const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}){1,2}$/;
+
 @Injectable({ providedIn: 'root' })
 export class GameWheelService {
   private readonly apiUrl = `${environment.apiUrl}/games`;
@@ -139,10 +147,12 @@ export class GameWheelService {
   createSegment(
     gameId: string,
     payload: CreateGameWheelSegmentPayload,
+    fallbacks?: SegmentPayloadFallbacks,
   ): Observable<{ status: number; segment: GameWheelSegment }> {
+    const body = GameWheelService.normalizeCreateSegmentPayload(payload, fallbacks);
     return this.http.post<{ status: number; segment: GameWheelSegment }>(
       `${this.apiUrl}/settings/${gameId}/wheel-segments`,
-      payload,
+      body,
     );
   }
 
@@ -150,10 +160,12 @@ export class GameWheelService {
     gameId: string,
     segmentId: string,
     payload: UpdateGameWheelSegmentPayload,
+    fallbacks?: SegmentPayloadFallbacks,
   ): Observable<{ status: number; segment: GameWheelSegment }> {
+    const body = GameWheelService.normalizeUpdateSegmentPayload(payload, fallbacks);
     return this.http.patch<{ status: number; segment: GameWheelSegment }>(
       `${this.apiUrl}/settings/${gameId}/wheel-segments/${segmentId}`,
-      payload,
+      body,
     );
   }
 
@@ -212,5 +224,73 @@ export class GameWheelService {
       '#A855F7',
     ];
     return colors[segmentIndex % colors.length];
+  }
+
+  static normalizeHexColor(
+    color: string | null | undefined,
+    segmentIndex: number,
+    fallbackColor?: string | null,
+  ): string {
+    const trimmed = color?.trim() ?? '';
+    if (HEX_COLOR_REGEX.test(trimmed)) {
+      return trimmed;
+    }
+
+    const fallback = fallbackColor?.trim() ?? '';
+    if (HEX_COLOR_REGEX.test(fallback)) {
+      return fallback;
+    }
+
+    return GameWheelService.defaultSegmentColor(segmentIndex);
+  }
+
+  static normalizeUpdateSegmentPayload(
+    payload: UpdateGameWheelSegmentPayload,
+    fallbacks?: SegmentPayloadFallbacks,
+  ): UpdateGameWheelSegmentPayload {
+    const segmentIndex = Number(
+      payload.segmentIndex ?? fallbacks?.segmentIndex ?? 0,
+    );
+    const rewardId = (payload.rewardId || fallbacks?.rewardId || '').trim();
+
+    return {
+      segmentIndex,
+      rewardId,
+      weight: Math.max(1, Number(payload.weight) || 1),
+      isActive: payload.isActive ?? true,
+      color: GameWheelService.normalizeHexColor(
+        payload.color,
+        segmentIndex,
+        fallbacks?.color,
+      ),
+    };
+  }
+
+  static normalizeCreateSegmentPayload(
+    payload: CreateGameWheelSegmentPayload,
+    fallbacks?: SegmentPayloadFallbacks,
+  ): CreateGameWheelSegmentPayload {
+    const segmentIndex = Number(payload.segmentIndex ?? fallbacks?.segmentIndex ?? 0);
+    const normalized: CreateGameWheelSegmentPayload = {
+      segmentIndex,
+      weight: Math.max(1, Number(payload.weight) || 1),
+      isActive: payload.isActive ?? true,
+      color: GameWheelService.normalizeHexColor(
+        payload.color,
+        segmentIndex,
+        fallbacks?.color,
+      ),
+    };
+
+    if (payload.reward) {
+      normalized.reward = payload.reward;
+    } else {
+      const rewardId = (payload.rewardId || fallbacks?.rewardId || '').trim();
+      if (rewardId) {
+        normalized.rewardId = rewardId;
+      }
+    }
+
+    return normalized;
   }
 }

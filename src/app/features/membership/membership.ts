@@ -42,7 +42,6 @@ interface Plan {
   billingPeriod: string;
   currency: string;
   discount: number | null;
-  trialPeriodDays: number;
 }
 
 interface AvailableSubscription {

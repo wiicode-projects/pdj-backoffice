@@ -15,11 +15,19 @@ import {
 } from '../../../core/services/game-setting.service';
 import {
   GameWheelService,
-  GameWheelReward,
   GameWheelSegment,
-  GameRewardType,
   CreateGameWheelRewardPayload,
 } from '../../../core/services/game-wheel.service';
+import {
+  GameRewardService,
+  GameReward,
+  GameRewardType,
+} from '../../../core/services/game-reward.service';
+import {
+  GameMysteryService,
+  GameMysteryPoolEntry,
+  CreateGameMysteryPoolEntryPayload,
+} from '../../../core/services/game-mystery.service';
 import {
   GameQuizService,
   GameQuizQuestion,
@@ -71,24 +79,10 @@ export class MiniGameDetail implements OnInit {
 
   wheelSegmentCount = 4;
   savingWheelConfig = false;
-  wheelRewards: GameWheelReward[] = [];
+  catalogRewards: GameReward[] = [];
   wheelSegments: GameWheelSegment[] = [];
   customizationItems: CustomizationItem[] = [];
   loadingWheel = false;
-
-  showRewardModal = false;
-  editingReward: GameWheelReward | null = null;
-  savingReward = false;
-  rewardForm = {
-    label: '',
-    rewardType: 'none' as GameRewardType,
-    ticketAmount: 1,
-    customizationItemId: '',
-    isActive: true,
-    sortOrder: 0,
-  };
-  confirmDeleteRewardId: string | null = null;
-  deletingReward = false;
 
   showSegmentModal = false;
   editingSegment: GameWheelSegment | null = null;
@@ -140,13 +134,27 @@ export class MiniGameDetail implements OnInit {
   savingTier = false;
   tierForm = {
     minCorrectAnswers: 0,
-    ticketAmount: 1,
+    rewardId: '',
     label: '',
     isActive: true,
     sortOrder: 0,
   };
   confirmDeleteTierId: string | null = null;
   deletingTier = false;
+
+  mysteryPoolEntries: GameMysteryPoolEntry[] = [];
+  loadingMystery = false;
+  showPoolModal = false;
+  editingPoolEntry: GameMysteryPoolEntry | null = null;
+  savingPoolEntry = false;
+  poolForm = {
+    rewardId: '',
+    weight: 1,
+    isActive: true,
+    sortOrder: 0,
+  };
+  confirmDeletePoolEntryId: string | null = null;
+  deletingPoolEntry = false;
 
   readonly correctAnswerLabel = GameQuizService.correctAnswerLabel;
 
@@ -165,8 +173,8 @@ export class MiniGameDetail implements OnInit {
     '#A855F7',
   ];
 
-  readonly rewardTypeLabel = GameWheelService.rewardTypeLabel;
-  readonly rewardDetail = GameWheelService.rewardDetail;
+  readonly rewardTypeLabel = GameRewardService.rewardTypeLabel;
+  readonly rewardDetail = GameRewardService.rewardDetail;
 
   private gameId = '';
 
@@ -175,7 +183,9 @@ export class MiniGameDetail implements OnInit {
     private router: Router,
     private gameSettingService: GameSettingService,
     private gameWheelService: GameWheelService,
+    private gameRewardService: GameRewardService,
     private gameQuizService: GameQuizService,
+    private gameMysteryService: GameMysteryService,
     private customizationItemService: CustomizationItemService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -193,6 +203,14 @@ export class MiniGameDetail implements OnInit {
 
   get isQuizFlash(): boolean {
     return this.game?.slug === 'quiz_flash';
+  }
+
+  get isMysteryBox(): boolean {
+    return this.game?.slug === 'mystery_box';
+  }
+
+  get hasRewardCatalog(): boolean {
+    return this.isSpinWin || this.isQuizFlash || this.isMysteryBox;
   }
 
   loadGame(): void {
@@ -226,11 +244,18 @@ export class MiniGameDetail implements OnInit {
           this.wheelSegmentCount = this.game?.wheelSegmentCount ?? 4;
           this.quizQuestionsPerSession = this.game?.quizQuestionsPerSession ?? 3;
           this.quizSecondsPerQuestion = this.game?.quizSecondsPerQuestion ?? 10;
+          if (this.hasRewardCatalog) {
+            this.loadCatalogRewards();
+            this.loadCustomizationItems();
+          }
           if (this.isSpinWin) {
             this.loadWheelData();
           }
           if (this.isQuizFlash) {
             this.loadQuizData();
+          }
+          if (this.isMysteryBox) {
+            this.loadMysteryData();
           }
           this.cdr.detectChanges();
         },
@@ -240,19 +265,40 @@ export class MiniGameDetail implements OnInit {
       });
   }
 
+  loadCatalogRewards(): void {
+    if (!this.gameId) return;
+
+    this.gameRewardService
+      .listRewards(this.gameId)
+      .subscribe({
+        next: (result) => {
+          this.catalogRewards = result.rewards;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  loadCustomizationItems(): void {
+    this.customizationItemService
+      .findAll()
+      .pipe(
+        catchError(() => of({ status: 200, items: [] as CustomizationItem[] })),
+      )
+      .subscribe({
+        next: (result) => {
+          this.customizationItems = result.items.filter((item) => item.isActive);
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   loadWheelData(): void {
     if (!this.gameId) return;
     this.loadingWheel = true;
 
     forkJoin({
-      rewards: this.gameWheelService.listRewards(this.gameId).pipe(
-        catchError(() => of({ status: 200, wheelSegmentCount: 4, rewards: [] })),
-      ),
       segments: this.gameWheelService.listSegments(this.gameId).pipe(
         catchError(() => of({ status: 200, wheelSegmentCount: 4, segments: [] })),
-      ),
-      customizations: this.customizationItemService.findAll().pipe(
-        catchError(() => of({ status: 200, items: [] as CustomizationItem[] })),
       ),
     })
       .pipe(
@@ -263,13 +309,9 @@ export class MiniGameDetail implements OnInit {
       )
       .subscribe({
         next: (result) => {
-          this.wheelRewards = result.rewards.rewards;
           this.wheelSegments = result.segments.segments;
           this.wheelSegmentCount =
             result.segments.wheelSegmentCount ?? this.wheelSegmentCount;
-          this.customizationItems = result.customizations.items.filter(
-            (item) => item.isActive,
-          );
           this.cdr.detectChanges();
         },
       });
@@ -303,117 +345,13 @@ export class MiniGameDetail implements OnInit {
       });
   }
 
-  openCreateReward(): void {
-    this.editingReward = null;
-    this.rewardForm = {
-      label: '',
-      rewardType: 'none',
-      ticketAmount: 1,
-      customizationItemId: '',
-      isActive: true,
-      sortOrder: this.wheelRewards.length,
-    };
-    this.showRewardModal = true;
-  }
-
-  openEditReward(reward: GameWheelReward): void {
-    this.editingReward = reward;
-    this.rewardForm = {
-      label: reward.label,
-      rewardType: reward.rewardType,
-      ticketAmount: reward.ticketAmount ?? 1,
-      customizationItemId: reward.customizationItemId ?? '',
-      isActive: reward.isActive,
-      sortOrder: reward.sortOrder,
-    };
-    this.showRewardModal = true;
-  }
-
-  closeRewardModal(): void {
-    this.showRewardModal = false;
-    this.editingReward = null;
-  }
-
-  onRewardTypeChange(): void {
-    if (this.rewardForm.rewardType === 'tombola_tickets' && !this.rewardForm.ticketAmount) {
-      this.rewardForm.ticketAmount = 1;
-    }
-  }
-
-  saveReward(): void {
-    if (!this.game || this.savingReward) return;
-
-    const payload: CreateGameWheelRewardPayload = {
-      label: this.rewardForm.label.trim(),
-      rewardType: this.rewardForm.rewardType,
-      isActive: this.rewardForm.isActive,
-      sortOrder: this.rewardForm.sortOrder,
-    };
-
-    if (this.rewardForm.rewardType === 'tombola_tickets') {
-      payload.ticketAmount = Math.max(1, this.rewardForm.ticketAmount);
-    }
-    if (this.rewardForm.rewardType === 'id_card_customization') {
-      payload.customizationItemId = this.rewardForm.customizationItemId || undefined;
-    }
-
-    this.savingReward = true;
-    const request$ = this.editingReward
-      ? this.gameWheelService.updateReward(this.game.id, this.editingReward.id, payload)
-      : this.gameWheelService.createReward(this.game.id, payload);
-
-    request$
-      .pipe(
-        finalize(() => {
-          this.savingReward = false;
-          this.cdr.detectChanges();
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.closeRewardModal();
-          this.loadWheelData();
-        },
-        error: () => {
-          alert('Enregistrement de la récompense échoué.');
-        },
-      });
-  }
-
-  askDeleteReward(rewardId: string): void {
-    this.confirmDeleteRewardId = rewardId;
-  }
-
-  cancelDeleteReward(): void {
-    this.confirmDeleteRewardId = null;
-  }
-
-  confirmDeleteReward(): void {
-    if (!this.game || !this.confirmDeleteRewardId || this.deletingReward) return;
-
-    this.deletingReward = true;
-    this.gameWheelService
-      .deleteReward(this.game.id, this.confirmDeleteRewardId)
-      .pipe(
-        finalize(() => {
-          this.deletingReward = false;
-          this.confirmDeleteRewardId = null;
-          this.cdr.detectChanges();
-        }),
-      )
-      .subscribe({
-        next: () => this.loadWheelData(),
-        error: () => alert('Suppression de la récompense échouée.'),
-      });
-  }
-
   openCreateSegment(): void {
     this.editingSegment = null;
     const segmentIndex = this.findNextSegmentIndex();
     this.segmentForm = {
       segmentIndex,
       rewardMode: 'existing',
-      rewardId: this.wheelRewards[0]?.id ?? '',
+      rewardId: this.catalogRewards[0]?.id ?? '',
       weight: 1,
       isActive: true,
       color: this.getDefaultSegmentColor(segmentIndex),
@@ -443,6 +381,9 @@ export class MiniGameDetail implements OnInit {
         customizationItemId: '',
       },
     };
+    if (!this.catalogRewards.length) {
+      this.loadCatalogRewards();
+    }
     this.showSegmentModal = true;
   }
 
@@ -463,25 +404,110 @@ export class MiniGameDetail implements OnInit {
     return this.defaultSegmentColors[segmentIndex % this.defaultSegmentColors.length];
   }
 
+  get segmentRewardOptions(): GameReward[] {
+    const rewardId = this.editingSegment?.rewardId;
+    const currentReward = this.editingSegment?.reward;
+
+    if (!rewardId) {
+      return this.catalogRewards;
+    }
+
+    if (this.catalogRewards.some((reward) => reward.id === rewardId)) {
+      return this.catalogRewards;
+    }
+
+    if (currentReward) {
+      return [
+        {
+          id: currentReward.id,
+          label: currentReward.label,
+          rewardType: currentReward.rewardType,
+          ticketAmount: currentReward.ticketAmount,
+          customizationItemId: currentReward.customizationItemId,
+          customizationItem: currentReward.customizationItem,
+          isActive: currentReward.isActive,
+          sortOrder: currentReward.sortOrder,
+          createdAt: currentReward.createdAt,
+          updatedAt: currentReward.updatedAt,
+        },
+        ...this.catalogRewards,
+      ];
+    }
+
+    return [
+      {
+        id: rewardId,
+        label: 'Récompense actuelle',
+        rewardType: 'none',
+        ticketAmount: null,
+        customizationItemId: null,
+        customizationItem: null,
+        isActive: true,
+        sortOrder: 0,
+        createdAt: '',
+        updatedAt: '',
+      },
+      ...this.catalogRewards,
+    ];
+  }
+
+  compareRewardIds(
+    first: string | null | undefined,
+    second: string | null | undefined,
+  ): boolean {
+    return (first ?? '') === (second ?? '');
+  }
+
+  get canSaveSegment(): boolean {
+    if (this.savingSegment) return false;
+
+    const segmentIndex = Number(this.segmentForm.segmentIndex);
+    if (!Number.isFinite(segmentIndex) || segmentIndex < 0) {
+      return false;
+    }
+
+    if (this.editingSegment) {
+      return !!(this.segmentForm.rewardId || this.editingSegment.rewardId);
+    }
+
+    if (this.segmentForm.rewardMode === 'existing') {
+      return !!this.segmentForm.rewardId;
+    }
+
+    return !!this.segmentForm.inlineReward.label.trim();
+  }
+
   onSegmentIndexChange(): void {
     if (this.editingSegment) return;
     this.segmentForm.color = this.getDefaultSegmentColor(this.segmentForm.segmentIndex);
   }
 
   saveSegment(): void {
-    if (!this.game || this.savingSegment) return;
+    if (!this.game || this.savingSegment || !this.canSaveSegment) return;
 
     this.savingSegment = true;
+    const fallbacks = this.editingSegment
+      ? {
+          rewardId: this.editingSegment.rewardId,
+          color: this.editingSegment.color,
+          segmentIndex: this.editingSegment.segmentIndex,
+        }
+      : undefined;
 
     if (this.editingSegment) {
       this.gameWheelService
-        .updateSegment(this.game.id, this.editingSegment.id, {
-          segmentIndex: this.segmentForm.segmentIndex,
-          rewardId: this.segmentForm.rewardId,
-          weight: Math.max(1, this.segmentForm.weight),
-          isActive: this.segmentForm.isActive,
-          color: this.segmentForm.color,
-        })
+        .updateSegment(
+          this.game.id,
+          this.editingSegment.id,
+          {
+            segmentIndex: this.segmentForm.segmentIndex,
+            rewardId: this.segmentForm.rewardId,
+            weight: this.segmentForm.weight,
+            isActive: this.segmentForm.isActive,
+            color: this.segmentForm.color,
+          },
+          fallbacks,
+        )
         .pipe(
           finalize(() => {
             this.savingSegment = false;
@@ -493,7 +519,7 @@ export class MiniGameDetail implements OnInit {
             this.closeSegmentModal();
             this.loadWheelData();
           },
-          error: () => alert('Enregistrement du segment échoué.'),
+          error: (err) => alert(this.formatSegmentError(err)),
         });
       return;
     }
@@ -507,7 +533,7 @@ export class MiniGameDetail implements OnInit {
       color: string;
     } = {
       segmentIndex: this.segmentForm.segmentIndex,
-      weight: Math.max(1, this.segmentForm.weight),
+      weight: this.segmentForm.weight,
       isActive: this.segmentForm.isActive,
       color: this.segmentForm.color,
     };
@@ -532,7 +558,11 @@ export class MiniGameDetail implements OnInit {
     }
 
     this.gameWheelService
-      .createSegment(this.game.id, payload)
+      .createSegment(this.game.id, payload, {
+        segmentIndex: this.segmentForm.segmentIndex,
+        color: this.segmentForm.color,
+        rewardId: this.segmentForm.rewardId,
+      })
       .pipe(
         finalize(() => {
           this.savingSegment = false;
@@ -543,9 +573,23 @@ export class MiniGameDetail implements OnInit {
         next: () => {
           this.closeSegmentModal();
           this.loadWheelData();
+          if (this.segmentForm.rewardMode === 'inline') {
+            this.loadCatalogRewards();
+          }
         },
-        error: () => alert('Enregistrement du segment échoué.'),
+        error: (err) => alert(this.formatSegmentError(err)),
       });
+  }
+
+  private formatSegmentError(err: { error?: { message?: string | string[] } }): string {
+    const message = err?.error?.message;
+    if (Array.isArray(message)) {
+      return message.join(', ');
+    }
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+    return 'Enregistrement du segment échoué.';
   }
 
   askDeleteSegment(segmentId: string): void {
@@ -842,7 +886,7 @@ export class MiniGameDetail implements OnInit {
     this.editingTier = null;
     this.tierForm = {
       minCorrectAnswers: 0,
-      ticketAmount: 1,
+      rewardId: this.catalogRewards[0]?.id ?? '',
       label: '',
       isActive: true,
       sortOrder: this.quizRewardTiers.length,
@@ -854,7 +898,7 @@ export class MiniGameDetail implements OnInit {
     this.editingTier = tier;
     this.tierForm = {
       minCorrectAnswers: tier.minCorrectAnswers,
-      ticketAmount: tier.ticketAmount,
+      rewardId: tier.rewardId,
       label: tier.label ?? '',
       isActive: tier.isActive,
       sortOrder: tier.sortOrder,
@@ -872,7 +916,7 @@ export class MiniGameDetail implements OnInit {
 
     const payload: CreateGameQuizRewardTierPayload = {
       minCorrectAnswers: this.tierForm.minCorrectAnswers,
-      ticketAmount: Math.max(0, this.tierForm.ticketAmount),
+      rewardId: this.tierForm.rewardId,
       label: this.tierForm.label.trim() || undefined,
       isActive: this.tierForm.isActive,
       sortOrder: this.tierForm.sortOrder,
@@ -923,6 +967,111 @@ export class MiniGameDetail implements OnInit {
       .subscribe({
         next: () => this.loadQuizData(),
         error: () => alert('Suppression de la récompense échouée.'),
+      });
+  }
+
+  loadMysteryData(): void {
+    if (!this.gameId) return;
+    this.loadingMystery = true;
+
+    this.gameMysteryService
+      .listPoolEntries(this.gameId)
+      .pipe(
+        finalize(() => {
+          this.loadingMystery = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          this.mysteryPoolEntries = result.entries;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  openCreatePoolEntry(): void {
+    this.editingPoolEntry = null;
+    this.poolForm = {
+      rewardId: this.catalogRewards[0]?.id ?? '',
+      weight: 1,
+      isActive: true,
+      sortOrder: this.mysteryPoolEntries.length,
+    };
+    this.showPoolModal = true;
+  }
+
+  openEditPoolEntry(entry: GameMysteryPoolEntry): void {
+    this.editingPoolEntry = entry;
+    this.poolForm = {
+      rewardId: entry.rewardId,
+      weight: entry.weight,
+      isActive: entry.isActive,
+      sortOrder: entry.sortOrder,
+    };
+    this.showPoolModal = true;
+  }
+
+  closePoolModal(): void {
+    this.showPoolModal = false;
+    this.editingPoolEntry = null;
+  }
+
+  savePoolEntry(): void {
+    if (!this.game || this.savingPoolEntry || !this.poolForm.rewardId) return;
+
+    const payload: CreateGameMysteryPoolEntryPayload = {
+      rewardId: this.poolForm.rewardId,
+      weight: Math.max(1, this.poolForm.weight),
+      isActive: this.poolForm.isActive,
+      sortOrder: this.poolForm.sortOrder,
+    };
+
+    this.savingPoolEntry = true;
+    const request$ = this.editingPoolEntry
+      ? this.gameMysteryService.updatePoolEntry(this.game.id, this.editingPoolEntry.id, payload)
+      : this.gameMysteryService.createPoolEntry(this.game.id, payload);
+
+    request$
+      .pipe(
+        finalize(() => {
+          this.savingPoolEntry = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.closePoolModal();
+          this.loadMysteryData();
+        },
+        error: () => alert('Enregistrement de l\'entrée pool échoué.'),
+      });
+  }
+
+  askDeletePoolEntry(entryId: string): void {
+    this.confirmDeletePoolEntryId = entryId;
+  }
+
+  cancelDeletePoolEntry(): void {
+    this.confirmDeletePoolEntryId = null;
+  }
+
+  confirmDeletePoolEntry(): void {
+    if (!this.game || !this.confirmDeletePoolEntryId || this.deletingPoolEntry) return;
+
+    this.deletingPoolEntry = true;
+    this.gameMysteryService
+      .deletePoolEntry(this.game.id, this.confirmDeletePoolEntryId)
+      .pipe(
+        finalize(() => {
+          this.deletingPoolEntry = false;
+          this.confirmDeletePoolEntryId = null;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => this.loadMysteryData(),
+        error: () => alert('Suppression de l\'entrée pool échouée.'),
       });
   }
 

@@ -91,10 +91,28 @@ export const routes: Routes = [
           import('./features/mini-games/mini-games').then((m) => m.MiniGames),
       },
       {
+        path: 'mini-games/rewards',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/mini-games/mini-game-rewards/mini-game-rewards').then((m) => m.MiniGameRewards),
+      },
+      {
         path: 'mini-games/:id',
         canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
           import('./features/mini-games/mini-game-detail/mini-game-detail').then((m) => m.MiniGameDetail),
+      },
+      {
+        path: 'tombola/:id',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/tombola/tombola-detail/tombola-detail').then((m) => m.TombolaDetail),
+      },
+      {
+        path: 'tombola',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/tombola/tombola').then((m) => m.Tombola),
       },
       {
         path: 'ads',

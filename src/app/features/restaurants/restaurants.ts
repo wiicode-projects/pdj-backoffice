@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { RestaurantService, AdminRestaurant, PaginatedRestaurants } from '../../core/services/restaurant.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'pdj-restaurants',
@@ -29,11 +29,15 @@ export class Restaurants implements OnInit {
   confirmDeleteId: string | null = null;
   deleting = false;
 
-  readonly apiBase = environment.apiUrl.replace('/api/v1', '');
+  // Ban toggle
+  togglingActiveId: string | null = null;
+
+
 
   constructor(
     private restaurantService: RestaurantService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -95,8 +99,7 @@ export class Restaurants implements OnInit {
   }
 
   getImageUrl(r: AdminRestaurant): string | null {
-    if (!r.imagePath) return null;
-    return `${this.apiBase}/${r.imagePath}`;
+    return r.imagePath || null;
   }
 
   getMembershipStatus(r: AdminRestaurant): 'none' | 'active' | 'inactive' {
@@ -107,10 +110,7 @@ export class Restaurants implements OnInit {
   // ── Side panel ───────────────────────────────────────────────────────────────
 
   openPanel(r: AdminRestaurant): void {
-    this.selectedRestaurant = r;
-    this.panelOpen = true;
-    this.confirmDeleteId = null;
-    this.cdr.detectChanges();
+    this.router.navigate(['/app/restaurants', r.id]);
   }
 
   closePanel(): void {
@@ -145,6 +145,34 @@ export class Restaurants implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => console.error('Failed to delete restaurant:', err),
+      });
+  }
+
+  // ── Ban toggle ───────────────────────────────────────────────────────────────
+
+  toggleRestaurantActive(restaurant: AdminRestaurant, event: Event): void {
+    event.stopPropagation();
+    if (this.togglingActiveId === restaurant.id) return;
+    const newState = !restaurant.isActive;
+    // Optimistic update
+    restaurant.isActive = newState;
+    this.togglingActiveId = restaurant.id;
+    this.cdr.detectChanges();
+
+    this.restaurantService.toggleActive(restaurant.id, newState)
+      .pipe(finalize(() => {
+        this.togglingActiveId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          restaurant.isActive = res.restaurant.isActive;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          restaurant.isActive = !newState;
+          this.cdr.detectChanges();
+        },
       });
   }
 }

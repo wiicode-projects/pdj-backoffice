@@ -1,0 +1,320 @@
+// ==============================
+// VARIABLES
+// ==============================
+$primary: #DC2626;
+$primary-light: rgba(220, 38, 38, 0.08);
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border: #E5E7EB;
+$border-light: #F3F4F6;
+$success: #059669;
+$success-light: rgba(5, 150, 105, 0.08);
+$blue: #3B82F6;
+$blue-light: rgba(59, 130, 246, 0.1);
+$green: #10B981;
+$green-light: rgba(16, 185, 129, 0.1);
+$orange: #F59E0B;
+$orange-light: rgba(245, 158, 11, 0.1);
+$purple: #8B5CF6;
+$purple-light: rgba(139, 92, 246, 0.1);
+$teal: #0D9488;
+$teal-light: rgba(13, 148, 136, 0.1);
+$red: #EF4444;
+$red-light: rgba(239, 68, 68, 0.08);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+$shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+$font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ==============================
+// PAGE
+// ==============================
+.page {
+  font-family: $font;
+  animation: fadeIn 0.35s ease;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 16px;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-medium;
+    margin: 0;
+  }
+
+  &__header-stats {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+}
+
+// ==============================
+// STAT PILLS
+// ==============================
+.stat-pill {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  &--active {
+    background: $green-light;
+    color: $green;
+  }
+
+  &--inactive {
+    background: $border-light;
+    color: $text-medium;
+  }
+}
+
+// ==============================
+// LOADING
+// ==============================
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 16px;
+  color: $text-medium;
+  font-size: 0.9rem;
+
+  &__spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+// ==============================
+// GAMES GRID
+// ==============================
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+// ==============================
+// GAME CARD
+// ==============================
+.game-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  box-shadow: $shadow-sm;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.4s ease backwards;
+
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: 0.06s; }
+  &:nth-child(3) { animation-delay: 0.12s; }
+  &:nth-child(4) { animation-delay: 0.18s; }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $green, $teal);
+    transition: background 0.3s ease;
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &--inactive {
+    opacity: 0.7;
+
+    &::before {
+      background: linear-gradient(90deg, $text-light, $border);
+    }
+
+    .game-card__icon { opacity: 0.5; }
+  }
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.3s ease;
+
+    &[data-type="spin"]     { background: $orange-light; color: $orange; }
+    &[data-type="mystery"]  { background: $blue-light;   color: $blue; }
+    &[data-type="quiz"]     { background: $purple-light; color: $purple; }
+    &[data-type="referral"] { background: $green-light;  color: $green; }
+    &[data-type="default"]  { background: $border-light; color: $text-medium; }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__clickable {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  &__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 4px;
+  }
+
+  &__desc {
+    font-size: 0.82rem;
+    color: $text-medium;
+    margin: 0 0 10px;
+    line-height: 1.4;
+  }
+
+  &__limit {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: $blue-light;
+    color: $blue;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    &--active {
+      background: $green-light;
+      color: $green;
+    }
+
+    &--inactive {
+      background: $border-light;
+      color: $text-medium;
+    }
+  }
+
+  &__toggle {
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+}
+
+// ==============================
+// TOGGLE SWITCH
+// ==============================
+.toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  border: none;
+  border-radius: 14px;
+  background: #D1D5DB;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  &__thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &--on {
+    background: $green;
+
+    .toggle-switch__thumb {
+      left: 25px;
+    }
+  }
+
+  &--loading {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  &:hover:not(:disabled):not(.toggle-switch--loading) {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// ==============================
+// ANIMATIONS
+// ==============================
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

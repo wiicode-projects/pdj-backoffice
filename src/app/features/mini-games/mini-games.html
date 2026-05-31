@@ -1,0 +1,92 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="page__header">
+    <div>
+      <h1 class="page__title">{{ 'MINI_GAMES.TITLE' | translate }}</h1>
+      <p class="page__subtitle">{{ 'MINI_GAMES.SUBTITLE' | translate }}</p>
+    </div>
+    <div class="page__header-stats">
+      <span class="stat-pill stat-pill--active">{{ activeCount }} {{ 'MINI_GAMES.ACTIVE' | translate }}</span>
+      <span class="stat-pill stat-pill--inactive">{{ inactiveCount }} {{ 'MINI_GAMES.INACTIVE' | translate }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  }
+
+  <!-- Game Cards Grid -->
+  @if (!loading) {
+    <div class="games-grid">
+      @for (game of games; track game.id) {
+        <div class="game-card" [class.game-card--inactive]="!game.isActive">
+          <div class="game-card__clickable" (click)="navigateToGame(game)">
+          <!-- Icon -->
+          <div class="game-card__icon" [attr.data-type]="getGameIcon(game.slug)">
+            @switch (game.slug) {
+              @case ('spin_win') {
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M12 3V12L18 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 12L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                </svg>
+              }
+              @case ('mystery_box') {
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 7H4C3.4 7 3 7.4 3 8V20C3 20.6 3.4 21 4 21H20C20.6 21 21 20.6 21 20V8C21 7.4 20.6 7 20 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M12 7V3M12 3L8 7M12 3L16 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 11V17M9 14H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              }
+              @case ('quiz_flash') {
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M9 9C9 7.34 10.34 6 12 6C13.66 6 15 7.34 15 9C15 10.66 13.66 12 12 12V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="currentColor"/>
+                </svg>
+              }
+              @case ('referral') {
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M2 20C2 16.7 5.1 14 9 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="17" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M17 16V22M14 19H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              }
+            }
+          </div>
+
+          <!-- Info -->
+          <div class="game-card__body">
+            <h3 class="game-card__name">{{ game.name }}</h3>
+            <p class="game-card__desc">{{ getLimitDescription(game) }}</p>
+            <span class="game-card__status" [class.game-card__status--active]="game.isActive" [class.game-card__status--inactive]="!game.isActive">
+              {{ game.isActive ? ('MINI_GAMES.ACTIVE' | translate) : ('MINI_GAMES.INACTIVE' | translate) }}
+            </span>
+          </div>
+          </div>
+
+          <!-- Toggle -->
+          <div class="game-card__toggle">
+            <button
+              class="toggle-switch"
+              [class.toggle-switch--on]="game.isActive"
+              [class.toggle-switch--loading]="togglingId === game.id"
+              [disabled]="togglingId !== null"
+              (click)="$event.stopPropagation(); toggleGame(game)"
+              [attr.aria-label]="game.isActive ? ('MINI_GAMES.DEACTIVATE' | translate) : ('MINI_GAMES.ACTIVATE' | translate)"
+            >
+              <span class="toggle-switch__thumb"></span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

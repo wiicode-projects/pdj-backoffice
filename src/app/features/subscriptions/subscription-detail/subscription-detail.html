@@ -228,10 +228,6 @@
                     <span class="plan-card__detail-label">{{ 'SUBSCRIPTIONS.DETAIL.DISCOUNT' | translate }}</span>
                     <span class="plan-card__detail-value">{{ plan.discount }}%</span>
                   </div>
-                  <div class="plan-card__detail">
-                    <span class="plan-card__detail-label">{{ 'SUBSCRIPTIONS.TRIAL_DAYS' | translate }}</span>
-                    <span class="plan-card__detail-value">{{ plan.trialPeriodDays }} {{ 'SUBSCRIPTIONS.DETAIL.DAYS' | translate }}</span>
-                  </div>
                 </div>
               </div>
             }
@@ -298,10 +294,6 @@
             <div class="form-group">
               <label class="form-label">{{ 'SUBSCRIPTIONS.DETAIL.DISCOUNT' | translate }} (%) *</label>
               <input class="form-input" type="number" [(ngModel)]="newPlan.discount" name="discount" required min="0" max="100" step="1" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">{{ 'SUBSCRIPTIONS.TRIAL_DAYS' | translate }} *</label>
-              <input class="form-input" type="number" [(ngModel)]="newPlan.trialPeriodDays" name="trialPeriodDays" required min="1" />
             </div>
           </div>
         </div>

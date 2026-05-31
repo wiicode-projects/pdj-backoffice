@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { UserService, AdminUser, PaginatedUsers } from '../../core/services/user.service';
@@ -34,9 +35,13 @@ export class Users implements OnInit {
   confirmDeleteId: string | null = null;
   deleting = false;
 
+  // Ban toggle
+  togglingActiveId: string | null = null;
+
   constructor(
     private userService: UserService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -123,10 +128,7 @@ export class Users implements OnInit {
   // ── Side panel ───────────────────────────────────────────────────────────────
 
   openPanel(user: AdminUser): void {
-    this.selectedUser = user;
-    this.panelOpen = true;
-    this.confirmDeleteId = null;
-    this.cdr.detectChanges();
+    this.router.navigate(['/app/users', user.id]);
   }
 
   closePanel(): void {
@@ -162,6 +164,38 @@ export class Users implements OnInit {
         },
         error: (err) => {
           console.error('Failed to delete user:', err);
+        },
+      });
+  }
+
+  // ── Ban toggle ────────────────────────────────────────────────────────────────
+
+  toggleUserActive(user: AdminUser, event: Event): void {
+    event.stopPropagation();
+    if (this.togglingActiveId === user.id) return;
+    const newState = !user.isActive;
+    // Optimistic update
+    user.isActive = newState;
+    this.togglingActiveId = user.id;
+    this.cdr.detectChanges();
+
+    this.userService.toggleActive(user.id, newState)
+      .pipe(finalize(() => {
+        this.togglingActiveId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          user.isActive = res.user.isActive;
+          if (this.selectedUser?.id === user.id) {
+            this.selectedUser.isActive = res.user.isActive;
+          }
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          // Revert on error
+          user.isActive = !newState;
+          this.cdr.detectChanges();
         },
       });
   }

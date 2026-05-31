@@ -1,0 +1,208 @@
+<div class="page">
+  <div class="page-header">
+    <div class="page-header__left">
+      <div class="page-header__icon">🎨</div>
+      <div>
+        <h1 class="page-header__title">Personnalisations IDcard</h1>
+        <p class="page-header__subtitle">Catalogue boutique — couverture recommandée pour Effets &amp; Stickers, prix en Frites</p>
+      </div>
+    </div>
+    <button class="btn btn--primary" (click)="openCreate()">Nouvel article</button>
+  </div>
+
+  <div class="filters">
+    <label>Type de personnalisation</label>
+    <select [(ngModel)]="filterType" class="field__input">
+      <option value="">Tous les types</option>
+      @for (type of customizationTypes; track type) {
+        <option [value]="type">{{ typeLabel(type) }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading) {
+    <div class="loading"><div class="loading__spinner"></div></div>
+  }
+
+  @if (!loading && filteredItems.length === 0) {
+    <div class="empty-state">
+      <h3>Aucun article</h3>
+      <p>Créez des articles ou ajustez le filtre.</p>
+    </div>
+  }
+
+  @if (!loading && filteredItems.length > 0) {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cover</th>
+          <th>Type</th>
+          <th>Sous-type</th>
+          <th>Clé</th>
+          <th>Nom</th>
+          <th>Prix</th>
+          <th>À la une</th>
+          <th>Actif</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredItems; track item.id) {
+          <tr [class.row--inactive]="!item.isActive">
+            <td>
+              @if (getCoverUrl(item)) {
+                <img [src]="getCoverUrl(item)!" alt="" class="cover-thumb" />
+              } @else {
+                <span class="cover-thumb cover-thumb--empty">—</span>
+              }
+            </td>
+            <td><span class="cat-badge">{{ typeLabelForCategory(item.category) }}</span></td>
+            <td><span class="cat-badge cat-badge--muted">{{ categoryLabel(item.category) }}</span></td>
+            <td><code>{{ item.itemKey }}</code></td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.priceFrites | number }} 🍟</td>
+            <td>{{ item.isFeatured ? 'Oui' : '—' }}</td>
+            <td>{{ item.isActive ? 'Oui' : 'Non' }}</td>
+            <td class="actions">
+              <button class="btn btn--ghost btn--sm" (click)="openEdit(item)">Modifier</button>
+              <button class="btn btn--ghost btn--sm btn--danger" (click)="askDelete(item.id)">Suppr.</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal__header">
+          <h2 class="modal__title">{{ editing ? 'Modifier' : 'Créer' }} un article</h2>
+          <button class="modal__close" type="button" (click)="closeModal()">×</button>
+        </div>
+
+        <div class="modal__body">
+          <div class="field field--full">
+            <label class="field__label">Image de couverture</label>
+            <p class="field__hint">
+              Optionnelle pour Couleurs et Police (aperçu natif dans l’app).
+              Recommandée pour Effets et Stickers.
+            </p>
+            <label class="image-drop" [class.image-drop--filled]="imagePreview">
+              @if (imagePreview) {
+                <img [src]="imagePreview" class="image-drop__preview" alt="aperçu cover" />
+                <span class="image-drop__change">Changer</span>
+              } @else {
+                <span>Ajouter une image (optionnel)</span>
+              }
+              <input type="file" accept="image/*" class="image-drop__input" (change)="onFileChange($event)" />
+            </label>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Sous-type (catalogue)</label>
+            <select
+              class="field__input"
+              [(ngModel)]="form.category"
+              (ngModelChange)="onCategoryChange()"
+              [disabled]="!!editing"
+            >
+              @for (cat of catalogCategories; track cat) {
+                <option [value]="cat">{{ categoryLabel(cat) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Clé (itemKey)</label>
+            @if (showEffectKeySelect) {
+              @if (availableEffectKeys.length === 0) {
+                <p class="field__hint field__hint--warn">
+                  Tous les effets implémentés sont déjà dans le catalogue.
+                </p>
+              } @else {
+                <select
+                  class="field__input"
+                  [(ngModel)]="form.itemKey"
+                  (ngModelChange)="onEffectKeyChange()"
+                >
+                  <option value="">Choisir un effet…</option>
+                  @for (opt of availableEffectKeys; track opt.key) {
+                    <option [value]="opt.key">{{ opt.label }} ({{ opt.key }})</option>
+                  }
+                </select>
+                <p class="field__hint">
+                  Effets disponibles dans l’app mobile, hors articles déjà créés.
+                </p>
+              }
+            } @else {
+              <input class="field__input" [(ngModel)]="form.itemKey" [readonly]="!!editing" />
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">Nom</label>
+            <input class="field__input" [(ngModel)]="form.name" />
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label">Description</label>
+            <textarea class="field__input" rows="2" [(ngModel)]="form.description"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Prix Frites</label>
+            <input class="field__input" type="number" min="0" [(ngModel)]="form.priceFrites" />
+          </div>
+
+          <div class="field">
+            <label class="field__label">Badge boutique</label>
+            <select class="field__input" [(ngModel)]="form.badgeLabel">
+              @for (b of badgeOptions; track b) {
+                <option [value]="b">{{ b || 'Aucun' }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field field--row">
+            <label><input type="checkbox" [(ngModel)]="form.isFeatured" /> À la une (featured)</label>
+          </div>
+
+          <div class="field field--row">
+            <label><input type="checkbox" [(ngModel)]="form.isDefaultFree" /> Gratuit par défaut (max 2/cat.)</label>
+          </div>
+
+          <div class="field field--row">
+            <label><input type="checkbox" [(ngModel)]="form.isActive" /> Actif</label>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Ordre</label>
+            <input class="field__input" type="number" min="0" [(ngModel)]="form.sortOrder" />
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button class="btn btn--ghost" type="button" (click)="closeModal()">Annuler</button>
+          <button class="btn btn--primary" type="button" [disabled]="!isFormValid() || saving" (click)="save()">
+            {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (confirmDeleteId) {
+    <div class="modal-overlay">
+      <div class="modal modal--sm">
+        <h2>Supprimer cet article ?</h2>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" (click)="cancelDelete()">Annuler</button>
+          <button class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete(confirmDeleteId!)">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

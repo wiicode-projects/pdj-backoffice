@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, tap, catchError, throwError, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface LoginRequest {
@@ -12,7 +12,18 @@ export interface LoginRequest {
 export interface LoginResponse {
   authToken: string;
   refreshToken: string;
+  statusCode: number;
   user: AuthUser;
+}
+
+export interface AuthRestaurant {
+  id: string;
+  name: string;
+  address: string;
+  city: string | null;
+  type: string;
+  reservationEnabled: boolean;
+  imagePath: string | null;
 }
 
 export interface AuthUser {
@@ -25,10 +36,13 @@ export interface AuthUser {
     id: string;
     name: string;
   };
-  restaurant?: {
-    id: string;
-    name: string;
-  };
+  restaurant: AuthRestaurant | null;
+}
+
+export interface UserInfoResponse {
+  status: number;
+  user: AuthUser;
+  token: string;
 }
 
 const AUTH_TOKEN_KEY = 'pdj_auth_token';
@@ -48,26 +62,51 @@ export class AuthService {
   readonly userRole = computed(() => this.currentUser()?.role?.name || null);
   readonly isAdmin = computed(() => this.userRole() === 'ADMIN');
   readonly isRestaurant = computed(() => this.userRole() === 'RESTAURANT');
+  readonly restaurantId = computed(() => this.currentUser()?.restaurant?.id || null);
 
   constructor(
     private http: HttpClient,
     private router: Router,
   ) {
     this.loadStoredUser();
+    // Re-fetch fresh user info on app reload if already authenticated
+    if (this.getAuthToken()) {
+      this.fetchAndStoreUserInfo().subscribe();
+    }
   }
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
+  login(credentials: LoginRequest): Observable<UserInfoResponse> {
     this.isLoading.set(true);
 
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
       tap((response) => {
         this.storeTokens(response.authToken, response.refreshToken);
-        this.storeUser(response.user);
-        this.currentUser.set(response.user);
+      }),
+      // After storing tokens, fetch the full user info (including restaurant)
+      switchMap(() => this.fetchAndStoreUserInfo()),
+      tap(() => {
         this.isLoading.set(false);
       }),
       catchError((error) => {
         this.isLoading.set(false);
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  /**
+   * Fetches the full user info from GET /users/me/infos.
+   * This mirrors the mobile's pattern of calling this endpoint after login
+   * to get the complete user object including the restaurant relation.
+   */
+  fetchAndStoreUserInfo(): Observable<UserInfoResponse> {
+    return this.http.get<UserInfoResponse>(`${environment.apiUrl}/users/me/infos`).pipe(
+      tap((response) => {
+        this.storeUser(response.user);
+        this.currentUser.set(response.user);
+      }),
+      catchError((error) => {
+        console.error('[AuthService] Failed to fetch user info:', error);
         return throwError(() => error);
       }),
     );
@@ -119,6 +158,10 @@ export class AuthService {
 
   getUser(): AuthUser | null {
     return this.currentUser();
+  }
+
+  getRestaurantId(): string | null {
+    return this.currentUser()?.restaurant?.id || null;
   }
 
   private storeTokens(authToken: string, refreshToken: string): void {

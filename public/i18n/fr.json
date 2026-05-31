@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "Gestion des utilisateurs",
+    "SUBTITLE": "Utilisateurs inscrits sur la plateforme",
     "CREATE": "Créer un utilisateur",
     "EDIT": "Modifier l'utilisateur",
     "FIRST_NAME": "Prénom",
@@ -104,28 +105,86 @@
     "PHONE": "Téléphone",
     "ROLE": "Rôle",
     "LANGUAGE": "Langue",
+    "ADDRESS": "Adresse",
     "CREATED_AT": "Date de création",
+    "VERIFIED": "Vérifié",
+    "UNVERIFIED": "Non vérifié",
+    "EMPTY_HINT": "Aucun utilisateur trouvé pour les filtres sélectionnés",
+    "SEARCH_PLACEHOLDER": "Rechercher par nom ou e-mail...",
     "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
     "CREATE_SUCCESS": "Utilisateur créé avec succès",
     "UPDATE_SUCCESS": "Utilisateur mis à jour avec succès",
-    "DELETE_SUCCESS": "Utilisateur supprimé avec succès"
+    "DELETE_SUCCESS": "Utilisateur supprimé avec succès",
+    "KPI": {
+      "TOTAL": "Total utilisateurs",
+      "ACTIVE": "Actifs",
+      "VERIFIED": "E-mails vérifiés",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "Utilisateur",
+      "CONTACT": "Téléphone",
+      "STATUS": "Statut",
+      "SUBSCRIPTION": "Abonnement",
+      "REGISTERED": "Inscription"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Gratuit"
+    },
+    "PANEL": {
+      "STATUS": "Statut du compte",
+      "INFOS": "Informations",
+      "SUBSCRIPTION": "Abonnement",
+      "EXPIRES": "Expire le",
+      "NO_SUBSCRIPTION": "Aucun abonnement actif"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Gestion des restaurants",
+    "SUBTITLE": "Restaurants principaux enregistrés sur la plateforme",
     "CREATE": "Créer un restaurant",
     "EDIT": "Modifier le restaurant",
     "ONBOARDING": "Intégrer un restaurant",
     "NAME": "Nom",
-    "TYPE": "Type",
     "CITY": "Ville",
     "ADDRESS": "Adresse",
     "RESERVATION_ENABLED": "Réservation activée",
     "LOCATIONS": "Localisations",
-    "OWNER": "Propriétaire",
+    "OWNER": "Contact réservation",
+    "EMPTY_HINT": "Aucun restaurant trouvé pour les filtres sélectionnés",
+    "SEARCH_PLACEHOLDER": "Rechercher par nom ou ville...",
     "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer ce restaurant ?",
     "CREATE_SUCCESS": "Restaurant créé avec succès",
     "UPDATE_SUCCESS": "Restaurant mis à jour avec succès",
-    "DELETE_SUCCESS": "Restaurant supprimé avec succès"
+    "DELETE_SUCCESS": "Restaurant supprimé avec succès",
+    "TYPE": {
+      "FIXED": "Fixe",
+      "ITINERANT": "Itinérant"
+    },
+    "KPI": {
+      "TOTAL": "Total restaurants",
+      "PREMIUM": "Abonnés premium",
+      "ITINERANT": "Itinérants",
+      "BRANCHES": "Succursales",
+      "VIEWS": "Vues",
+      "CLICKS": "Clics"
+    },
+    "TABLE": {
+      "RESTAURANT": "Restaurant",
+      "CITY": "Ville",
+      "TYPE": "Type",
+      "SUBSCRIPTION": "Abonnement",
+      "VIEWS": "Vues",
+      "BRANCHES": "Succursales"
+    },
+    "PANEL": {
+      "INFOS": "Informations",
+      "SUBSCRIPTION": "Abonnement",
+      "BRANCHES": "Succursales",
+      "NO_SUBSCRIPTION": "Aucun abonnement actif",
+      "NO_BRANCHES": "Aucune succursale"
+    }
   },
   "DISHES": {
     "TITLE": "Gestion des plats",
@@ -149,17 +208,81 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Gestion des abonnements",
+    "SUBTITLE": "Gérez vos offres d'abonnement pour les utilisateurs et restaurants",
     "CREATE": "Créer un abonnement",
     "NAME": "Nom",
     "DESCRIPTION": "Description",
-    "PRICE": "Prix",
+    "PRICE": "Prix mensuel",
     "TARGET_TYPE": "Type cible",
     "PLANS": "Plans",
     "FEATURES": "Fonctionnalités",
     "MEMBERS": "Membres",
     "BILLING_PERIOD": "Période de facturation",
     "CURRENCY": "Devise",
-    "TRIAL_DAYS": "Jours d'essai"
+    "TRIAL_DAYS": "Jours d'essai",
+    "MONTH": "mois",
+    "NEXT": "Suivant",
+    "STEP_INFO": "Informations",
+    "STEP_LIMITS": "Limites",
+    "STEP_FEATURES": "Options",
+    "EMPTY_HINT": "Commencez par créer votre premier abonnement",
+    "DEFAULT": "Abonnement par défaut",
+    "COLOR": "Couleur",
+    "TARGET_TYPES": {
+      "USER": "Utilisateur",
+      "RESTAURANT": "Restaurant"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menus / jour",
+      "IMAGES_DISH": "Images / plat",
+      "PHOTOS": "Photos profil",
+      "RESTAURANTS": "Restaurants"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Accès Menus & Profils",
+      "SEARCH_GEO": "Recherche & Géo",
+      "MINI_GAMES": "Mini-jeux",
+      "NO_ADS": "Sans publicité",
+      "ADS": "Avec publicité",
+      "BACKOFFICE": "Back-office complet",
+      "ID_CARD": "Carte ID Premium",
+      "REFERRAL": "Parrainage via code",
+      "DRAWS": "Participation tirages",
+      "ITINERANT": "Restaurant itinérant",
+      "GIFT": "Cadeaux autorisés",
+      "MULTI_RESTAURANT": "Multi-restaurant"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "Sans publicité",
+      "PREMIUM_ID_CARD": "Carte ID Premium",
+      "UNLIMITED_GAMES": "Jeux illimités",
+      "ADVANCED_FILTERS": "Filtres avancés",
+      "EXCLUSIVE_OFFERS": "Offres exclusives",
+      "HIGHLIGHT_IN_SEARCH": "Mise en avant"
+    },
+    "EDIT_TITLE": "Modifier l'abonnement",
+    "DELETE_TITLE": "Supprimer l'abonnement",
+    "DELETE_CONFIRM": "Êtes-vous sûr de vouloir supprimer cet abonnement ?",
+    "DELETE_WARNING": "Cette action est irréversible. Tous les plans associés seront également supprimés.",
+    "UPDATE_SUCCESS": "Abonnement mis à jour avec succès",
+    "DELETE_SUCCESS": "Abonnement supprimé avec succès",
+    "DETAIL": {
+      "DISCOUNT": "Réduction",
+      "DAYS": "jours",
+      "NO_PLANS": "Aucun plan défini pour le moment",
+      "CREATED": "Créé le"
+    },
+    "PLAN": {
+      "ADD": "Ajouter un plan",
+      "CREATE_TITLE": "Créer un plan",
+      "TYPE": "Type de plan",
+      "PERIODS": {
+        "MONTHLY": "Mensuel",
+        "QUARTERLY": "Trimestriel",
+        "SEMI_ANNUALLY": "Semestriel",
+        "YEARLY": "Annuel"
+      }
+    }
   },
   "MENUS": {
     "TITLE": "Gestion des menus"

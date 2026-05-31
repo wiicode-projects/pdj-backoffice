@@ -1,18 +1,163 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { finalize } from 'rxjs';
+import {
+  SubscriptionService,
+  Subscription,
+  CreateSubscriptionDto,
+  TargetType,
+  SubscriptionFeature,
+} from '../../core/services/subscription.service';
 
 @Component({
   selector: 'pdj-subscriptions',
   standalone: true,
-  imports: [TranslateModule],
-  template: `
-    <div class="page">
-      <h1 class="page__title">{{ 'SUBSCRIPTIONS.TITLE' | translate }}</h1>
-    </div>
-  `,
-  styles: [`
-    .page { font-family: 'PolySans Trial', -apple-system, sans-serif; }
-    .page__title { font-size: 1.6rem; font-weight: 700; color: #1F2937; }
-  `],
+  imports: [CommonModule, FormsModule, TranslateModule],
+  templateUrl: './subscriptions.html',
+  styleUrl: './subscriptions.scss',
 })
-export class Subscriptions {}
+export class Subscriptions implements OnInit {
+  subscriptions: Subscription[] = [];
+  loading = false;
+  creating = false;
+  createError = '';
+  showCreateDialog = false;
+  currentStep = 1;
+
+  targetTypes = Object.values(TargetType);
+  allFeatures = Object.values(SubscriptionFeature);
+  targetFilter: string = '';
+
+  newSub: CreateSubscriptionDto = this.getEmptySubscription();
+
+  get filteredSubscriptions(): Subscription[] {
+    if (!this.targetFilter) return this.subscriptions;
+    return this.subscriptions.filter(s => s.targetType === this.targetFilter);
+  }
+
+  constructor(
+    private subscriptionService: SubscriptionService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.loadSubscriptions();
+  }
+
+  loadSubscriptions(): void {
+    this.loading = true;
+    this.subscriptionService.findAll()
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (response) => {
+          this.subscriptions = response.subscriptions;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load subscriptions:', err);
+        },
+      });
+  }
+
+  createSubscription(): void {
+    this.creating = true;
+
+    // Ensure numeric fields are actual numbers (ngModel can bind strings)
+    const payload: CreateSubscriptionDto = {
+      ...this.newSub,
+      monthlyPrice: Number(this.newSub.monthlyPrice),
+      maxMenusPerDay: Number(this.newSub.maxMenusPerDay),
+      maxImagesPerDish: Number(this.newSub.maxImagesPerDish),
+      maxProfilePhotos: Number(this.newSub.maxProfilePhotos),
+      maxRestaurants: Number(this.newSub.maxRestaurants),
+    };
+
+    this.subscriptionService.create(payload)
+      .pipe(finalize(() => {
+        this.creating = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.closeDialog();
+          this.loadSubscriptions();
+        },
+        error: (err) => {
+          console.error('Failed to create subscription:', err);
+          this.createError = err.error?.message || 'Une erreur est survenue lors de la création.';
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  isFeatureSelected(feature: SubscriptionFeature): boolean {
+    return this.newSub.features?.includes(feature) ?? false;
+  }
+
+  toggleFeature(feature: SubscriptionFeature): void {
+    if (!this.newSub.features) {
+      this.newSub.features = [];
+    }
+    const index = this.newSub.features.indexOf(feature);
+    if (index === -1) {
+      this.newSub.features.push(feature);
+    } else {
+      this.newSub.features.splice(index, 1);
+    }
+  }
+
+  getStep2Label(): string {
+    if (this.newSub.targetType === TargetType.RESTAURANT) {
+      return 'SUBSCRIPTIONS.STEP_LIMITS';
+    }
+    return 'SUBSCRIPTIONS.STEP_FEATURES';
+  }
+
+  getCountByTarget(targetType: string): number {
+    return this.subscriptions.filter(s => s.targetType === targetType).length;
+  }
+
+  navigateToDetail(sub: Subscription): void {
+    this.router.navigate(['/app/subscriptions', sub.id]);
+  }
+
+  closeDialog(): void {
+    this.showCreateDialog = false;
+    this.currentStep = 1;
+    this.createError = '';
+    this.newSub = this.getEmptySubscription();
+  }
+
+  private getEmptySubscription(): CreateSubscriptionDto {
+    return {
+      name: '',
+      description: '',
+      monthlyPrice: 0,
+      targetType: '' as TargetType,
+      features: [],
+      maxMenusPerDay: 3,
+      maxImagesPerDish: 1,
+      maxProfilePhotos: 5,
+      maxRestaurants: 1,
+      accessMenusAndProfils: false,
+      rechercheAndGeo: false,
+      miniGames: false,
+      hasAdvertisement: true,
+      backOfficeComplet: false,
+      idCardPremium: false,
+      parrainageViaCode: false,
+      participationTirages: false,
+      isAllowedToBeItinerant: false,
+      canHaveGift: false,
+      isMultiRestaurant: false,
+      isDefault: false,
+    };
+  }
+}

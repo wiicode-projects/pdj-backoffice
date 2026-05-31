@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "Gestione utenti",
+    "SUBTITLE": "Utenti registrati sulla piattaforma",
     "CREATE": "Creare utente",
     "EDIT": "Modificare utente",
     "FIRST_NAME": "Nome",
@@ -104,28 +105,86 @@
     "PHONE": "Telefono",
     "ROLE": "Ruolo",
     "LANGUAGE": "Lingua",
+    "ADDRESS": "Indirizzo",
     "CREATED_AT": "Data di creazione",
+    "VERIFIED": "Verificato",
+    "UNVERIFIED": "Non verificato",
+    "EMPTY_HINT": "Nessun utente trovato per i filtri selezionati",
+    "SEARCH_PLACEHOLDER": "Cerca per nome o e-mail...",
     "DELETE_CONFIRM": "Sei sicuro di voler eliminare questo utente?",
     "CREATE_SUCCESS": "Utente creato con successo",
     "UPDATE_SUCCESS": "Utente aggiornato con successo",
-    "DELETE_SUCCESS": "Utente eliminato con successo"
+    "DELETE_SUCCESS": "Utente eliminato con successo",
+    "KPI": {
+      "TOTAL": "Utenti totali",
+      "ACTIVE": "Attivi",
+      "VERIFIED": "E-mail verificate",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "Utente",
+      "CONTACT": "Telefono",
+      "STATUS": "Stato",
+      "SUBSCRIPTION": "Abbonamento",
+      "REGISTERED": "Registrato"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Gratuito"
+    },
+    "PANEL": {
+      "STATUS": "Stato dell'account",
+      "INFOS": "Informazioni",
+      "SUBSCRIPTION": "Abbonamento",
+      "EXPIRES": "Scade il",
+      "NO_SUBSCRIPTION": "Nessun abbonamento attivo"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Gestione ristoranti",
+    "SUBTITLE": "Ristoranti principali registrati sulla piattaforma",
     "CREATE": "Creare ristorante",
     "EDIT": "Modificare ristorante",
     "ONBOARDING": "Integrare ristorante",
     "NAME": "Nome",
-    "TYPE": "Tipo",
     "CITY": "Città",
     "ADDRESS": "Indirizzo",
     "RESERVATION_ENABLED": "Prenotazione attivata",
     "LOCATIONS": "Posizioni",
-    "OWNER": "Proprietario",
+    "OWNER": "Contatto prenotazione",
+    "EMPTY_HINT": "Nessun ristorante trovato per i filtri selezionati",
+    "SEARCH_PLACEHOLDER": "Cerca per nome o città...",
     "DELETE_CONFIRM": "Sei sicuro di voler eliminare questo ristorante?",
     "CREATE_SUCCESS": "Ristorante creato con successo",
     "UPDATE_SUCCESS": "Ristorante aggiornato con successo",
-    "DELETE_SUCCESS": "Ristorante eliminato con successo"
+    "DELETE_SUCCESS": "Ristorante eliminato con successo",
+    "TYPE": {
+      "FIXED": "Fisso",
+      "ITINERANT": "Itinerante"
+    },
+    "KPI": {
+      "TOTAL": "Ristoranti totali",
+      "PREMIUM": "Abbonati premium",
+      "ITINERANT": "Itineranti",
+      "BRANCHES": "Filiali",
+      "VIEWS": "Visualizzazioni",
+      "CLICKS": "Clic"
+    },
+    "TABLE": {
+      "RESTAURANT": "Ristorante",
+      "CITY": "Città",
+      "TYPE": "Tipo",
+      "SUBSCRIPTION": "Abbonamento",
+      "VIEWS": "Visualizzazioni",
+      "BRANCHES": "Filiali"
+    },
+    "PANEL": {
+      "INFOS": "Informazioni",
+      "SUBSCRIPTION": "Abbonamento",
+      "BRANCHES": "Filiali",
+      "NO_SUBSCRIPTION": "Nessun abbonamento attivo",
+      "NO_BRANCHES": "Nessuna filiale"
+    }
   },
   "DISHES": {
     "TITLE": "Gestione piatti",
@@ -149,17 +208,81 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Gestione abbonamenti",
+    "SUBTITLE": "Gestisci le offerte di abbonamento per utenti e ristoranti",
     "CREATE": "Creare abbonamento",
     "NAME": "Nome",
     "DESCRIPTION": "Descrizione",
-    "PRICE": "Prezzo",
+    "PRICE": "Prezzo mensile",
     "TARGET_TYPE": "Tipo di destinazione",
     "PLANS": "Piani",
     "FEATURES": "Funzionalità",
     "MEMBERS": "Membri",
     "BILLING_PERIOD": "Periodo di fatturazione",
     "CURRENCY": "Valuta",
-    "TRIAL_DAYS": "Giorni di prova"
+    "TRIAL_DAYS": "Giorni di prova",
+    "MONTH": "mese",
+    "NEXT": "Avanti",
+    "STEP_INFO": "Informazioni",
+    "STEP_LIMITS": "Limiti",
+    "STEP_FEATURES": "Opzioni",
+    "EMPTY_HINT": "Inizia creando il tuo primo abbonamento",
+    "DEFAULT": "Abbonamento predefinito",
+    "COLOR": "Colore",
+    "TARGET_TYPES": {
+      "USER": "Utente",
+      "RESTAURANT": "Ristorante"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menù / giorno",
+      "IMAGES_DISH": "Immagini / piatto",
+      "PHOTOS": "Foto profilo",
+      "RESTAURANTS": "Ristoranti"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Accesso Menù e Profili",
+      "SEARCH_GEO": "Ricerca e Geo",
+      "MINI_GAMES": "Mini giochi",
+      "NO_ADS": "Senza pubblicità",
+      "ADS": "Con pubblicità",
+      "BACKOFFICE": "Back-office completo",
+      "ID_CARD": "Tessera ID Premium",
+      "REFERRAL": "Referral tramite codice",
+      "DRAWS": "Partecipazione estrazioni",
+      "ITINERANT": "Ristorante itinerante",
+      "GIFT": "Regali consentiti",
+      "MULTI_RESTAURANT": "Multi-ristorante"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "Senza pubblicità",
+      "PREMIUM_ID_CARD": "Tessera ID Premium",
+      "UNLIMITED_GAMES": "Giochi illimitati",
+      "ADVANCED_FILTERS": "Filtri avanzati",
+      "EXCLUSIVE_OFFERS": "Offerte esclusive",
+      "HIGHLIGHT_IN_SEARCH": "In evidenza nella ricerca"
+    },
+    "EDIT_TITLE": "Modifica abbonamento",
+    "DELETE_TITLE": "Elimina abbonamento",
+    "DELETE_CONFIRM": "Sei sicuro di voler eliminare questo abbonamento?",
+    "DELETE_WARNING": "Questa azione è irreversibile. Tutti i piani associati verranno eliminati.",
+    "UPDATE_SUCCESS": "Abbonamento aggiornato con successo",
+    "DELETE_SUCCESS": "Abbonamento eliminato con successo",
+    "DETAIL": {
+      "DISCOUNT": "Sconto",
+      "DAYS": "giorni",
+      "NO_PLANS": "Nessun piano definito al momento",
+      "CREATED": "Creato il"
+    },
+    "PLAN": {
+      "ADD": "Aggiungi piano",
+      "CREATE_TITLE": "Crea un piano",
+      "TYPE": "Tipo di piano",
+      "PERIODS": {
+        "MONTHLY": "Mensile",
+        "QUARTERLY": "Trimestrale",
+        "SEMI_ANNUALLY": "Semestrale",
+        "YEARLY": "Annuale"
+      }
+    }
   },
   "MENUS": {
     "TITLE": "Gestione menù"

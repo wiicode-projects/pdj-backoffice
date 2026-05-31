@@ -1,0 +1,635 @@
+<div class="detail-page">
+  <!-- Back button -->
+  <button class="back-btn" (click)="goBack()">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {{ 'COMMON.BACK' | translate }}
+  </button>
+
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <span>{{ 'COMMON.LOADING' | translate }}...</span>
+    </div>
+  }
+
+  @if (!loading && subscription) {
+    <!-- Header -->
+    <div class="detail-hero" [class.detail-hero--restaurant]="isRestaurant()">
+      <div class="detail-hero__top">
+        <div class="detail-hero__icon" [class.detail-hero__icon--restaurant]="isRestaurant()">
+          @if (isRestaurant()) {
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M3 3V12C3 13.1 3.9 14 5 14H9V21H11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 3V9C16 10.1 16.9 11 18 11H19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          } @else {
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4 20C4 16 7.5 13.5 12 13.5C16.5 13.5 20 16 20 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          }
+        </div>
+        <div class="detail-hero__info">
+          <span class="detail-hero__badge" [class.detail-hero__badge--restaurant]="isRestaurant()">
+            {{ 'SUBSCRIPTIONS.TARGET_TYPES.' + subscription.targetType | translate }}
+          </span>
+          @if (subscription.isDefault) {
+            <span class="detail-hero__badge detail-hero__badge--default">{{ 'SUBSCRIPTIONS.DEFAULT' | translate }}</span>
+          }
+          <h1 class="detail-hero__title">{{ subscription.name }}</h1>
+          @if (subscription.description) {
+            <p class="detail-hero__desc">{{ subscription.description }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="detail-hero__actions">
+        <div class="detail-hero__price" [class.detail-hero__price--restaurant]="isRestaurant()">
+          <span class="detail-hero__price-value">{{ subscription.price | number:'1.2-2' }}</span>
+          <div class="detail-hero__price-meta">
+            <span class="detail-hero__price-currency">CHF</span>
+            <span class="detail-hero__price-period">/ {{ 'SUBSCRIPTIONS.MONTH' | translate }}</span>
+          </div>
+        </div>
+        <div class="detail-hero__btns">
+          <button class="btn btn--outline btn--sm" id="btn-edit-subscription" (click)="openEditDialog()">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M14.5 3.5L16.5 5.5L6 16H4V14L14.5 3.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+            {{ 'COMMON.EDIT' | translate }}
+          </button>
+          <button class="btn btn--danger-outline btn--sm" id="btn-delete-subscription" (click)="openDeleteDialog()">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M4 6H16M7 6V4C7 3.4 7.4 3 8 3H12C12.6 3 13 3.4 13 4V6M8 9V15M12 9V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 6L6 17C6 17.6 6.4 18 7 18H13C13.6 18 14 17.6 14 17L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content grid -->
+    <div class="detail-grid">
+      <!-- Limits (Restaurant) -->
+      @if (isRestaurant()) {
+        <div class="detail-card">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2V18M2 10H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.STEP_LIMITS' | translate }}
+          </h3>
+          <div class="detail-card__limits">
+            <div class="limit-item">
+              <span class="limit-item__value">{{ subscription.maxMenusPerDay || '∞' }}</span>
+              <span class="limit-item__label">{{ 'SUBSCRIPTIONS.LIMITS.MENUS_DAY' | translate }}</span>
+            </div>
+            <div class="limit-item">
+              <span class="limit-item__value">{{ subscription.maxImagesPerDish || '∞' }}</span>
+              <span class="limit-item__label">{{ 'SUBSCRIPTIONS.LIMITS.IMAGES_DISH' | translate }}</span>
+            </div>
+            <div class="limit-item">
+              <span class="limit-item__value">{{ subscription.maxProfilePhotos || '∞' }}</span>
+              <span class="limit-item__label">{{ 'SUBSCRIPTIONS.LIMITS.PHOTOS' | translate }}</span>
+            </div>
+            <div class="limit-item">
+              <span class="limit-item__value">{{ subscription.maxRestaurants || '∞' }}</span>
+              <span class="limit-item__label">{{ 'SUBSCRIPTIONS.LIMITS.RESTAURANTS' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Boolean features (User) -->
+      @if (!isRestaurant()) {
+        <div class="detail-card">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.STEP_FEATURES' | translate }}
+          </h3>
+          <div class="detail-card__features">
+            <div class="feat-row" [class.feat-row--active]="subscription.accessMenusAndProfils">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.ACCESS_MENUS' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.accessMenusAndProfils ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.rechercheAndGeo">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.SEARCH_GEO' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.rechercheAndGeo ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.miniGames">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.MINI_GAMES' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.miniGames ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="!subscription.hasAdvertisement">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.NO_ADS' | translate }}</span>
+              <span class="feat-row__status">{{ !subscription.hasAdvertisement ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.backOfficeComplet">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.BACKOFFICE' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.backOfficeComplet ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.idCardPremium">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.ID_CARD' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.idCardPremium ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.parrainageViaCode">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.REFERRAL' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.parrainageViaCode ? '✓' : '✗' }}</span>
+            </div>
+            <div class="feat-row" [class.feat-row--active]="subscription.participationTirages">
+              <span class="feat-row__dot"></span>
+              <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.DRAWS' | translate }}</span>
+              <span class="feat-row__status">{{ subscription.participationTirages ? '✓' : '✗' }}</span>
+            </div>
+
+            <!-- Restaurant-specific features -->
+            @if (isRestaurant()) {
+              <div class="feat-row" [class.feat-row--active]="subscription.isAllowedToBeItinerant">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.ITINERANT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.isAllowedToBeItinerant ? '✓' : '✗' }}</span>
+              </div>
+              <div class="feat-row" [class.feat-row--active]="subscription.canHaveGift">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.GIFT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.canHaveGift ? '✓' : '✗' }}</span>
+              </div>
+              <div class="feat-row" [class.feat-row--active]="subscription.isMultiRestaurant">
+                <span class="feat-row__dot"></span>
+                <span class="feat-row__label">{{ 'SUBSCRIPTIONS.FEAT.MULTI_RESTAURANT' | translate }}</span>
+                <span class="feat-row__status">{{ subscription.isMultiRestaurant ? '✓' : '✗' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Feature tags -->
+      @if (subscription.features && subscription.features.length > 0) {
+        <div class="detail-card">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M3 5L3 9.5L10 16.5L17 9.5V5L12 3H8L3 5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.FEATURES' | translate }}
+          </h3>
+          <div class="detail-card__tags">
+            @for (feat of subscription.features; track feat) {
+              <span class="tag-chip">{{ 'SUBSCRIPTIONS.FEATURES_LIST.' + feat | translate }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Plans -->
+      <div class="detail-card detail-card--full">
+        <div class="detail-card__header">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 8H18" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.PLANS' | translate }}
+          </h3>
+          <button class="btn btn--primary btn--sm" (click)="openPlanDialog()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ 'SUBSCRIPTIONS.PLAN.ADD' | translate }}
+          </button>
+        </div>
+        @if (subscription.plans && subscription.plans.length > 0) {
+          <div class="plans-grid">
+            @for (plan of subscription.plans; track plan.id) {
+              <div class="plan-card" [class.plan-card--restaurant]="isRestaurant()">
+                <div class="plan-card__badge">{{ plan.type }}</div>
+                <div class="plan-card__period">{{ plan.billingPeriod }}</div>
+                <div class="plan-card__details">
+                  <div class="plan-card__detail">
+                    <span class="plan-card__detail-label">{{ 'SUBSCRIPTIONS.CURRENCY' | translate }}</span>
+                    <span class="plan-card__detail-value">{{ plan.currency }}</span>
+                  </div>
+                  <div class="plan-card__detail">
+                    <span class="plan-card__detail-label">{{ 'SUBSCRIPTIONS.DETAIL.DISCOUNT' | translate }}</span>
+                    <span class="plan-card__detail-value">{{ plan.discount }}%</span>
+                  </div>
+                  <div class="plan-card__detail">
+                    <span class="plan-card__detail-label">{{ 'SUBSCRIPTIONS.TRIAL_DAYS' | translate }}</span>
+                    <span class="plan-card__detail-value">{{ plan.trialPeriodDays }} {{ 'SUBSCRIPTIONS.DETAIL.DAYS' | translate }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="plans-empty">
+            <svg width="40" height="40" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1"/>
+              <path d="M2 8H18" stroke="currentColor" stroke-width="1"/>
+            </svg>
+            <p>{{ 'SUBSCRIPTIONS.DETAIL.NO_PLANS' | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Footer meta -->
+    <div class="detail-footer">
+      <span class="detail-footer__meta">
+        {{ 'SUBSCRIPTIONS.DETAIL.CREATED' | translate }}: {{ subscription.createdAt | date:'dd MMM yyyy, HH:mm' }}
+      </span>
+    </div>
+  }
+</div>
+
+<!-- Create Plan Dialog -->
+@if (showPlanDialog) {
+  <div class="dialog-overlay" (click)="closePlanDialog()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <h2>{{ 'SUBSCRIPTIONS.PLAN.CREATE_TITLE' | translate }}</h2>
+        <button class="dialog__close" (click)="closePlanDialog()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="dialog__body" (ngSubmit)="createPlan()">
+        <div class="form-section">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.BILLING_PERIOD' | translate }} *</label>
+              <select class="form-input" [(ngModel)]="newPlan.billingPeriod" name="billingPeriod" required>
+                <option value="">--</option>
+                @for (bp of billingPeriods; track bp) {
+                  <option [value]="bp">{{ 'SUBSCRIPTIONS.PLAN.PERIODS.' + bp | translate }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.CURRENCY' | translate }} *</label>
+              <select class="form-input" [(ngModel)]="newPlan.currency" name="currency" required>
+                <option value="">--</option>
+                @for (c of currencies; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.DETAIL.DISCOUNT' | translate }} (%) *</label>
+              <input class="form-input" type="number" [(ngModel)]="newPlan.discount" name="discount" required min="0" max="100" step="1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.TRIAL_DAYS' | translate }} *</label>
+              <input class="form-input" type="number" [(ngModel)]="newPlan.trialPeriodDays" name="trialPeriodDays" required min="1" />
+            </div>
+          </div>
+        </div>
+
+          @if (planError) {
+            <div class="dialog__error">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              {{ planError }}
+            </div>
+          }
+
+        <div class="dialog__footer">
+          <button type="button" class="btn btn--secondary" (click)="closePlanDialog()">
+            {{ 'COMMON.CANCEL' | translate }}
+          </button>
+          <button type="submit" class="btn btn--primary" [disabled]="creatingPlan || !newPlan.billingPeriod || !newPlan.currency">
+            @if (creatingPlan) {
+              <div class="btn__spinner"></div>
+            }
+            {{ 'COMMON.CREATE' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Edit Subscription Dialog -->
+@if (showEditDialog) {
+  <div class="dialog-overlay" (click)="closeEditDialog()">
+    <div class="dialog dialog--wide" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <h2>{{ 'SUBSCRIPTIONS.EDIT_TITLE' | translate }}</h2>
+        <button class="dialog__close" (click)="closeEditDialog()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="dialog__body" (ngSubmit)="updateSubscription()">
+        <!-- Step indicator: only for USER (2-step flow) -->
+        @if (editSub.targetType === 'USER') {
+          <div class="steps">
+            <div class="steps__item" [class.steps__item--active]="editCurrentStep === 1" [class.steps__item--done]="editCurrentStep > 1" (click)="editCurrentStep = 1">
+              <span class="steps__number">1</span>
+              <span class="steps__label">{{ 'SUBSCRIPTIONS.STEP_INFO' | translate }}</span>
+            </div>
+            <div class="steps__line" [class.steps__line--active]="editCurrentStep > 1"></div>
+            <div class="steps__item" [class.steps__item--active]="editCurrentStep === 2" (click)="editCurrentStep = 2">
+              <span class="steps__number">2</span>
+              <span class="steps__label">{{ 'SUBSCRIPTIONS.STEP_FEATURES' | translate }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Step 1: Basic info -->
+        @if (editCurrentStep === 1) {
+          <div class="form-section">
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.NAME' | translate }} *</label>
+              <input class="form-input" type="text" [(ngModel)]="editSub.name" name="editName" required placeholder="Ex: Premium Restaurant" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.DESCRIPTION' | translate }} *</label>
+              <textarea class="form-input form-textarea" [(ngModel)]="editSub.description" name="editDescription" rows="3" required placeholder="Description de l'abonnement..."></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">{{ 'SUBSCRIPTIONS.PRICE' | translate }} (CHF) *</label>
+                <input class="form-input" type="number" [(ngModel)]="editSub.monthlyPrice" name="editMonthlyPrice" required min="0" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">{{ 'SUBSCRIPTIONS.TARGET_TYPE' | translate }} *</label>
+                <select class="form-input" [(ngModel)]="editSub.targetType" name="editTargetType" required>
+                  <option value="">--</option>
+                  @for (t of targetTypes; track t) {
+                    <option [value]="t">{{ 'SUBSCRIPTIONS.TARGET_TYPES.' + t | translate }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">{{ 'SUBSCRIPTIONS.COLOR' | translate }}</label>
+              <div class="color-input">
+                <input type="color" [(ngModel)]="editSub.color" name="editColor" class="color-input__picker" />
+                <input class="form-input color-input__text" type="text" [(ngModel)]="editSub.color" name="editColorText" placeholder="#DC2626" />
+              </div>
+            </div>
+
+            <label class="form-toggle-row">
+              <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.DEFAULT' | translate }}</span>
+              <span class="form-toggle">
+                <input type="checkbox" [(ngModel)]="editSub.isDefault" name="editIsDefault" />
+                <span class="form-toggle__slider"></span>
+              </span>
+            </label>
+
+            <!-- Feature chips: USER only -->
+            @if (editSub.targetType === 'USER') {
+              <div class="form-group form-section--animated">
+                <label class="form-label">{{ 'SUBSCRIPTIONS.FEATURES' | translate }}</label>
+                <div class="form-chips">
+                  @for (feat of allFeatures; track feat) {
+                    <label class="form-chip" [class.form-chip--active]="isEditFeatureSelected(feat)">
+                      <input type="checkbox" [checked]="isEditFeatureSelected(feat)" (change)="toggleEditFeature(feat)" hidden />
+                      {{ 'SUBSCRIPTIONS.FEATURES_LIST.' + feat | translate }}
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Limits: RESTAURANT only -->
+            @if (editSub.targetType === 'RESTAURANT') {
+              <div class="form-section--animated">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">{{ 'SUBSCRIPTIONS.LIMITS.MENUS_DAY' | translate }} *</label>
+                    <input class="form-input" type="number" [(ngModel)]="editSub.maxMenusPerDay" name="editMaxMenusPerDay" required min="0" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">{{ 'SUBSCRIPTIONS.LIMITS.IMAGES_DISH' | translate }} *</label>
+                    <input class="form-input" type="number" [(ngModel)]="editSub.maxImagesPerDish" name="editMaxImagesPerDish" required min="0" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">{{ 'SUBSCRIPTIONS.LIMITS.PHOTOS' | translate }} *</label>
+                    <input class="form-input" type="number" [(ngModel)]="editSub.maxProfilePhotos" name="editMaxProfilePhotos" required min="0" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">{{ 'SUBSCRIPTIONS.LIMITS.RESTAURANTS' | translate }} *</label>
+                    <input class="form-input" type="number" [(ngModel)]="editSub.maxRestaurants" name="editMaxRestaurants" required min="0" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-toggles" style="margin-top: 16px">
+                <label class="form-toggle-row">
+                  <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ITINERANT' | translate }}</span>
+                  <span class="form-toggle">
+                    <input type="checkbox" [(ngModel)]="editSub.isAllowedToBeItinerant" name="editIsAllowedToBeItinerant" />
+                    <span class="form-toggle__slider"></span>
+                  </span>
+                </label>
+                <label class="form-toggle-row">
+                  <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.GIFT' | translate }}</span>
+                  <span class="form-toggle">
+                    <input type="checkbox" [(ngModel)]="editSub.canHaveGift" name="editCanHaveGift" />
+                    <span class="form-toggle__slider"></span>
+                  </span>
+                </label>
+                <label class="form-toggle-row">
+                  <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.MULTI_RESTAURANT' | translate }}</span>
+                  <span class="form-toggle">
+                    <input type="checkbox" [(ngModel)]="editSub.isMultiRestaurant" name="editIsMultiRestaurant" />
+                    <span class="form-toggle__slider"></span>
+                  </span>
+                </label>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Step 2: Boolean features (User only) -->
+        @if (editCurrentStep === 2 && editSub.targetType === 'USER') {
+          <div class="form-section">
+            <div class="form-toggles">
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ACCESS_MENUS' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.accessMenusAndProfils" name="editAccessMenusAndProfils" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.SEARCH_GEO' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.rechercheAndGeo" name="editRechercheAndGeo" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.MINI_GAMES' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.miniGames" name="editMiniGames" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ADS' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.hasAdvertisement" name="editHasAdvertisement" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.BACKOFFICE' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.backOfficeComplet" name="editBackOfficeComplet" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.ID_CARD' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.idCardPremium" name="editIdCardPremium" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.REFERRAL' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.parrainageViaCode" name="editParrainageViaCode" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+              <label class="form-toggle-row">
+                <span class="form-toggle-label">{{ 'SUBSCRIPTIONS.FEAT.DRAWS' | translate }}</span>
+                <span class="form-toggle">
+                  <input type="checkbox" [(ngModel)]="editSub.participationTirages" name="editParticipationTirages" />
+                  <span class="form-toggle__slider"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+        }
+
+        @if (editError) {
+          <div class="dialog__error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ editError }}
+          </div>
+        }
+
+        <div class="dialog__footer">
+          @if (editCurrentStep > 1) {
+            <button type="button" class="btn btn--secondary" (click)="editCurrentStep = editCurrentStep - 1">
+              {{ 'COMMON.BACK' | translate }}
+            </button>
+          } @else {
+            <button type="button" class="btn btn--secondary" (click)="closeEditDialog()">
+              {{ 'COMMON.CANCEL' | translate }}
+            </button>
+          }
+
+          @if (editSub.targetType === 'USER' && editCurrentStep === 1) {
+            <button type="button" class="btn btn--primary" (click)="editCurrentStep = 2">
+              {{ 'SUBSCRIPTIONS.NEXT' | translate }}
+            </button>
+          } @else {
+            <button type="submit" class="btn btn--primary" [disabled]="editing">
+              @if (editing) {
+                <div class="btn__spinner"></div>
+              }
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Dialog -->
+@if (showDeleteDialog) {
+  <div class="dialog-overlay" (click)="closeDeleteDialog()">
+    <div class="dialog dialog--delete" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <h2>{{ 'SUBSCRIPTIONS.DELETE_TITLE' | translate }}</h2>
+        <button class="dialog__close" (click)="closeDeleteDialog()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dialog__body">
+        <div class="delete-confirm">
+          <div class="delete-confirm__icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10.29 3.86L1.82 18C1.64 18.3 1.55 18.65 1.55 19C1.56 19.35 1.66 19.7 1.84 20C2.02 20.3 2.28 20.56 2.58 20.74C2.89 20.91 3.24 21 3.59 21H20.41C20.76 21 21.11 20.91 21.42 20.74C21.72 20.56 21.98 20.3 22.16 20C22.34 19.7 22.44 19.35 22.45 19C22.45 18.65 22.36 18.3 22.18 18L13.71 3.86C13.53 3.56 13.27 3.32 12.97 3.15C12.66 2.98 12.32 2.89 11.97 2.89C11.62 2.89 11.28 2.98 10.97 3.15C10.67 3.32 10.41 3.56 10.29 3.86Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="delete-confirm__text">
+            {{ 'SUBSCRIPTIONS.DELETE_CONFIRM' | translate }}
+          </p>
+          @if (subscription) {
+            <div class="delete-confirm__name">« {{ subscription.name }} »</div>
+          }
+          <p class="delete-confirm__warning">
+            {{ 'SUBSCRIPTIONS.DELETE_WARNING' | translate }}
+          </p>
+        </div>
+
+        @if (deleteError) {
+          <div class="dialog__error" style="margin: 16px 0 0;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ deleteError }}
+          </div>
+        }
+      </div>
+
+      <div class="dialog__footer">
+        <button type="button" class="btn btn--secondary" (click)="closeDeleteDialog()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button type="button" class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete()">
+          @if (deleting) {
+            <div class="btn__spinner"></div>
+          }
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -96,6 +96,7 @@
   },
   "USERS": {
     "TITLE": "User Management",
+    "SUBTITLE": "Users registered on the platform",
     "CREATE": "Create user",
     "EDIT": "Edit user",
     "FIRST_NAME": "First name",
@@ -104,28 +105,86 @@
     "PHONE": "Phone",
     "ROLE": "Role",
     "LANGUAGE": "Language",
+    "ADDRESS": "Address",
     "CREATED_AT": "Created at",
+    "VERIFIED": "Verified",
+    "UNVERIFIED": "Unverified",
+    "EMPTY_HINT": "No users found for selected filters",
+    "SEARCH_PLACEHOLDER": "Search by name or email...",
     "DELETE_CONFIRM": "Are you sure you want to delete this user?",
     "CREATE_SUCCESS": "User created successfully",
     "UPDATE_SUCCESS": "User updated successfully",
-    "DELETE_SUCCESS": "User deleted successfully"
+    "DELETE_SUCCESS": "User deleted successfully",
+    "KPI": {
+      "TOTAL": "Total users",
+      "ACTIVE": "Active",
+      "VERIFIED": "Verified emails",
+      "PREMIUM": "Premium"
+    },
+    "TABLE": {
+      "USER": "User",
+      "CONTACT": "Phone",
+      "STATUS": "Status",
+      "SUBSCRIPTION": "Subscription",
+      "REGISTERED": "Registered"
+    },
+    "FILTER": {
+      "PREMIUM": "Premium",
+      "FREE": "Free"
+    },
+    "PANEL": {
+      "STATUS": "Account status",
+      "INFOS": "Information",
+      "SUBSCRIPTION": "Subscription",
+      "EXPIRES": "Expires on",
+      "NO_SUBSCRIPTION": "No active subscription"
+    }
   },
   "RESTAURANTS": {
     "TITLE": "Restaurant Management",
+    "SUBTITLE": "Main restaurants registered on the platform",
     "CREATE": "Create restaurant",
     "EDIT": "Edit restaurant",
     "ONBOARDING": "Onboard restaurant",
     "NAME": "Name",
-    "TYPE": "Type",
     "CITY": "City",
     "ADDRESS": "Address",
     "RESERVATION_ENABLED": "Reservation enabled",
     "LOCATIONS": "Locations",
-    "OWNER": "Owner",
+    "OWNER": "Booking contact",
+    "EMPTY_HINT": "No restaurants found for selected filters",
+    "SEARCH_PLACEHOLDER": "Search by name or city...",
     "DELETE_CONFIRM": "Are you sure you want to delete this restaurant?",
     "CREATE_SUCCESS": "Restaurant created successfully",
     "UPDATE_SUCCESS": "Restaurant updated successfully",
-    "DELETE_SUCCESS": "Restaurant deleted successfully"
+    "DELETE_SUCCESS": "Restaurant deleted successfully",
+    "TYPE": {
+      "FIXED": "Fixed",
+      "ITINERANT": "Itinerant"
+    },
+    "KPI": {
+      "TOTAL": "Total restaurants",
+      "PREMIUM": "Premium subscribers",
+      "ITINERANT": "Itinerant",
+      "BRANCHES": "Branches",
+      "VIEWS": "Views",
+      "CLICKS": "Clicks"
+    },
+    "TABLE": {
+      "RESTAURANT": "Restaurant",
+      "CITY": "City",
+      "TYPE": "Type",
+      "SUBSCRIPTION": "Subscription",
+      "VIEWS": "Views",
+      "BRANCHES": "Branches"
+    },
+    "PANEL": {
+      "INFOS": "Information",
+      "SUBSCRIPTION": "Subscription",
+      "BRANCHES": "Branches",
+      "NO_SUBSCRIPTION": "No active subscription",
+      "NO_BRANCHES": "No branches"
+    }
   },
   "DISHES": {
     "TITLE": "Dish Management",
@@ -149,17 +208,81 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Subscription Management",
+    "SUBTITLE": "Manage your subscription plans for users and restaurants",
     "CREATE": "Create subscription",
     "NAME": "Name",
     "DESCRIPTION": "Description",
-    "PRICE": "Price",
+    "PRICE": "Monthly price",
     "TARGET_TYPE": "Target type",
     "PLANS": "Plans",
     "FEATURES": "Features",
     "MEMBERS": "Members",
     "BILLING_PERIOD": "Billing period",
     "CURRENCY": "Currency",
-    "TRIAL_DAYS": "Trial days"
+    "TRIAL_DAYS": "Trial days",
+    "MONTH": "month",
+    "NEXT": "Next",
+    "STEP_INFO": "Information",
+    "STEP_LIMITS": "Limits",
+    "STEP_FEATURES": "Options",
+    "EMPTY_HINT": "Start by creating your first subscription",
+    "DEFAULT": "Default subscription",
+    "COLOR": "Color",
+    "TARGET_TYPES": {
+      "USER": "User",
+      "RESTAURANT": "Restaurant"
+    },
+    "LIMITS": {
+      "MENUS_DAY": "Menus / day",
+      "IMAGES_DISH": "Images / dish",
+      "PHOTOS": "Profile photos",
+      "RESTAURANTS": "Restaurants"
+    },
+    "FEAT": {
+      "ACCESS_MENUS": "Menus & Profiles Access",
+      "SEARCH_GEO": "Search & Geo",
+      "MINI_GAMES": "Mini Games",
+      "NO_ADS": "No Ads",
+      "ADS": "With Ads",
+      "BACKOFFICE": "Full Back-office",
+      "ID_CARD": "Premium ID Card",
+      "REFERRAL": "Referral via code",
+      "DRAWS": "Draws participation",
+      "ITINERANT": "Itinerant restaurant",
+      "GIFT": "Gifts allowed",
+      "MULTI_RESTAURANT": "Multi-restaurant"
+    },
+    "FEATURES_LIST": {
+      "NO_ADS": "No Ads",
+      "PREMIUM_ID_CARD": "Premium ID Card",
+      "UNLIMITED_GAMES": "Unlimited Games",
+      "ADVANCED_FILTERS": "Advanced Filters",
+      "EXCLUSIVE_OFFERS": "Exclusive Offers",
+      "HIGHLIGHT_IN_SEARCH": "Highlight in Search"
+    },
+    "EDIT_TITLE": "Edit subscription",
+    "DELETE_TITLE": "Delete subscription",
+    "DELETE_CONFIRM": "Are you sure you want to delete this subscription?",
+    "DELETE_WARNING": "This action is irreversible. All associated plans will also be deleted.",
+    "UPDATE_SUCCESS": "Subscription updated successfully",
+    "DELETE_SUCCESS": "Subscription deleted successfully",
+    "DETAIL": {
+      "DISCOUNT": "Discount",
+      "DAYS": "days",
+      "NO_PLANS": "No plans defined yet",
+      "CREATED": "Created on"
+    },
+    "PLAN": {
+      "ADD": "Add plan",
+      "CREATE_TITLE": "Create a plan",
+      "TYPE": "Plan type",
+      "PERIODS": {
+        "MONTHLY": "Monthly",
+        "QUARTERLY": "Quarterly",
+        "SEMI_ANNUALLY": "Semi-annually",
+        "YEARLY": "Yearly"
+      }
+    }
   },
   "MENUS": {
     "TITLE": "Menu Management"

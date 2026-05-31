@@ -6,6 +6,8 @@ services:
     container_name: pdj_backoffice
     networks:
       - proxy-network
+    ports:
+      - "127.0.0.1:80:80" # accessible uniquement en local
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"] #port 80 par défaut
       #test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/health"]

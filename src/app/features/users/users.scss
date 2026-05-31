@@ -390,6 +390,8 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   &--inactive  { color: $text-medium; background: $border-light; }
   &--verified  { color: $blue; background: $blue-light; }
   &--unverified { color: $amber; background: $amber-light; }
+  &--banned    { color: $danger; background: $danger-light; }
+  &--ok        { color: $success; background: $success-light; }
 }
 
 // ── Subscription cell ─────────────────────────────────────────────────────────
@@ -437,6 +439,18 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     &:hover { background: $danger-light; color: $danger; }
   }
 
+  &--ban {
+    color: $danger;
+    &:hover { background: $danger-light; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &--unban {
+    color: $success;
+    &:hover { background: $success-light; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
   &--danger-confirm {
     background: $danger;
     color: white;
@@ -473,6 +487,12 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.78rem;
   color: $text-medium;
   font-weight: 600;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 // ==============================
@@ -676,13 +696,32 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   transition: all 0.2s ease;
   white-space: nowrap;
 
+  &--ban {
+    background: $danger-light;
+    color: $danger;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    width: 100%;
+    justify-content: center;
+    &:hover { background: darken($danger-light, 5%); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
+  &--unban {
+    background: $success-light;
+    color: $success;
+    border: 1px solid rgba(5, 150, 105, 0.3);
+    width: 100%;
+    justify-content: center;
+    &:hover { background: darken($success-light, 5%); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
   &--danger-outline {
     background: none;
     color: $danger;
     border: 1px solid rgba(220, 38, 38, 0.3);
     width: 100%;
     justify-content: center;
-
     &:hover { background: $danger-light; }
   }
 

@@ -1,0 +1,493 @@
+// ── Design tokens ──────────────────────────────────────────────────────────────
+$font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+$primary: #DC2626;
+$primary-light: rgba(220, 38, 38, 0.08);
+$bg:          #F3F4F6;
+$card-bg:     #FFFFFF;
+$border:      #E5E7EB;
+$border-light:#F3F4F6;
+$text-dark:   #1F2937;
+$text-medium: #6B7280;
+$text-light:  #9CA3AF;
+$success:     #059669;
+$success-light: rgba(5, 150, 105, 0.1);
+$danger:      #DC2626;
+$danger-light: rgba(220, 38, 38, 0.08);
+$amber:       #F59E0B;
+$amber-light: rgba(245, 158, 11, 0.1);
+$teal:        #0D9488;
+$teal-light:  rgba(13, 148, 136, 0.1);
+$radius-sm:   8px;
+$radius-md:   12px;
+$radius-lg:   16px;
+$shadow-sm:   0 1px 2px rgba(0,0,0,0.04);
+$shadow-md:   0 4px 16px rgba(0,0,0,0.06);
+
+// ── Page ────────────────────────────────────────────────────────────────────────
+.manage-page {
+  font-family: $font;
+  animation: fadeIn 0.4s ease;
+}
+
+// ── Loading ─────────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+
+  &__spinner {
+    width: 36px; height: 36px;
+    border: 3px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+}
+
+// ── Error ───────────────────────────────────────────────────────────────────────
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 24px;
+  text-align: center;
+
+  &__icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: $danger-light; color: $danger;
+    display: flex; align-items: center; justify-content: center;
+  }
+  h3 { font-size: 1.1rem; font-weight: 600; color: $text-dark; margin: 0; }
+  p  { font-size: 0.875rem; color: $text-medium; margin: 0 0 16px; }
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────────
+.manage-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  animation: fadeSlideDown 0.4s ease both;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  background: $card-bg;
+  color: $text-medium;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: $font;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $text-dark;
+    border-color: #D1D5DB;
+    background: $border-light;
+    transform: translateX(-2px);
+  }
+}
+
+.type-pill {
+  display: inline-flex;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: $amber-light;
+  color: $amber;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--itinerant {
+    background: $teal-light;
+    color: $teal;
+  }
+}
+
+// ── Banners ─────────────────────────────────────────────────────────────────────
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: $radius-md;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: fadeSlideDown 0.3s ease;
+
+  &--success {
+    background: $success-light;
+    color: $success;
+    border: 1px solid rgba($success, 0.15);
+  }
+  &--error {
+    background: $danger-light;
+    color: $danger;
+    border: 1px solid rgba($danger, 0.15);
+  }
+}
+
+// ── Layout ──────────────────────────────────────────────────────────────────────
+.manage-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 24px;
+  animation: cardSlideUp 0.5s ease both;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Preview card ────────────────────────────────────────────────────────────────
+.preview-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 24px;
+  align-self: start;
+
+  &__image-wrap {
+    height: 180px;
+    background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  &__image-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: $text-light;
+  }
+
+  &__body {
+    padding: 20px;
+  }
+
+  &__name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 6px;
+  }
+
+  &__address {
+    font-size: 0.85rem;
+    color: $text-medium;
+    margin: 0 0 14px;
+    line-height: 1.4;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: $text-medium;
+    margin-bottom: 8px;
+
+    svg { color: $text-light; flex-shrink: 0; }
+  }
+
+  &__stats {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid $border-light;
+    margin-top: 14px;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      color: $text-medium;
+      font-weight: 500;
+    }
+  }
+
+  &__meta {
+    font-size: 0.72rem;
+    color: $text-light;
+    font-style: italic;
+  }
+}
+
+// ── Form card ───────────────────────────────────────────────────────────────────
+.form-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 28px;
+  box-shadow: $shadow-sm;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 24px;
+  }
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: $text-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 18px;
+}
+
+.form-divider {
+  height: 1px;
+  background: $border-light;
+  margin: 24px 0;
+}
+
+// ── Form controls ───────────────────────────────────────────────────────────────
+.form-group {
+  margin-bottom: 18px;
+  &--toggle { display: flex; align-items: center; gap: 12px; }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text-dark;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: $text-dark;
+  background: #fff;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.08); }
+  &::placeholder { color: $text-light; }
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+// ── Type selector ───────────────────────────────────────────────────────────────
+.type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  &__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 14px;
+    border: 2px solid $border;
+    border-radius: $radius-md;
+    background: $card-bg;
+    color: $text-medium;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: $font;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #D1D5DB;
+      background: $border-light;
+    }
+
+    &--active {
+      border-color: $primary;
+      color: $primary;
+      background: $primary-light;
+
+      svg { color: $primary; }
+    }
+  }
+}
+
+// ── Toggle ──────────────────────────────────────────────────────────────────────
+.form-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0; width: 0; height: 0;
+    &:checked + .form-toggle__slider {
+      background: $primary;
+      &::before { transform: translateX(20px); }
+    }
+  }
+
+  &__slider {
+    position: absolute; inset: 0;
+    background: $border;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &::before {
+      content: '';
+      position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  }
+}
+
+.form-toggle-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: $text-dark;
+}
+
+.reservation-fields {
+  animation: fadeSlideDown 0.3s ease;
+}
+
+// ── Actions ─────────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid $border-light;
+}
+
+// ── Buttons ─────────────────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: $font;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+
+  &--primary {
+    background: $primary; color: white;
+    &:hover:not(:disabled) { background: #B91C1C; transform: translateY(-1px); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
+  &--cancel {
+    background: $border-light; color: $text-medium;
+    &:hover { background: $border; }
+  }
+
+  &__spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(#fff,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+// ── Animations ──────────────────────────────────────────────────────────────────
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Responsive ──────────────────────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .preview-card {
+    position: static;
+  }
+
+  .manage-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr; }
+  .type-selector { grid-template-columns: 1fr; }
+}

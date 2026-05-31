@@ -1,0 +1,474 @@
+<div class="detail-page">
+
+  @if (loading) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+    </div>
+  }
+
+  @if (!loading && tombola) {
+    <div class="detail-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ 'TOMBOLA.TITLE' | translate }}
+      </button>
+
+      <div class="header-actions">
+        @if (isDraft) {
+          <button class="btn btn--primary" [disabled]="savingStatus" (click)="openTombola()">
+            @if (savingStatus) { <span class="btn__spinner"></span> }
+            {{ 'TOMBOLA.OPEN' | translate }}
+          </button>
+        }
+        @if (isOpen) {
+          <button
+            type="button"
+            class="btn btn--primary btn--draw"
+            [disabled]="showDrawModal || drawingRank !== null || !canRunDraw"
+            (click)="runDraw()"
+          >
+            @if (drawingRank !== null) { <span class="btn__spinner"></span> }
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            {{ 'TOMBOLA.RUN_DRAW' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-card__main">
+        <span class="period-pill">{{ getPeriodLabel() }}</span>
+        <h1>{{ tombola.title }}</h1>
+        @if (tombola.prizeDescription) {
+          <p class="hero-card__prize">{{ tombola.prizeDescription }}</p>
+        }
+        <div class="status-control">
+          <label for="tombola-status">{{ 'TOMBOLA.STATUS' | translate }}</label>
+          <select
+            id="tombola-status"
+            class="status-select"
+            [(ngModel)]="selectedStatus"
+            [disabled]="savingStatus"
+            (ngModelChange)="onStatusChange($event)"
+          >
+            <option value="DRAFT">{{ 'TOMBOLA.STATUS_DRAFT' | translate }}</option>
+            <option value="OPEN">{{ 'TOMBOLA.STATUS_OPEN' | translate }}</option>
+            <option value="DRAWN">{{ 'TOMBOLA.STATUS_DRAWN' | translate }}</option>
+          </select>
+          @if (savingStatus) {
+            <span class="status-control__spinner"></span>
+          }
+        </div>
+        @if (statusError) {
+          <p class="status-control__error">{{ statusError }}</p>
+        }
+      </div>
+      @if (stats) {
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-card__value">{{ stats.participantCount }}</span>
+            <span class="stat-card__label">{{ 'TOMBOLA.PARTICIPANTS' | translate }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__value">{{ stats.totalTickets }}</span>
+            <span class="stat-card__label">{{ 'TOMBOLA.TOTAL_TICKETS' | translate }}</span>
+          </div>
+          @if (isDrawn && tombola.drawnAt) {
+            <div class="stat-card">
+              <span class="stat-card__value">{{ tombola.drawnAt | date:'dd/MM/yyyy' }}</span>
+              <span class="stat-card__label">{{ 'TOMBOLA.DRAWN_AT' | translate }}</span>
+            </div>
+          }
+          @if (stats.winnerCount > 0) {
+            <div class="stat-card">
+              <span class="stat-card__value">{{ stats.winnerCount }}</span>
+              <span class="stat-card__label">{{ 'TOMBOLA.WINNERS' | translate }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (drawError) {
+      <div class="alert alert--error">{{ drawError }}</div>
+    }
+    @if (drawSuccess) {
+      <div class="alert alert--success">{{ drawSuccess }}</div>
+    }
+    @if (resetTicketsError) {
+      <div class="alert alert--error">{{ resetTicketsError }}</div>
+    }
+    @if (resetTicketsMessage) {
+      <div class="alert alert--success">{{ resetTicketsMessage }}</div>
+    }
+
+    <div class="section-card rewards-section">
+      <div class="section-card__header">
+        <div>
+          <h2>{{ 'TOMBOLA.REWARDS' | translate }}</h2>
+          <p>{{ 'TOMBOLA.REWARDS_DESC' | translate }}</p>
+        </div>
+        @if (canManageRewards && !rewardsFull) {
+          <button class="btn btn--primary" (click)="openCreateReward()">
+            {{ 'TOMBOLA.ADD_REWARD' | translate }}
+          </button>
+        }
+      </div>
+
+      <div class="rewards-grid">
+        @for (rankOpt of rankOptions; track rankOpt.value) {
+          @if (getRewardForRank(rankOpt.value); as reward) {
+            <div
+              class="reward-card"
+              [class.reward-card--drawn]="getWinnerForRank(rankOpt.value)"
+              [class.reward-card--just-won]="lastRevealedRank === rankOpt.value"
+            >
+              <span class="reward-card__rank">{{ rankOpt.labelKey | translate }}</span>
+              <div class="reward-card__image">
+                @if (reward.imageUrl) {
+                  <img [src]="reward.imageUrl" [alt]="reward.name">
+                }
+              </div>
+              <h3 class="reward-card__name">{{ reward.name }}</h3>
+
+              @if (getWinnerForRank(rankOpt.value); as winnerEntry) {
+                <div class="reward-card__winner">
+                  <div class="avatar">{{ getInitials(winnerEntry.user.firstName, winnerEntry.user.lastName) }}</div>
+                  <div class="reward-card__winner-info">
+                    <strong>{{ getFullName(winnerEntry.user.firstName, winnerEntry.user.lastName) }}</strong>
+                    <span>{{ winnerEntry.ticketCount }} {{ 'TOMBOLA.TICKETS' | translate }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (canDrawRank(rankOpt.value)) {
+                <button
+                  type="button"
+                  class="btn btn--primary btn--sm btn--draw"
+                  [disabled]="showDrawModal || drawingRank !== null"
+                  (click)="runDraw(rankOpt.value)"
+                >
+                  @if (isDrawingRank(rankOpt.value)) { <span class="btn__spinner"></span> }
+                  {{ 'TOMBOLA.DRAW_PRIZE' | translate }}
+                </button>
+              }
+
+              @if (canManageRewards) {
+                <div class="reward-card__actions">
+                  <button class="btn btn--ghost btn--sm" (click)="openEditReward(reward)">
+                    {{ 'COMMON.EDIT' | translate }}
+                  </button>
+                  <button class="btn btn--ghost btn--sm btn--danger" (click)="deleteReward(reward)">
+                    {{ 'COMMON.DELETE' | translate }}
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="reward-card reward-card--empty">
+              <span class="reward-card__rank">{{ rankOpt.labelKey | translate }}</span>
+              <div class="reward-card__placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <p>{{ 'TOMBOLA.NO_REWARD_FOR_RANK' | translate }}</p>
+              @if (canManageRewards) {
+                <button class="btn btn--ghost btn--sm" (click)="openCreateReward(rankOpt.value)">
+                  {{ 'TOMBOLA.ADD_REWARD' | translate }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card__header">
+        <div>
+          <h2>
+            @if (hasParticipantSnapshot) {
+              {{ 'TOMBOLA.PARTICIPANTS_SNAPSHOT' | translate }}
+            } @else {
+              {{ 'TOMBOLA.CURRENT_HOLDERS' | translate }}
+            }
+          </h2>
+          <p>
+            @if (hasParticipantSnapshot) {
+              {{ 'TOMBOLA.PARTICIPANTS_SNAPSHOT_DESC' | translate }}
+            } @else {
+              {{ 'TOMBOLA.CURRENT_HOLDERS_DESC' | translate }}
+            }
+          </p>
+        </div>
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="search"
+            (ngModelChange)="onSearch()"
+            [placeholder]="'TOMBOLA.SEARCH_USER' | translate"
+          />
+        </div>
+      </div>
+
+      @if (isOpen) {
+        <div class="draw-panel">
+          <div class="draw-panel__info">
+            <strong>{{ 'TOMBOLA.DRAW_ALGO_TITLE' | translate }}</strong>
+            <p>{{ 'TOMBOLA.DRAW_ALGO_DESC' | translate }}</p>
+            @if (nextDrawRank) {
+              <span class="draw-panel__next">
+                {{ 'TOMBOLA.NEXT_DRAW' | translate }}:
+                {{ getRankLabel(nextDrawRank) | translate }}
+              </span>
+            } @else if (rewards.length === 0) {
+              <span class="draw-panel__hint">{{ 'TOMBOLA.DRAW_NEED_REWARD' | translate }}</span>
+            }
+            @if (stats) {
+              <span class="draw-panel__stats">
+                {{ stats.participantCount }} {{ 'TOMBOLA.PARTICIPANTS' | translate | lowercase }}
+                · {{ stats.drawPoolCount }} {{ 'TOMBOLA.WITH_TICKETS' | translate | lowercase }}
+                · {{ stats.totalTickets }} {{ 'TOMBOLA.TICKETS' | translate | lowercase }}
+              </span>
+            }
+          </div>
+          <div class="draw-panel__actions">
+            <button
+              type="button"
+              class="btn btn--ghost btn--draw"
+              [disabled]="resettingTickets || showDrawModal"
+              (click)="resetAllUserTickets()"
+            >
+              @if (resettingTickets) { <span class="btn__spinner"></span> }
+              {{ 'TOMBOLA.RESET_TICKETS' | translate }}
+            </button>
+            <button
+              type="button"
+              class="btn btn--primary btn--draw"
+              [disabled]="showDrawModal || drawingRank !== null || !canRunDraw"
+              [title]="drawBlockedReason ? (('TOMBOLA.DRAW_BLOCKED_' + drawBlockedReason) | translate) : ''"
+              (click)="runDraw()"
+            >
+              @if (drawingRank !== null) { <span class="btn__spinner"></span> }
+              {{ 'TOMBOLA.TRIGGER_DRAW' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (loadingRows) {
+        <div class="loading loading--inline">
+          <div class="loading__spinner"></div>
+        </div>
+      }
+
+      @if (!loadingRows && !hasParticipantSnapshot && holders.length === 0) {
+        <div class="empty-inline">{{ 'TOMBOLA.NO_HOLDERS' | translate }}</div>
+      }
+
+      @if (!loadingRows && hasParticipantSnapshot && participants.length === 0) {
+        <div class="empty-inline">{{ 'TOMBOLA.NO_PARTICIPANTS' | translate }}</div>
+      }
+
+      @if (!loadingRows && !hasParticipantSnapshot && holders.length > 0) {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'TOMBOLA.USER' | translate }}</th>
+                <th>{{ 'TOMBOLA.EMAIL' | translate }}</th>
+                <th class="text-right">{{ 'TOMBOLA.TICKETS' | translate }}</th>
+                <th>{{ 'TOMBOLA.ACCOUNT' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (holder of holders; track holder.id) {
+                <tr>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar">{{ getInitials(holder.firstName, holder.lastName) }}</div>
+                      <span>{{ getFullName(holder.firstName, holder.lastName) }}</span>
+                    </div>
+                  </td>
+                  <td>{{ holder.email }}</td>
+                  <td class="text-right">
+                    <span class="ticket-pill">{{ holder.tombolaTicketBalance }}</span>
+                  </td>
+                  <td>
+                    <span class="account-pill" [class.account-pill--inactive]="!holder.isActive">
+                      {{ holder.isActive ? ('TOMBOLA.ACTIVE' | translate) : ('TOMBOLA.BANNED' | translate) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (!loadingRows && hasParticipantSnapshot && participants.length > 0) {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'TOMBOLA.USER' | translate }}</th>
+                <th>{{ 'TOMBOLA.EMAIL' | translate }}</th>
+                <th class="text-right">{{ 'TOMBOLA.TICKETS' | translate }}</th>
+                <th>{{ 'TOMBOLA.RESULT' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (participant of participants; track participant.id) {
+                <tr [class.row-winner]="participant.wonRank">
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar">{{ getInitials(participant.user.firstName, participant.user.lastName) }}</div>
+                      <span>{{ getFullName(participant.user.firstName, participant.user.lastName) }}</span>
+                    </div>
+                  </td>
+                  <td>{{ participant.user.email }}</td>
+                  <td class="text-right">
+                    <span class="ticket-pill">{{ participant.ticketCount }}</span>
+                  </td>
+                  <td>
+                    @if (participant.wonRank) {
+                      <span class="winner-pill">{{ getRankLabel(participant.wonRank) | translate }}</span>
+                    } @else {
+                      —
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (total > limit) {
+        <div class="pagination">
+          <span>{{ (page - 1) * limit + 1 }}–{{ page * limit > total ? total : page * limit }} / {{ total }}</span>
+          <div class="pagination__controls">
+            <button class="pag-btn" [disabled]="page <= 1" (click)="prevPage()">‹</button>
+            <span>{{ page }} / {{ totalPages }}</span>
+            <button class="pag-btn" [disabled]="page >= totalPages" (click)="nextPage()">›</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showDrawModal) {
+  <div class="draw-modal-overlay">
+    <div class="draw-modal" (click)="$event.stopPropagation()">
+      @if (drawModalPhase === 'spinning') {
+        <div class="draw-modal__spin">
+          <div class="draw-wheel" aria-hidden="true">
+            <div class="draw-wheel__ring draw-wheel__ring--outer"></div>
+            <div class="draw-wheel__ring draw-wheel__ring--inner"></div>
+            <div class="draw-wheel__core">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <p class="draw-modal__label">{{ getRankLabel(drawModalRank!) | translate }}</p>
+          <h2 class="draw-modal__title">{{ 'TOMBOLA.DRAW_SPINNING' | translate }}</h2>
+          <div class="draw-modal__name-slot">{{ spinningDisplayName }}</div>
+        </div>
+      } @else if (drawModalPhase === 'ready') {
+        <div class="draw-modal__ready">
+          <div class="draw-modal__ready-icon" aria-hidden="true">🎉</div>
+          <p class="draw-modal__label">{{ getRankLabel(drawModalRank!) | translate }}</p>
+          <h2 class="draw-modal__title">{{ 'TOMBOLA.DRAW_READY' | translate }}</h2>
+          <p class="draw-modal__ready-desc">{{ 'TOMBOLA.DRAW_READY_DESC' | translate }}</p>
+          <button type="button" class="btn btn--primary draw-modal__close-btn" (click)="revealDrawWinner()">
+            {{ 'TOMBOLA.DRAW_REVEAL' | translate }}
+          </button>
+        </div>
+      } @else if (drawModalPhase === 'revealed' && pendingDrawResult) {
+        <div class="draw-modal__reveal">
+          <div class="draw-modal__confetti" aria-hidden="true"></div>
+          <span class="draw-modal__badge">{{ getRankLabel(pendingDrawResult.rank) | translate }}</span>
+          @if (getDrawModalReward(); as reward) {
+            <p class="draw-modal__prize">{{ reward.name }}</p>
+          }
+          <div class="draw-modal__winner-avatar">
+            {{ getInitials(pendingDrawResult.winner.user.firstName, pendingDrawResult.winner.user.lastName) }}
+          </div>
+          <h2 class="draw-modal__winner-name">
+            {{ getFullName(pendingDrawResult.winner.user.firstName, pendingDrawResult.winner.user.lastName) }}
+          </h2>
+          <p class="draw-modal__winner-meta">
+            {{ pendingDrawResult.winner.ticketCount }} {{ 'TOMBOLA.TICKETS' | translate }}
+            · {{ pendingDrawResult.winner.user.email }}
+          </p>
+          <p class="draw-modal__close-hint">{{ 'TOMBOLA.DRAW_CLOSE_HINT' | translate }}</p>
+          <button type="button" class="btn btn--primary draw-modal__close-btn" (click)="closeDrawModal()">
+            {{ 'TOMBOLA.DRAW_CLOSE' | translate }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (showRewardModal) {
+  <div class="modal-overlay" (click)="closeRewardModal()"></div>
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>
+        @if (editingReward) {
+          {{ 'TOMBOLA.EDIT_REWARD' | translate }}
+        } @else {
+          {{ 'TOMBOLA.ADD_REWARD' | translate }}
+        }
+      </h2>
+      <button type="button" class="modal__close" (click)="closeRewardModal()">×</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-row">
+        <label>{{ 'TOMBOLA.REWARD_NAME' | translate }}</label>
+        <input type="text" [(ngModel)]="rewardForm.name" [placeholder]="'TOMBOLA.REWARD_NAME_PLACEHOLDER' | translate">
+      </div>
+      <div class="form-row">
+        <label>{{ 'TOMBOLA.REWARD_RANK' | translate }}</label>
+        <select [(ngModel)]="rewardForm.rank">
+          @for (rank of getAvailableRanks(); track rank) {
+            <option [ngValue]="rank">
+              @if (rank === 1) { {{ 'TOMBOLA.RANK_FIRST' | translate }} }
+              @if (rank === 2) { {{ 'TOMBOLA.RANK_SECOND' | translate }} }
+              @if (rank === 3) { {{ 'TOMBOLA.RANK_THIRD' | translate }} }
+            </option>
+          }
+        </select>
+      </div>
+      <div class="form-row">
+        <label>{{ 'TOMBOLA.REWARD_IMAGE' | translate }}</label>
+        <input type="file" accept="image/*" (change)="onRewardFileChange($event)">
+        @if (imagePreview) {
+          <div class="image-preview">
+            <img [src]="imagePreview" alt="Preview">
+          </div>
+        }
+      </div>
+      @if (rewardError) {
+        <p class="form-error">{{ rewardError }}</p>
+      }
+    </div>
+    <div class="modal__footer">
+      <button type="button" class="btn btn--ghost" (click)="closeRewardModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button type="button" class="btn btn--primary" [disabled]="savingReward" (click)="saveReward()">
+        @if (savingReward) { <span class="btn__spinner"></span> }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  </div>
+}

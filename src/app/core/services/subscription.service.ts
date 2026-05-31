@@ -72,7 +72,6 @@ export interface SubscriptionPlan {
   type: string;
   isDeleted: boolean;
   discount: number;
-  trialPeriodDays: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -104,7 +103,6 @@ export interface CreateSubscriptionDto {
 
 export interface CreatePlanDto {
   discount: number;
-  trialPeriodDays: number;
   billingPeriod: BillingPeriod;
   currency: Currency;
   type?: PlanType;

@@ -1,0 +1,326 @@
+<div class="edit-dish">
+  <!-- Loading state -->
+  @if (loadingDish) {
+    <div class="edit-dish__loading">
+      <div class="edit-dish__spinner"></div>
+    </div>
+  }
+
+  @if (!loadingDish) {
+    <!-- Header with back + steps -->
+    <div class="edit-dish__header">
+      <button class="edit-dish__back" (click)="prevStep()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ (currentStep === 1 ? 'COMMON.CANCEL' : 'COMMON.BACK') | translate }}
+      </button>
+      <div class="edit-dish__stepper">
+        @for (s of [1, 2, 3]; track s) {
+          <div class="edit-dish__step"
+            [class.edit-dish__step--active]="currentStep === s"
+            [class.edit-dish__step--done]="currentStep > s">
+            <div class="edit-dish__step-circle">
+              @if (currentStep > s) {
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 7l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              } @else {
+                {{ s }}
+              }
+            </div>
+            @if (s < 3) {
+              <div class="edit-dish__step-line" [class.edit-dish__step-line--done]="currentStep > s"></div>
+            }
+          </div>
+        }
+      </div>
+      <div class="edit-dish__step-label">
+        {{ ('DISHES.CREATE_FORM.STEP_' + currentStep) | translate }}
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 1: Basic info ═══════════ -->
+    @if (currentStep === 1) {
+      <div class="edit-dish__form step-animate">
+        <h2 class="edit-dish__section-title">{{ 'DISHES.EDIT_FORM.INFO_TITLE' | translate }}</h2>
+        <p class="edit-dish__section-sub">{{ 'DISHES.EDIT_FORM.INFO_SUBTITLE' | translate }}</p>
+
+        <!-- Name -->
+        <div class="form-group" [class.form-group--error]="errors['name']">
+          <label class="form-group__label">{{ 'DISHES.NAME' | translate }} *</label>
+          <input type="text" class="form-group__input" [(ngModel)]="name"
+            [placeholder]="'DISHES.CREATE_FORM.NAME_PLACEHOLDER' | translate" />
+          @if (errors['name']) {
+            <span class="form-group__error">{{ errors['name'] | translate }}</span>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="form-group" [class.form-group--error]="errors['description']">
+          <div class="form-group__label-row">
+            <label class="form-group__label">{{ 'DISHES.DESCRIPTION' | translate }} *</label>
+            <span class="form-group__counter">{{ descriptionLength }}/300</span>
+          </div>
+          <textarea class="form-group__textarea" [(ngModel)]="description" maxlength="300"
+            [placeholder]="'DISHES.CREATE_FORM.DESC_PLACEHOLDER' | translate" rows="4"></textarea>
+          @if (errors['description']) {
+            <span class="form-group__error">{{ errors['description'] | translate }}</span>
+          }
+        </div>
+
+        <!-- Price -->
+        <div class="form-group" [class.form-group--error]="errors['price']">
+          <label class="form-group__label">{{ 'DISHES.PRICE' | translate }} *</label>
+          <div class="form-group__input-wrap">
+            <input type="number" step="0.01" min="0" class="form-group__input" [(ngModel)]="price" placeholder="0.00" />
+            <span class="form-group__suffix">CHF</span>
+          </div>
+          @if (errors['price']) {
+            <span class="form-group__error">{{ errors['price'] | translate }}</span>
+          }
+        </div>
+
+        <!-- Category picker -->
+        <div class="form-group">
+          <label class="form-group__label">{{ 'DISHES.CATEGORY' | translate }}</label>
+          <div class="pill-grid">
+            @for (cat of categories; track cat.value) {
+              <button class="pill" [class.pill--active]="selectedCategory === cat.value"
+                [style.--pill-color]="getCategoryColor(cat.value)"
+                (click)="selectedCategory = cat.value">
+                {{ cat.labelKey | translate }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Diet picker -->
+        <div class="form-group">
+          <label class="form-group__label">{{ 'DISHES.CREATE_FORM.DIET_LABEL' | translate }}</label>
+          <div class="pill-grid pill-grid--2col">
+            @for (diet of diets; track diet.value) {
+              <button class="pill" [class.pill--active]="selectedDiet === diet.value" (click)="selectedDiet = diet.value">
+                {{ diet.labelKey | translate }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Optional fields -->
+        <div class="form-group__row">
+          <div class="form-group">
+            <label class="form-group__label">{{ 'DISHES.CALORIES' | translate }}</label>
+            <div class="form-group__input-wrap">
+              <input type="number" min="0" class="form-group__input" [(ngModel)]="calories" placeholder="0" />
+              <span class="form-group__suffix">kcal</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">{{ 'DISHES.PREPARATION_TIME' | translate }}</label>
+            <div class="form-group__input-wrap">
+              <input type="number" min="0" class="form-group__input" [(ngModel)]="preparationTime" placeholder="0" />
+              <span class="form-group__suffix">min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-dish__footer">
+          <button class="btn btn--secondary" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+          <button class="btn btn--primary" (click)="nextStep()">
+            {{ 'COMMON.NEXT' | translate }}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════ STEP 2: Image ═══════════ -->
+    @if (currentStep === 2) {
+      <div class="edit-dish__form step-animate">
+        <h2 class="edit-dish__section-title">{{ 'DISHES.CREATE_FORM.IMAGE_TITLE' | translate }}</h2>
+        <p class="edit-dish__section-sub">{{ 'DISHES.EDIT_FORM.IMAGE_SUBTITLE' | translate }}</p>
+
+        <!-- Main image upload -->
+        <div class="upload-zone" [class.upload-zone--error]="errors['image']" [class.upload-zone--has-image]="imagePreview">
+          @if (!imagePreview) {
+            <label class="upload-zone__label">
+              <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
+              <div class="upload-zone__content">
+                <div class="upload-zone__icon-wrap">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="6" width="24" height="20" rx="4" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="14" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M4 22l6-6c1.5-1.5 3.5-1.5 5 0l9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20 18l2-2c1.5-1.5 3.5-1.5 5 0l1 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <span class="upload-zone__text">{{ 'DISHES.CREATE_FORM.CHOOSE_PHOTO' | translate }}</span>
+                <span class="upload-zone__hint">{{ 'DISHES.CREATE_FORM.IMAGE_SIZE_HINT' | translate }}</span>
+              </div>
+            </label>
+          } @else {
+            <div class="upload-zone__preview">
+              <img [src]="imagePreview" alt="Dish preview" class="upload-zone__img" />
+              <label class="upload-zone__change">
+                <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {{ 'DISHES.EDIT_FORM.CHANGE_PHOTO' | translate }}
+              </label>
+              <button class="upload-zone__remove" (click)="removeImage()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+        @if (errors['image']) {
+          <span class="form-group__error">{{ errors['image'] | translate }}</span>
+        }
+
+        <!-- Gallery -->
+        @if (maxGalleryImages > 0) {
+          <div class="form-group gallery-section">
+            <div class="form-group__label-row">
+              <label class="form-group__label">{{ 'DISHES.GALLERY' | translate }}</label>
+              <span class="form-group__counter">{{ galleryPreviews.length }}/{{ maxGalleryImages }}</span>
+            </div>
+            <div class="gallery-grid">
+              @for (preview of galleryPreviews; track $index; let i = $index) {
+                <div class="gallery-grid__item">
+                  <img [src]="preview" class="gallery-grid__img" />
+                  <button class="gallery-grid__remove" (click)="removeGalleryImage(i)">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M9 3L3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+              @if (galleryPreviews.length < maxGalleryImages) {
+                <label class="gallery-grid__add">
+                  <input type="file" accept="image/*" multiple (change)="onGallerySelected($event)" hidden />
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10 6v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 10h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span>{{ 'DISHES.CREATE_FORM.ADD_GALLERY' | translate }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="gallery-section__upgrade">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="3" y="5" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M5 5V4a2 2 0 014 0v1" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            <span>{{ 'DISHES.CREATE_FORM.UPGRADE_HINT' | translate }}</span>
+          </div>
+        }
+
+        <div class="edit-dish__footer">
+          <button class="btn btn--secondary" (click)="prevStep()">{{ 'COMMON.BACK' | translate }}</button>
+          <button class="btn btn--primary" (click)="nextStep()">
+            {{ 'DISHES.CREATE_FORM.PREVIEW' | translate }}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════ STEP 3: Preview ═══════════ -->
+    @if (currentStep === 3 && !submitted) {
+      <div class="edit-dish__form step-animate">
+        <h2 class="edit-dish__section-title">{{ 'DISHES.CREATE_FORM.PREVIEW_TITLE' | translate }}</h2>
+        <p class="edit-dish__section-sub">{{ 'DISHES.CREATE_FORM.PREVIEW_SUBTITLE' | translate }}</p>
+
+        <div class="preview-card">
+          @if (imagePreview) {
+            <img [src]="imagePreview" class="preview-card__hero" alt="Preview" />
+          }
+          <div class="preview-card__body">
+            <div class="preview-card__top-row">
+              <h3 class="preview-card__name">{{ name }}</h3>
+              <span class="preview-card__price">{{ formatPrice(price) }}</span>
+            </div>
+            <div class="preview-card__tags">
+              <span class="preview-card__tag" [style.background-color]="getCategoryColor(selectedCategory) + '18'" [style.color]="getCategoryColor(selectedCategory)">
+                {{ getCategoryLabel(selectedCategory) | translate }}
+              </span>
+              <span class="preview-card__tag preview-card__tag--diet">
+                {{ getDietLabel(selectedDiet) | translate }}
+              </span>
+            </div>
+            <p class="preview-card__desc">{{ description }}</p>
+            <div class="preview-card__meta">
+              @if (calories) {
+                <div class="preview-card__meta-item">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                  </svg>
+                  {{ calories }} kcal
+                </div>
+              }
+              @if (preparationTime) {
+                <div class="preview-card__meta-item">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 4v4h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ preparationTime }} min
+                </div>
+              }
+            </div>
+            @if (galleryPreviews.length > 0) {
+              <div class="preview-card__gallery">
+                @for (img of galleryPreviews; track $index) {
+                  <img [src]="img" class="preview-card__gallery-img" />
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="edit-dish__error">{{ errorMessage }}</div>
+        }
+
+        <div class="edit-dish__footer">
+          <button class="btn btn--secondary" (click)="prevStep()">{{ 'COMMON.BACK' | translate }}</button>
+          <button class="btn btn--primary" [disabled]="submitting" (click)="submit()">
+            @if (submitting) {
+              <span class="btn__spinner"></span>
+            }
+            {{ 'COMMON.SAVE' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════ Success ═══════════ -->
+    @if (submitted) {
+      <div class="edit-dish__success step-animate">
+        <div class="edit-dish__success-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="28" stroke="#10B981" stroke-width="3"/>
+            <path d="M20 32l8 8 16-18" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>{{ 'DISHES.EDIT_FORM.SUCCESS_TITLE' | translate }}</h2>
+        <p>{{ 'DISHES.EDIT_FORM.SUCCESS_SUBTITLE' | translate }}</p>
+        <button class="btn btn--primary" (click)="goToDishes()">{{ 'DISHES.CREATE_FORM.BACK_TO_DISHES' | translate }}</button>
+      </div>
+    }
+  }
+</div>

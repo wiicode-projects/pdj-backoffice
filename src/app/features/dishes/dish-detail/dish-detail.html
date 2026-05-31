@@ -1,0 +1,303 @@
+<div class="detail-page">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-state__spinner"></div>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="error-state">
+      <div class="error-state__icon">
+        <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 6V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="14" r="0.8" fill="currentColor"/>
+        </svg>
+      </div>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn--primary" (click)="goBack()">← Retour aux plats</button>
+    </div>
+  }
+
+  @if (!loading && dish) {
+    <!-- Header -->
+    <div class="detail-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Plats
+      </button>
+      <div class="detail-header__title">
+        <h1>{{ dish.name }}</h1>
+        @if (dish.category) {
+          <span class="category-badge" [style.background]="getCategoryColor(dish.category) + '14'" [style.color]="getCategoryColor(dish.category)">
+            {{ getCategoryLabel(dish.category) }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="detail-hero">
+      <div class="detail-hero__top">
+        <!-- Carousel -->
+        <div class="carousel">
+          <div class="carousel__main">
+            @if (currentImage) {
+              <img class="carousel__img" [src]="currentImage" [alt]="dish.name" />
+              @if (allImages.length > 1) {
+                <button class="carousel__arrow carousel__arrow--left" (click)="prevImage()">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="carousel__arrow carousel__arrow--right" (click)="nextImage()">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M7 4L12 9L7 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="carousel__counter">{{ selectedImageIndex + 1 }} / {{ allImages.length }}</div>
+              }
+            } @else {
+              <div class="carousel__placeholder">
+                <svg width="48" height="48" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Aucune image</span>
+              </div>
+            }
+          </div>
+          @if (allImages.length > 1) {
+            <div class="carousel__thumbs">
+              <button class="carousel__scroll-btn" (click)="scrollThumbs('left')">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="carousel__thumb-strip" #thumbStrip>
+                @for (img of allImages; track img; let i = $index) {
+                  <button class="carousel__thumb" [class.carousel__thumb--active]="i === selectedImageIndex" (click)="selectImage(i)">
+                    <img [src]="getThumbUrl(i)" [alt]="'Image ' + (i + 1)" />
+                  </button>
+                }
+              </div>
+              <button class="carousel__scroll-btn" (click)="scrollThumbs('right')">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Info -->
+        <div class="detail-hero__info">
+          <div class="detail-hero__badges">
+            @if (dish.category) {
+              <span class="category-badge" [style.background]="getCategoryColor(dish.category) + '14'" [style.color]="getCategoryColor(dish.category)">
+                {{ getCategoryLabel(dish.category) }}
+              </span>
+            }
+            @if (dish.diet) {
+              <span class="diet-badge">{{ getDietLabel(dish.diet) }}</span>
+            }
+          </div>
+          <h1 class="detail-hero__title">{{ dish.name }}</h1>
+          <div class="detail-hero__price">{{ formatPrice(dish.price) }}</div>
+          @if (dish.description) {
+            <p class="detail-hero__description">{{ dish.description }}</p>
+          }
+          <div class="detail-hero__meta-strip">
+            @if (dish.preparationTime) {
+              <div class="meta-chip">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M8 4.5V8L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {{ dish.preparationTime }} min
+              </div>
+            }
+            @if (dish.calories) {
+              <div class="meta-chip">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2C8 2 4 6 4 9.5C4 11.7 5.8 13.5 8 13.5C10.2 13.5 12 11.7 12 9.5C12 6 8 2 8 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+                {{ dish.calories }} kcal
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="detail-hero__actions">
+        <button class="btn btn--edit" (click)="navigateToEdit()">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+          Modifier
+        </button>
+        <button class="btn btn--danger-outline" (click)="openDeleteDialog()">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+            <path d="M4 6H16M7 6V4C7 3.4 7.4 3 8 3H12C12.6 3 13 3.4 13 4V6M8 9V15M12 9V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 6L6 17C6 17.6 6.4 18 7 18H13C13.6 18 14 17.6 14 17L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Supprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Detail cards -->
+    <div class="detail-grid">
+      <!-- Information card -->
+      <div class="detail-card">
+        <h3 class="detail-card__title">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 9V14M10 7V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Informations
+        </h3>
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-row__label">Nom</span>
+            <span class="info-row__value">{{ dish.name }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Prix</span>
+            <span class="info-row__value info-row__value--price">{{ formatPrice(dish.price) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Catégorie</span>
+            <span class="info-row__value">
+              @if (dish.category) {
+                <span class="category-badge category-badge--sm" [style.background]="getCategoryColor(dish.category) + '14'" [style.color]="getCategoryColor(dish.category)">
+                  {{ getCategoryLabel(dish.category) }}
+                </span>
+              } @else {
+                —
+              }
+            </span>
+          </div>
+          @if (dish.diet) {
+            <div class="info-row">
+              <span class="info-row__label">Régime</span>
+              <span class="info-row__value">
+                <span class="diet-badge diet-badge--sm">{{ getDietLabel(dish.diet) }}</span>
+              </span>
+            </div>
+          }
+          <div class="info-row">
+            <span class="info-row__label">Créé le</span>
+            <span class="info-row__value">{{ formatDate(dish.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nutrition card -->
+      <div class="detail-card">
+        <h3 class="detail-card__title">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Détails
+        </h3>
+        <div class="info-list">
+          @if (dish.preparationTime) {
+            <div class="info-row">
+              <span class="info-row__label">Temps de préparation</span>
+              <span class="info-row__value">{{ dish.preparationTime }} min</span>
+            </div>
+          }
+          @if (dish.calories) {
+            <div class="info-row">
+              <span class="info-row__label">Calories</span>
+              <span class="info-row__value">{{ dish.calories }} kcal</span>
+            </div>
+          }
+          <div class="info-row">
+            <span class="info-row__label">Images</span>
+            <span class="info-row__value">{{ allImages.length }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Mise à jour</span>
+            <span class="info-row__value">{{ formatDate(dish.updatedAt) }}</span>
+          </div>
+        </div>
+        @if (!dish.preparationTime && !dish.calories) {
+          <div class="empty-hint">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M7 10H13M10 7V13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <p>Aucun détail nutritionnel renseigné</p>
+          </div>
+        }
+      </div>
+
+      <!-- Description card (full width) -->
+      @if (dish.description) {
+        <div class="detail-card detail-card--full">
+          <h3 class="detail-card__title">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 7H14M6 10H14M6 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Description
+          </h3>
+          <p class="description-text">{{ dish.description }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="detail-footer">
+      <span class="detail-footer__meta">Créé le {{ formatDate(dish.createdAt) }}</span>
+    </div>
+  }
+
+  <!-- Delete dialog -->
+  @if (showDeleteDialog) {
+    <div class="dialog-overlay" (click)="closeDeleteDialog()">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <div class="dialog__header">
+          <h2>Supprimer le plat</h2>
+          <button class="dialog__close" (click)="closeDeleteDialog()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="dialog__body">
+          <div class="delete-confirm">
+            <div class="delete-confirm__icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M10.29 3.86L1.82 18C1.64 18.3 1.55 18.65 1.55 19C1.56 19.35 1.66 19.7 1.84 20C2.02 20.3 2.28 20.56 2.58 20.74C2.89 20.91 3.24 21 3.59 21H20.41C20.76 21 21.11 20.91 21.42 20.74C21.72 20.56 21.98 20.3 22.16 20C22.34 19.7 22.44 19.35 22.45 19C22.45 18.65 22.36 18.3 22.18 18L13.71 3.86C13.53 3.56 13.27 3.32 12.97 3.15C12.66 2.98 12.32 2.89 11.97 2.89C11.62 2.89 11.28 2.98 10.97 3.15C10.67 3.32 10.41 3.56 10.29 3.86Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="delete-confirm__text">Êtes-vous sûr de vouloir supprimer ce plat ?</p>
+            @if (dish) {
+              <div class="delete-confirm__name">« {{ dish.name }} »</div>
+            }
+          </div>
+        </div>
+        <div class="dialog__footer">
+          <button class="btn btn--cancel" (click)="closeDeleteDialog()">Annuler</button>
+          <button class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete()">
+            @if (deleting) { <span class="btn__spinner"></span> }
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

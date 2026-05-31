@@ -1,0 +1,361 @@
+// ==============================
+// VARIABLES
+// ==============================
+$primary: #DC2626;
+$primary-light: rgba(220, 38, 38, 0.08);
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border: #E5E7EB;
+$border-light: #F3F4F6;
+$success: #059669;
+$success-light: rgba(5, 150, 105, 0.08);
+$blue: #3B82F6;
+$blue-light: rgba(59, 130, 246, 0.1);
+$green: #10B981;
+$green-light: rgba(16, 185, 129, 0.1);
+$orange: #F59E0B;
+$orange-light: rgba(245, 158, 11, 0.1);
+$purple: #8B5CF6;
+$purple-light: rgba(139, 92, 246, 0.1);
+$red: #EF4444;
+$red-light: rgba(239, 68, 68, 0.08);
+$teal: #0D9488;
+$teal-light: rgba(13, 148, 136, 0.1);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+$shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+$font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ==============================
+// PAGE
+// ==============================
+.page {
+  font-family: $font;
+  animation: fadeIn 0.35s ease;
+
+  &__header {
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-medium;
+    margin: 0;
+  }
+}
+
+// ==============================
+// KPI STRIP
+// ==============================
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.kpi-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: $shadow-sm;
+  transition: all 0.25s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--blue   { background: $blue-light;   color: $blue; }
+    &--green  { background: $green-light;  color: $green; }
+    &--orange { background: $orange-light; color: $orange; }
+    &--red    { background: $red-light;    color: $red; }
+  }
+
+  &__body { display: flex; flex-direction: column; gap: 2px; }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $text-dark;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  &__label { font-size: 0.78rem; color: $text-medium; font-weight: 500; }
+}
+
+// ==============================
+// FILTERS
+// ==============================
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  &__search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+
+    svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-light;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    font-family: $font;
+    color: $text-dark;
+    background: $card-bg;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &::placeholder { color: $text-light; }
+    &:focus {
+      border-color: $blue;
+      box-shadow: 0 0 0 3px $blue-light;
+    }
+  }
+
+  &__select {
+    padding: 10px 36px 10px 14px;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    font-family: $font;
+    color: $text-dark;
+    background: $card-bg;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: $blue;
+      box-shadow: 0 0 0 3px $blue-light;
+    }
+  }
+}
+
+// ==============================
+// LOADING
+// ==============================
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 16px;
+  color: $text-medium;
+  font-size: 0.9rem;
+
+  &__spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+// ==============================
+// TABLE
+// ==============================
+.table-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  thead {
+    background: $border-light;
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $text-light;
+      border-bottom: 1px solid $border;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background 0.15s ease;
+      cursor: default;
+
+      &:hover { background: rgba(59, 130, 246, 0.03); }
+      &:not(:last-child) td { border-bottom: 1px solid $border-light; }
+    }
+
+    td {
+      padding: 14px 16px;
+      color: $text-dark;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+  }
+}
+
+.td-date { color: $text-dark; font-weight: 600; font-size: 0.82rem; }
+.td-secondary { color: $text-medium; font-weight: 400; }
+
+// ==============================
+// OWNER CELL
+// ==============================
+.owner-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &__avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: $blue-light;
+    color: $blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--restaurant {
+      background: $orange-light;
+      color: $orange;
+    }
+  }
+
+  &__name {
+    font-weight: 600;
+    color: $text-dark;
+  }
+}
+
+// ==============================
+// TYPE PILL
+// ==============================
+.type-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: $blue-light;
+  color: $blue;
+
+  &--restaurant {
+    background: $orange-light;
+    color: $orange;
+  }
+}
+
+// ==============================
+// STATUS BADGE
+// ==============================
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--paid      { background: $green-light; color: $green; }
+  &--pending   { background: $orange-light; color: $orange; }
+  &--cancelled { background: $red-light; color: $red; }
+  &--refunded  { background: $purple-light; color: $purple; }
+}
+
+// ==============================
+// EMPTY STATE
+// ==============================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  color: $text-light;
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+
+  svg { margin-bottom: 12px; }
+
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+// ==============================
+// ANIMATIONS
+// ==============================
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

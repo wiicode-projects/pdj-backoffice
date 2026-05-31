@@ -1,0 +1,115 @@
+<div class="page">
+  <div class="page-header">
+    <div class="page-header__left">
+      <div class="page-header__icon page-header__icon--analytics">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 20V14M8 20V10M12 20V6M16 20V12M20 20V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="page-header__title">Analytiques Shop</h1>
+        <p class="page-header__subtitle">Santé de l'économie des Frites</p>
+      </div>
+    </div>
+    <button class="btn btn--secondary btn--sm" (click)="load()">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+        <path d="M4 10C4 6.7 6.7 4 10 4C12.3 4 14.3 5.2 15.5 7M16 10C16 13.3 13.3 16 10 16C7.7 16 5.7 14.8 4.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M14 7H16V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Actualiser
+    </button>
+  </div>
+
+  @if (loading) { <div class="loading"><div class="loading__spinner"></div></div> }
+
+  @if (!loading && analytics) {
+    <!-- KPI row -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--gold">
+        <div class="kpi-card__icon">🍟</div>
+        <div class="kpi-card__body">
+          <div class="kpi-card__value">{{ analytics.totalCirculation | number }}</div>
+          <div class="kpi-card__label">Frites en circulation</div>
+          <div class="kpi-card__sub">{{ circulationRate }} des émises</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">📈</div>
+        <div class="kpi-card__body">
+          <div class="kpi-card__value">{{ analytics.totalEmitted | number }}</div>
+          <div class="kpi-card__label">Total émises (tous temps)</div>
+          <div class="kpi-card__sub">{{ analytics.usersWithFrites | number }} porteurs actifs</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--red">
+        <div class="kpi-card__icon">🛒</div>
+        <div class="kpi-card__body">
+          <div class="kpi-card__value">{{ analytics.totalSpent | number }}</div>
+          <div class="kpi-card__label">Total dépensées</div>
+          <div class="kpi-card__sub">Burn rate {{ burnRate }}</div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">⚡</div>
+        <div class="kpi-card__body">
+          <div class="kpi-card__value">{{ analytics.recentTxCount | number }}</div>
+          <div class="kpi-card__label">Transactions (7 jours)</div>
+          <div class="kpi-card__sub">Activité récente</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Transaction breakdown -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <h2 class="detail-card__title">Répartition par type</h2>
+        </div>
+        <div class="breakdown-list">
+          @for (row of analytics.byType; track row.type) {
+            <div class="breakdown-item">
+              <span class="type-pill tx--{{ row.type === 'PACK_PURCHASE' ? 'blue' : row.type === 'ITEM_PURCHASE' ? 'purple' : row.type === 'ADMIN_ADJUST' ? 'red' : 'green' }}">
+                {{ txLabels[row.type] ?? row.type }}
+              </span>
+              <div class="breakdown-bar-wrap">
+                <div class="breakdown-bar" [style.width.%]="(row.total / analytics!.totalEmitted) * 100 || 0"></div>
+              </div>
+              <div class="breakdown-stats">
+                <span class="breakdown-count">{{ row.count | number }} tx</span>
+                <span class="breakdown-total">{{ row.total | number }} 🍟</span>
+              </div>
+            </div>
+          }
+          @if (analytics.byType.length === 0) {
+            <p class="empty-msg">Aucune transaction enregistrée.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Top wallets leaderboard -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <h2 class="detail-card__title">Top 10 portefeuilles 🏆</h2>
+        </div>
+        <div class="leaderboard">
+          @for (w of analytics.topWallets; track w.id; let i = $index) {
+            <div class="leaderboard-item">
+              <span class="leaderboard-rank" [class.leaderboard-rank--gold]="i === 0" [class.leaderboard-rank--silver]="i === 1" [class.leaderboard-rank--bronze]="i === 2">
+                {{ i + 1 }}
+              </span>
+              <div class="leaderboard-avatar">{{ getInitials(w) }}</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">{{ w.firstName }} {{ w.lastName }}</div>
+                <div class="leaderboard-email">{{ w.email }}</div>
+              </div>
+              <div class="leaderboard-balance">🍟 {{ w.fritesBalance | number }}</div>
+            </div>
+          }
+          @if (analytics.topWallets.length === 0) {
+            <p class="empty-msg">Aucun utilisateur avec des Frites.</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

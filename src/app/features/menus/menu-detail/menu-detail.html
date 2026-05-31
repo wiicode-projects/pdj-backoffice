@@ -1,0 +1,348 @@
+<div class="detail-page">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-state__spinner"></div>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="error-state">
+      <div class="error-state__icon">
+        <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 6V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="14" r="0.8" fill="currentColor"/>
+        </svg>
+      </div>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn--primary" (click)="goBack()">← Retour aux menus</button>
+    </div>
+  }
+
+  @if (!loading && menu) {
+    <!-- Header -->
+    <div class="detail-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M12 3L6 9L12 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Menus
+      </button>
+      <button class="btn btn--edit" (click)="openEditForm()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+        Modifier
+      </button>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-card__left">
+        @if (menu.image) {
+          <div class="hero-card__image-wrap">
+            <img [src]="menu.image" [alt]="menu.name" class="hero-card__image" />
+          </div>
+        } @else {
+          <div class="hero-card__image-placeholder">
+            <svg width="40" height="40" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        }
+        <div class="hero-card__info">
+          <h1 class="hero-card__name">{{ menu.name }}</h1>
+          @if (menu.description) {
+            <p class="hero-card__description">{{ menu.description }}</p>
+          }
+          <div class="hero-card__badges">
+            @if (menu.isModele) {
+              <span class="badge badge--model">
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2L12.9 7.9L19 8.8L14.5 13.2L15.6 19.3L10 16.4L4.4 19.3L5.5 13.2L1 8.8L7.1 7.9L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+                Modèle
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="hero-card__right">
+        <div class="hero-stat">
+          <span class="hero-stat__value hero-stat__value--price">{{ formatPrice(menu.price) }}</span>
+          <span class="hero-stat__label">Prix</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat__value">{{ formatShortDate(menu.availableAt) }}</span>
+          <span class="hero-stat__label">Disponible le</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat__value">{{ getDishes().length }}</span>
+          <span class="hero-stat__label">Plats</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu Info Cards -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h2 class="info-card__title">Informations</h2>
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-row__label">Nom</span>
+            <span class="info-row__value">{{ menu.name || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Prix total</span>
+            <span class="info-row__value info-row__value--price">{{ formatPrice(menu.price) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Disponible le</span>
+            <span class="info-row__value">{{ formatDate(menu.availableAt) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Modèle</span>
+            <span class="info-row__value">{{ menu.isModele ? 'Oui' : 'Non' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h2 class="info-card__title">Composition</h2>
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-row__label">Entrée</span>
+            <span class="info-row__value">{{ menu.appetizer?.name || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Plat principal</span>
+            <span class="info-row__value" style="font-weight: 700">{{ menu.mainCourse?.name || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">Dessert</span>
+            <span class="info-row__value">{{ menu.dessert?.name || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dishes Section -->
+    <div class="dishes-section">
+      <h2 class="dishes-section__title">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Détails des plats
+      </h2>
+
+      @for (entry of getDishes(); track entry.dish.id) {
+        <div class="dish-detail-card" [class.dish-detail-card--main]="entry.role === 'Plat principal'">
+          <div class="dish-detail-card__header">
+            <div class="dish-detail-card__role-badge" [style.background]="getCategoryColor(entry.dish.category) + '14'" [style.color]="getCategoryColor(entry.dish.category)">
+              {{ entry.role }}
+            </div>
+            @if (entry.dish.category) {
+              <div class="dish-detail-card__category-badge" [style.background]="getCategoryColor(entry.dish.category) + '14'" [style.color]="getCategoryColor(entry.dish.category)">
+                {{ getCategoryLabel(entry.dish.category) }}
+              </div>
+            }
+            @if (entry.dish.diet) {
+              <div class="dish-detail-card__diet-badge">
+                {{ getDietLabel(entry.dish.diet) }}
+              </div>
+            }
+          </div>
+
+          <div class="dish-detail-card__content">
+            <div class="dish-detail-card__info">
+              <h3 class="dish-detail-card__name">{{ entry.dish.name }}</h3>
+              @if (entry.dish.description) {
+                <p class="dish-detail-card__description">{{ entry.dish.description }}</p>
+              }
+              <div class="dish-detail-card__meta">
+                <span class="dish-detail-card__price">{{ formatPrice(entry.dish.price) }}</span>
+                @if (entry.dish.preparationTime) {
+                  <span class="dish-detail-card__prep">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
+                      <path d="M8 4.5V8L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ entry.dish.preparationTime }} min
+                  </span>
+                }
+                @if (entry.dish.calories) {
+                  <span class="dish-detail-card__cal">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <path d="M8 2C8 2 4 6 4 9.5C4 11.7 5.8 13.5 8 13.5C10.2 13.5 12 11.7 12 9.5C12 6 8 2 8 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                    </svg>
+                    {{ entry.dish.calories }} kcal
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Images Gallery -->
+            @if (getAllImages(entry.dish).length > 0) {
+              <div class="dish-detail-card__gallery">
+                @for (img of getAllImages(entry.dish); track img; let i = $index) {
+                  <div class="dish-detail-card__gallery-item" (click)="openLightbox(getAllImages(entry.dish), i)">
+                    <img [src]="img" [alt]="entry.dish.name" class="dish-detail-card__gallery-img" />
+                    @if (i === 0) {
+                      <span class="dish-detail-card__gallery-main">Principal</span>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="dish-detail-card__no-image">
+                <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/>
+                  <circle cx="7" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M2 14L6 10L10 14L14 8L18 14" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+                <span>Aucune image</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (getDishes().length === 0) {
+        <div class="empty-dishes">
+          <svg width="48" height="48" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M10 2V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <h3>Aucun plat</h3>
+          <p>Ce menu ne contient aucun plat.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Edit Modal -->
+  @if (formOpen) {
+    <div class="modal-overlay" (click)="closeForm()"></div>
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">Modifier le menu</h2>
+        <button class="modal__close" (click)="closeForm()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        @if (formError) {
+          <div class="modal__error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 4.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+            </svg>
+            <span>{{ formError }}</span>
+          </div>
+        }
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input type="text" class="form-input" [(ngModel)]="menuName" placeholder="Nom du menu" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Disponible le *</label>
+            <input type="date" class="form-input" [(ngModel)]="menuAvailableAt" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prix (CHF)</label>
+            <input type="number" class="form-input" [(ngModel)]="menuPrice" min="0" step="0.5" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plat principal *</label>
+          @if (dishesLoading) {
+            <div class="form-input form-input--loading">Chargement...</div>
+          } @else {
+            <select class="form-input form-select" [(ngModel)]="menuMainCourseId">
+              <option value="">Sélectionner un plat</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }} — {{ formatPrice(dish.price) }}</option>
+              }
+            </select>
+          }
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Entrée</label>
+            <select class="form-input form-select" [(ngModel)]="menuAppetizerId">
+              <option value="">Aucune</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dessert</label>
+            <select class="form-input form-select" [(ngModel)]="menuDessertId">
+              <option value="">Aucun</option>
+              @for (dish of allDishes; track dish.id) {
+                <option [value]="dish.id">{{ dish.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-group form-group--toggle">
+          <label class="form-toggle">
+            <input type="checkbox" [(ngModel)]="menuIsModele" />
+            <span class="form-toggle__slider"></span>
+          </label>
+          <span class="form-toggle-label">Sauvegarder comme modèle</span>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--cancel" (click)="closeForm()">Annuler</button>
+        <button class="btn btn--primary" [disabled]="formSubmitting" (click)="submitForm()">
+          @if (formSubmitting) { <span class="btn__spinner"></span> }
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Lightbox -->
+  @if (lightboxOpen) {
+    <div class="lightbox" (click)="closeLightbox()">
+      <div class="lightbox__content" (click)="$event.stopPropagation()">
+        <button class="lightbox__close" (click)="closeLightbox()">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        @if (lightboxImages.length > 1) {
+          <button class="lightbox__nav lightbox__nav--prev" (click)="prevImage()">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+              <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="lightbox__nav lightbox__nav--next" (click)="nextImage()">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+              <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        }
+        <img [src]="lightboxImages[lightboxIndex]" alt="Image" class="lightbox__image" />
+        @if (lightboxImages.length > 1) {
+          <div class="lightbox__counter">{{ lightboxIndex + 1 }} / {{ lightboxImages.length }}</div>
+        }
+      </div>
+    </div>
+  }
+</div>

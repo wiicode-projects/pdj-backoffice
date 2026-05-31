@@ -1,0 +1,163 @@
+<div class="edit-event-page">
+  @if (loading) {
+    <div class="loading-state"><div class="spinner-lg"></div><p>Chargement…</p></div>
+  } @else if (saved) {
+    <div class="success-container">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#10B981" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 class="success-title">Modifications enregistrées !</h2>
+        <p class="success-sub">Redirection en cours…</p>
+      </div>
+    </div>
+  } @else {
+
+    <!-- Header -->
+    <div class="page-header">
+      <button class="back-btn" (click)="cancel()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div>
+        <h1 class="page-title">Modifier l'événement</h1>
+        <p class="page-subtitle">{{ title || 'Sans titre' }}</p>
+      </div>
+    </div>
+
+    <div class="form-container">
+      <div class="form-body">
+        <div class="form-grid">
+
+          <!-- Title -->
+          <div class="field field--full">
+            <label class="field__label">Titre <span class="required">*</span></label>
+            <input type="text" class="field__input" [(ngModel)]="title" [class.field__input--error]="errors['title']"/>
+            @if (errors['title']) { <span class="field__error">{{ errors['title'] }}</span> }
+          </div>
+
+          <!-- Category -->
+          <div class="field">
+            <label class="field__label">Catégorie</label>
+            <select class="field__input" [(ngModel)]="category">
+              @for (opt of categoryOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div class="field">
+            <label class="field__label">Statut</label>
+            <select class="field__input" [(ngModel)]="status">
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Restaurant -->
+          <div class="field">
+            <label class="field__label">Restaurant</label>
+            <select class="field__input" [(ngModel)]="restaurantId">
+              <option value="">Aucun (plateforme)</option>
+              @for (r of restaurants; track r.id) {
+                <option [value]="r.id">{{ r.name }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Location -->
+          <div class="field">
+            <label class="field__label">Lieu</label>
+            <input type="text" class="field__input" [(ngModel)]="location"/>
+          </div>
+
+          <!-- Dates -->
+          <div class="field">
+            <label class="field__label">Date de début <span class="required">*</span></label>
+            <input type="datetime-local" class="field__input" [(ngModel)]="startDate" [class.field__input--error]="errors['startDate']"/>
+            @if (errors['startDate']) { <span class="field__error">{{ errors['startDate'] }}</span> }
+          </div>
+          <div class="field">
+            <label class="field__label">Date de fin <span class="required">*</span></label>
+            <input type="datetime-local" class="field__input" [(ngModel)]="endDate" [class.field__input--error]="errors['endDate']"/>
+            @if (errors['endDate']) { <span class="field__error">{{ errors['endDate'] }}</span> }
+          </div>
+
+          <!-- Max attendees -->
+          <div class="field">
+            <label class="field__label">Places max</label>
+            <input type="number" class="field__input" min="0" [(ngModel)]="maxAttendees"/>
+          </div>
+
+          <!-- Featured -->
+          <div class="field field--toggle">
+            <label class="toggle-label">
+              <input type="checkbox" [(ngModel)]="isFeatured" class="toggle-checkbox"/>
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-text">Mettre en avant</span>
+            </label>
+          </div>
+
+          <!-- Banner color -->
+          <div class="field field--full">
+            <label class="field__label">Couleur bannière</label>
+            <div class="color-grid">
+              @for (c of colorPresets; track c.gradient) {
+                <button type="button" class="color-swatch" [style.background]="c.gradient" [class.color-swatch--active]="imageColor === c.gradient" (click)="imageColor = c.gradient">
+                  @if (imageColor === c.gradient) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Cover image -->
+          <div class="field field--full">
+            <label class="field__label">Image de couverture</label>
+            @if (displayCover) {
+              <div class="cover-preview">
+                <img [src]="displayCover" alt="Cover" class="cover-preview__img"/>
+                <button class="cover-preview__remove" (click)="removeCover()" title="Supprimer">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            } @else {
+              <label class="upload-zone" for="cover-input-edit">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="upload-zone__text">Télécharger une image</span>
+                <span class="upload-zone__hint">PNG, JPG ou WebP · Max 5 MB</span>
+                <input type="file" id="cover-input-edit" accept="image/*" (change)="onCoverSelected($event)" hidden/>
+              </label>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="field field--full">
+            <label class="field__label">Description</label>
+            <textarea class="field__input field__textarea" rows="4" [(ngModel)]="description"></textarea>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <button class="btn btn--ghost" (click)="cancel()">Annuler</button>
+        <button class="btn btn--primary" (click)="save()" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner"></span> Sauvegarde…
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Enregistrer
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>

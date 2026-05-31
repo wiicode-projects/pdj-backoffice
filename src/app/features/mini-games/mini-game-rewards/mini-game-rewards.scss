@@ -1,0 +1,263 @@
+$primary: #DC2626;
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$border: #E5E7EB;
+$border-light: #F3F4F6;
+$red: #EF4444;
+$red-light: rgba(239, 68, 68, 0.08);
+$radius-sm: 8px;
+$radius-md: 12px;
+$font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+
+.page {
+  font-family: $font;
+  animation: fadeIn 0.35s ease;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 16px;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-medium;
+    margin: 0;
+  }
+}
+
+.rewards-toolbar {
+  margin-bottom: 20px;
+  max-width: 360px;
+}
+
+.detail-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: $text-dark;
+    }
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  &__label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $text-medium;
+  }
+
+  &__input {
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+    font-family: $font;
+    font-size: 0.9rem;
+    color: $text-dark;
+    background: $card-bg;
+  }
+
+  &--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: $text-medium;
+  padding: 40px 0;
+
+  &__spinner {
+    width: 22px;
+    height: 22px;
+    border: 2px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  &--inline {
+    padding: 24px;
+    justify-content: center;
+  }
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: $text-medium;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+    font-size: 0.85rem;
+  }
+
+  th {
+    color: $text-medium;
+    font-weight: 700;
+  }
+}
+
+.td-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.row--inactive {
+  opacity: 0.55;
+}
+
+.btn {
+  border: none;
+  border-radius: $radius-sm;
+  padding: 10px 16px;
+  font-family: $font;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &--primary {
+    background: $primary;
+    color: white;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    border: 1px solid $border;
+    color: $text-medium;
+
+    &:hover {
+      background: $border-light;
+      color: $text-dark;
+    }
+  }
+
+  &--danger {
+    background: $red-light;
+    color: $red;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  &--sm {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  background: $card-bg;
+  border-radius: $radius-md;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+  &--sm {
+    max-width: 420px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: $text-dark;
+  }
+
+  &__close {
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: $text-medium;
+  }
+
+  &__body {
+    padding: 20px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 20px 20px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

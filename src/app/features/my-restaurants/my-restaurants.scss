@@ -1,0 +1,537 @@
+$primary-red: #DC2626;
+$primary-light: rgba(220, 38, 38, 0.08);
+$card-bg: #FFFFFF;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$text-light: #9CA3AF;
+$border-color: #E5E7EB;
+$border-light: #F3F4F6;
+$success: #059669;
+$success-light: rgba(5, 150, 105, 0.1);
+$danger-light: rgba(220, 38, 38, 0.08);
+$amber: #F59E0B;
+$amber-light: rgba(245, 158, 11, 0.1);
+$teal: #0D9488;
+$teal-light: rgba(13, 148, 136, 0.1);
+$blue: #3B82F6;
+$blue-light: rgba(59, 130, 246, 0.1);
+$font: 'PolySans Trial', -apple-system, sans-serif;
+
+.my-restaurants {
+  font-family: $font;
+
+  &__header { margin-bottom: 28px; animation: fadeSlideDown 0.5s ease both; }
+  &__title { font-size: 1.6rem; font-weight: 700; color: $text-dark; }
+  &__subtitle { font-size: 0.88rem; color: $text-medium; margin-top: 2px; }
+
+  &__loading { display: flex; justify-content: center; padding: 80px 0; }
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid $border-color; border-top-color: $primary-red;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+
+// ── Main Card ──────────────────────────────────────────────────────────
+.main-card {
+  background: $card-bg; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px; animation: cardSlideUp 0.5s ease both;
+
+  &__image-wrap {
+    position: relative; height: 220px;
+    background: linear-gradient(135deg, #F3F4F6, #E5E7EB); overflow: hidden;
+  }
+  &__image { width: 100%; height: 100%; object-fit: cover; }
+  &__image-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: $text-light;
+  }
+  &__type-badge {
+    position: absolute; top: 14px; right: 14px;
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(#fff, 0.92); backdrop-filter: blur(6px);
+    font-size: 0.75rem; font-weight: 700; color: $text-dark;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  &__body { padding: 28px; }
+
+  &__top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__name { font-size: 1.4rem; font-weight: 700; color: $text-dark; margin: 0; }
+
+  &__info-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;
+  }
+  &__info { display: flex; flex-direction: column; gap: 2px; }
+  &__label {
+    font-size: 0.72rem; color: $text-light; text-transform: uppercase;
+    letter-spacing: 0.5px; font-weight: 600;
+  }
+  &__value { font-size: 0.92rem; color: $text-dark; font-weight: 500; }
+
+  &__stats {
+    display: flex; gap: 24px; padding-top: 20px;
+    border-top: 1px solid $border-color;
+  }
+}
+
+// ── Type display (like mobile) ────────────────────────────────────────
+.type-section {
+  margin-bottom: 20px;
+}
+
+.type-display {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: $border-light;
+  border-radius: 14px;
+  border: 1px solid $border-color;
+
+  &__icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: $amber-light;
+    color: $amber;
+    flex-shrink: 0;
+
+    &--itinerant {
+      background: $teal-light;
+      color: $teal;
+    }
+
+    &--multi {
+      background: $blue-light;
+      color: $blue;
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-light;
+  }
+
+  &__value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+}
+
+// ── Manage button ─────────────────────────────────────────────────────
+.manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: $font;
+  background: $primary-red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #B91C1C;
+    transform: translateY(-1px);
+  }
+}
+
+.stat {
+  display: flex; align-items: center; gap: 8px; color: $text-medium;
+  &__value { font-size: 1.1rem; font-weight: 700; color: $text-dark; }
+  &__label { font-size: 0.78rem; color: $text-light; }
+}
+
+// ── Branches ──────────────────────────────────────────────────────────
+.branches-section {
+  animation: fadeSlideDown 0.5s ease 0.2s both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  &__title {
+    font-size: 1.05rem; font-weight: 600; color: $text-dark;
+    display: flex; align-items: center; gap: 8px;
+    margin: 0;
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px; height: 22px;
+    padding: 0 6px;
+    border-radius: 12px;
+    background: $primary-light;
+    color: $primary-red;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+}
+
+.create-branch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: $font;
+  background: $card-bg;
+  color: $primary-red;
+  border: 1.5px solid rgba($primary-red, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $primary-light;
+    border-color: $primary-red;
+  }
+
+  &--secondary {
+    margin-top: 16px;
+  }
+}
+
+.branches-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
+}
+
+.branch-card {
+  background: $card-bg; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer; display: flex;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  animation: cardSlideUp 0.45s ease both;
+  border: 1px solid $border-color;
+
+  &:hover {
+    transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  &__image-wrap {
+    width: 110px; min-height: 110px; flex-shrink: 0;
+    background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+    position: relative;
+  }
+  &__image { width: 100%; height: 100%; object-fit: cover; }
+  &__image-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center; color: $text-light;
+  }
+
+  &__type-tag {
+    position: absolute;
+    bottom: 6px; left: 6px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(#000, 0.55);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(4px);
+  }
+
+  &__body { padding: 16px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  &__name { font-size: 0.95rem; font-weight: 700; color: $text-dark; margin-bottom: 4px; }
+  &__address { font-size: 0.8rem; color: $text-medium; margin-bottom: 8px; }
+  &__meta { display: flex; align-items: center; justify-content: space-between; }
+  &__stats {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.78rem; color: $text-medium;
+  }
+}
+
+.branches-empty {
+  text-align: center; padding: 60px 20px; color: $text-light;
+  animation: fadeSlideDown 0.5s ease 0.3s both;
+  display: flex; flex-direction: column; align-items: center;
+
+  &__icon { margin-bottom: 12px; }
+  p { font-size: 0.88rem; color: $text-medium; margin: 0 0 4px; }
+}
+
+// ── Type mini badge ───────────────────────────────────────────────────
+.type-mini-badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: $amber-light;
+  color: $amber;
+
+  &--itinerant {
+    background: $teal-light;
+    color: $teal;
+  }
+}
+
+// ── Panel ──────────────────────────────────────────────────────────────
+.panel-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3);
+  z-index: 100; animation: fadeIn 0.2s ease;
+}
+
+.panel {
+  position: fixed; top: 0; right: 0; width: 420px; height: 100vh;
+  background: $card-bg; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  z-index: 101; display: flex; flex-direction: column;
+  animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1); overflow-y: auto;
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px; border-bottom: 1px solid $border-color;
+  }
+  &__title { font-size: 1.2rem; font-weight: 700; color: $text-dark; }
+  &__close {
+    background: none; border: none; color: $text-light; cursor: pointer;
+    padding: 4px; border-radius: 6px; transition: all 0.15s ease;
+    display: flex; align-items: center; justify-content: center;
+    &:hover { color: $text-dark; background: rgba($border-color, 0.5); }
+  }
+  &__body { padding: 24px; flex: 1; }
+  &__image { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; }
+  &__info-group { margin-bottom: 16px; }
+  &__label {
+    display: block; font-size: 0.75rem; color: $text-light;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  &__value { font-size: 0.95rem; color: $text-dark; font-weight: 500; }
+}
+
+// ── Create Branch Modal ───────────────────────────────────────────────
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  width: 520px;
+  max-width: 94vw;
+  background: $card-bg;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modalSlideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 26px;
+    border-bottom: 1px solid $border-color;
+
+    h2 { font-size: 1.15rem; font-weight: 700; color: $text-dark; margin: 0; }
+  }
+
+  &__close {
+    background: none; border: none; color: $text-light;
+    cursor: pointer; padding: 4px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    &:hover { color: $text-dark; background: rgba($border-color, 0.5); }
+  }
+
+  &__body { padding: 26px; }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: $danger-light;
+    color: $primary-red;
+    border: 1px solid rgba($primary-red, 0.15);
+    margin-bottom: 18px;
+    animation: fadeSlideDown 0.25s ease;
+  }
+
+  &__form-group {
+    margin-bottom: 18px;
+  }
+
+  &__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 6px;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid $border-color;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: $text-dark;
+    background: #fff;
+    transition: all 0.2s ease;
+    outline: none;
+    font-family: $font;
+    box-sizing: border-box;
+
+    &:focus { border-color: $primary-red; box-shadow: 0 0 0 3px rgba($primary-red, 0.08); }
+    &::placeholder { color: $text-light; }
+  }
+
+  &__type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  &__type-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 14px;
+    border: 2px solid $border-color;
+    border-radius: 12px;
+    background: $card-bg;
+    color: $text-medium;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: $font;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #D1D5DB;
+      background: $border-light;
+    }
+
+    &--active {
+      border-color: $primary-red;
+      color: $primary-red;
+      background: $primary-light;
+
+      svg { color: $primary-red; }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 26px;
+    border-top: 1px solid $border-color;
+  }
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: $font;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+
+  &--primary {
+    background: $primary-red; color: white;
+    &:hover:not(:disabled) { background: #B91C1C; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
+  &--cancel {
+    background: $border-light; color: $text-medium;
+    &:hover { background: $border-color; }
+  }
+
+  &__spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(#fff, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 900px) {
+  .main-card__info-grid { grid-template-columns: 1fr; }
+  .main-card__top-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .branches-grid { grid-template-columns: 1fr; }
+  .branches-section__header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .panel { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .modal__form-row { grid-template-columns: 1fr; }
+  .modal__type-selector { grid-template-columns: 1fr; }
+}

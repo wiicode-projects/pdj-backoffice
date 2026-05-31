@@ -1,0 +1,155 @@
+<div class="page">
+
+  <div class="page__header">
+    <div>
+      <h1 class="page__title">{{ 'MINI_GAME_REWARDS.TITLE' | translate }}</h1>
+      <p class="page__subtitle">{{ 'MINI_GAME_REWARDS.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  @if (loadingGames) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+  } @else if (rewardGames.length === 0) {
+    <div class="empty-state">
+      <p>{{ 'MINI_GAME_REWARDS.NO_GAMES' | translate }}</p>
+    </div>
+  } @else {
+    <div class="rewards-toolbar">
+      <label class="field">
+        <span class="field__label">{{ 'MINI_GAME_REWARDS.SELECT_GAME' | translate }}</span>
+        <select class="field__input" [(ngModel)]="selectedGameId" (ngModelChange)="onGameChange()">
+          @for (game of rewardGames; track game.id) {
+            <option [value]="game.id">{{ game.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-card__header">
+        <h3>{{ 'GAME_DETAIL.REWARDS.TITLE' | translate }}</h3>
+        <button class="btn btn--primary btn--sm" type="button" (click)="openCreateReward()">
+          {{ 'GAME_DETAIL.REWARDS.ADD' | translate }}
+        </button>
+      </div>
+
+      @if (loadingCatalog) {
+        <div class="loading loading--inline">
+          <div class="loading__spinner"></div>
+        </div>
+      } @else if (catalogRewards.length === 0) {
+        <div class="empty-state">
+          <p>{{ 'GAME_DETAIL.REWARDS.NO_REWARDS' | translate }}</p>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ 'GAME_DETAIL.REWARDS.COL.LABEL' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.REWARDS.COL.REWARD_TYPE' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.REWARDS.COL.REWARD_DETAIL' | translate }}</th>
+                <th>{{ 'GAME_DETAIL.REWARDS.COL.ACTIVE' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (reward of catalogRewards; track reward.id) {
+                <tr [class.row--inactive]="!reward.isActive">
+                  <td>{{ reward.label }}</td>
+                  <td>{{ rewardTypeLabel(reward.rewardType) }}</td>
+                  <td>{{ rewardDetail(reward) }}</td>
+                  <td>{{ reward.isActive ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}</td>
+                  <td class="td-actions">
+                    <button class="btn btn--ghost btn--sm" type="button" (click)="openEditReward(reward)">
+                      {{ 'COMMON.EDIT' | translate }}
+                    </button>
+                    <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="askDeleteReward(reward.id)">
+                      {{ 'COMMON.DELETE' | translate }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showRewardModal) {
+  <div class="modal-overlay" (click)="closeRewardModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">
+          {{ editingReward ? ('GAME_DETAIL.REWARDS.EDIT' | translate) : ('GAME_DETAIL.REWARDS.ADD' | translate) }}
+        </h2>
+        <button class="modal__close" type="button" (click)="closeRewardModal()">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.REWARDS.COL.LABEL' | translate }}</label>
+          <input class="field__input" [(ngModel)]="rewardForm.label" />
+        </div>
+        <div class="field">
+          <label class="field__label">{{ 'GAME_DETAIL.REWARDS.COL.REWARD_TYPE' | translate }}</label>
+          <select class="field__input" [(ngModel)]="rewardForm.rewardType" (ngModelChange)="onRewardTypeChange()">
+            <option value="none">{{ 'GAME_DETAIL.REWARDS.TYPE.NONE' | translate }}</option>
+            <option value="tombola_tickets">{{ 'GAME_DETAIL.REWARDS.TYPE.TOMBOLA' | translate }}</option>
+            <option value="id_card_customization">{{ 'GAME_DETAIL.REWARDS.TYPE.CUSTOMIZATION' | translate }}</option>
+          </select>
+        </div>
+        @if (rewardForm.rewardType === 'tombola_tickets') {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.REWARDS.TICKET_AMOUNT' | translate }}</label>
+            <input class="field__input" type="number" min="1" [(ngModel)]="rewardForm.ticketAmount" />
+          </div>
+        }
+        @if (rewardForm.rewardType === 'id_card_customization') {
+          <div class="field">
+            <label class="field__label">{{ 'GAME_DETAIL.REWARDS.CUSTOMIZATION_ITEM' | translate }}</label>
+            <select class="field__input" [(ngModel)]="rewardForm.customizationItemId">
+              <option value="">{{ 'GAME_DETAIL.REWARDS.SELECT_CUSTOMIZATION' | translate }}</option>
+              @for (item of activeCustomizationItems; track item.id) {
+                <option [value]="item.id">{{ item.name }} ({{ item.itemKey }})</option>
+              }
+            </select>
+          </div>
+        }
+        <label class="field field--checkbox">
+          <input type="checkbox" [(ngModel)]="rewardForm.isActive" />
+          <span>{{ 'GAME_DETAIL.REWARDS.COL.ACTIVE' | translate }}</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="closeRewardModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" type="button" [disabled]="savingReward || !rewardForm.label.trim()" (click)="saveReward()">
+          {{ savingReward ? ('GAME_DETAIL.REWARDS.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (confirmDeleteRewardId) {
+  <div class="modal-overlay" (click)="cancelDeleteReward()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ 'GAME_DETAIL.REWARDS.DELETE' | translate }}</h2>
+      </div>
+      <div class="modal__body">
+        <p>{{ 'GAME_DETAIL.REWARDS.DELETE_CONFIRM' | translate }}</p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button" (click)="cancelDeleteReward()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn--danger" type="button" [disabled]="deletingReward" (click)="confirmDeleteReward()">
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

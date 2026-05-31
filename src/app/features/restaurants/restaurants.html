@@ -165,9 +165,14 @@
 
               <!-- Type -->
               <td>
-                <span class="type-badge" [class.type-badge--itinerant]="r.type === 'ITINERANT'">
-                  {{ 'RESTAURANTS.TYPE.' + r.type | translate }}
-                </span>
+                <div class="badge-group">
+                  <span class="type-badge" [class.type-badge--itinerant]="r.type === 'ITINERANT'">
+                    {{ 'RESTAURANTS.TYPE.' + r.type | translate }}
+                  </span>
+                  <span class="badge" [class.badge--banned]="!r.isActive" [class.badge--ok]="r.isActive">
+                    {{ r.isActive ? ('BAN.ACTIVE' | translate) : ('BAN.BANNED' | translate) }}
+                  </span>
+                </div>
               </td>
 
               <!-- Subscription -->
@@ -209,19 +214,41 @@
 
               <!-- Actions -->
               <td (click)="$event.stopPropagation()">
-                @if (confirmDeleteId !== r.id) {
-                  <button class="action-btn action-btn--danger" (click)="askDelete(r.id, $event)" title="Supprimer">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                      <path d="M2 4H13M5 4V3C5 2.4 5.4 2 6 2H9C9.6 2 10 2.4 10 3V4M11 4L10.5 12C10.5 12.6 10 13 9.4 13H5.6C5 13 4.5 12.6 4.5 12L4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                    </svg>
+                <div class="row-actions">
+                  <button
+                    class="action-btn"
+                    [class.action-btn--ban]="r.isActive"
+                    [class.action-btn--unban]="!r.isActive"
+                    [disabled]="togglingActiveId === r.id"
+                    (click)="toggleRestaurantActive(r, $event)"
+                    [title]="r.isActive ? ('BAN.BAN' | translate) : ('BAN.UNBAN' | translate)"
+                  >
+                    @if (r.isActive) {
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    }
                   </button>
-                } @else {
-                  <div class="confirm-delete">
-                    <span>{{ 'COMMON.CONFIRM' | translate }} ?</span>
-                    <button class="action-btn action-btn--danger-confirm" [disabled]="deleting" (click)="confirmDelete(r.id)">{{ 'COMMON.YES' | translate }}</button>
-                    <button class="action-btn action-btn--cancel" (click)="cancelDelete()">{{ 'COMMON.NO' | translate }}</button>
-                  </div>
-                }
+                  @if (confirmDeleteId !== r.id) {
+                    <button class="action-btn action-btn--danger" (click)="askDelete(r.id, $event)" title="Supprimer">
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <path d="M2 4H13M5 4V3C5 2.4 5.4 2 6 2H9C9.6 2 10 2.4 10 3V4M11 4L10.5 12C10.5 12.6 10 13 9.4 13H5.6C5 13 4.5 12.6 4.5 12L4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  } @else {
+                    <div class="confirm-delete">
+                      <span>{{ 'COMMON.CONFIRM' | translate }} ?</span>
+                      <button class="action-btn action-btn--danger-confirm" [disabled]="deleting" (click)="confirmDelete(r.id)">{{ 'COMMON.YES' | translate }}</button>
+                      <button class="action-btn action-btn--cancel" (click)="cancelDelete()">{{ 'COMMON.NO' | translate }}</button>
+                    </div>
+                  }
+                </div>
               </td>
             </tr>
           }
@@ -351,6 +378,16 @@
 
         <!-- Footer -->
         <div class="panel__footer">
+          <button
+            class="btn"
+            [class.btn--ban]="selectedRestaurant.isActive"
+            [class.btn--unban]="!selectedRestaurant.isActive"
+            [disabled]="togglingActiveId === selectedRestaurant.id"
+            (click)="toggleRestaurantActive(selectedRestaurant, $event)"
+          >
+            @if (togglingActiveId === selectedRestaurant.id) { <div class="btn__spinner"></div> }
+            {{ selectedRestaurant.isActive ? ('BAN.BAN' | translate) : ('BAN.UNBAN' | translate) }}
+          </button>
           @if (confirmDeleteId !== selectedRestaurant.id) {
             <button class="btn btn--danger-outline" (click)="askDelete(selectedRestaurant.id, $event)">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

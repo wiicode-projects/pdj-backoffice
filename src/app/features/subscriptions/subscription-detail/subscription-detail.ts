@@ -91,7 +91,6 @@ export class SubscriptionDetail implements OnInit {
     const payload: CreatePlanDto = {
       ...this.newPlan,
       discount: Number(this.newPlan.discount),
-      trialPeriodDays: Number(this.newPlan.trialPeriodDays),
     };
 
     this.subscriptionService.createPlan(this.subscriptionId, payload)
@@ -264,7 +263,6 @@ export class SubscriptionDetail implements OnInit {
   private getEmptyPlan(): CreatePlanDto {
     return {
       discount: 0,
-      trialPeriodDays: 14,
       billingPeriod: '' as BillingPeriod,
       currency: '' as Currency,
     };

@@ -1,0 +1,251 @@
+<div class="dishes-page">
+  <div class="dishes-page__header">
+    <div>
+      <h1 class="dishes-page__title">{{ 'DISHES.TITLE' | translate }}</h1>
+      <p class="dishes-page__subtitle">{{ 'DISHES.SUBTITLE' | translate }}</p>
+    </div>
+    <div class="dishes-page__header-right">
+      <button class="dishes-page__create-btn" (click)="navigateToCreate()">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        {{ 'DISHES.CREATE' | translate }}
+      </button>
+      <div class="dishes-page__count">
+        <span class="dishes-page__count-value">{{ totalItems }}</span>
+        <span class="dishes-page__count-label">{{ 'DISHES.TOTAL' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category filter + Search -->
+  <div class="dishes-toolbar">
+    <div class="category-filter">
+      @for (cat of categories; track cat.value) {
+        <button
+          class="category-filter__tab"
+          [class.category-filter__tab--active]="selectedCategory === cat.value"
+          (click)="selectCategory(cat.value)"
+        >
+          {{ cat.labelKey | translate }}
+        </button>
+      }
+    </div>
+    <div class="search-box">
+      <svg class="search-box__icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 12L16 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        class="search-box__input"
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchInput()"
+        [placeholder]="'DISHES.SEARCH_PLACEHOLDER' | translate"
+      />
+      @if (searchText) {
+        <button class="search-box__clear" (click)="clearSearch()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 3L11 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11 3L3 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="dishes-page__loading">
+      <div class="dishes-page__spinner"></div>
+    </div>
+  }
+
+  @if (!loading) {
+    <!-- Dish grid -->
+    @if (dishes.length > 0) {
+      <div class="dishes-grid">
+        @for (dish of dishes; track dish.id; let i = $index) {
+          <div class="dish-card" (click)="navigateToDetail(dish)" [style.animation-delay]="(i * 0.05) + 's'">
+            <div class="dish-card__image-wrap">
+              @if (dish.image) {
+                <img [src]="getImageUrl(dish.image)" [alt]="dish.name" class="dish-card__image" />
+              } @else {
+                <div class="dish-card__image-placeholder">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              }
+              @if (dish.category) {
+                <span class="dish-card__category" [style.background-color]="getCategoryColor(dish.category) + '18'" [style.color]="getCategoryColor(dish.category)">
+                  {{ getCategoryLabel(dish.category) | translate }}
+                </span>
+              }
+            </div>
+            <div class="dish-card__body">
+              <h3 class="dish-card__name">{{ dish.name }}</h3>
+              <span class="dish-card__price">{{ formatPrice(dish.price) }}</span>
+            </div>
+            <div class="dish-card__actions">
+              <button class="dish-card__action-btn dish-card__action-btn--edit" (click)="navigateToEdit(dish.id); $event.stopPropagation()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button class="dish-card__action-btn dish-card__action-btn--delete" (click)="askDelete(dish.id, $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                  <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            @if (confirmDeleteId === dish.id) {
+              <div class="dish-card__delete-confirm" (click)="$event.stopPropagation()">
+                <p>{{ 'DISHES.DELETE_CONFIRM' | translate }}</p>
+                <div class="dish-card__delete-actions">
+                  <button class="btn btn--cancel" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+                  <button class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete(dish.id)">
+                    @if (deleting) { <span class="btn__spinner"></span> }
+                    {{ 'COMMON.DELETE' | translate }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (dishes.length === 0) {
+      <div class="dishes-page__empty">
+        <div class="dishes-page__empty-icon">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="22" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 28h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M28 20v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>{{ 'DISHES.EMPTY_TITLE' | translate }}</h3>
+        <p>{{ 'DISHES.EMPTY_HINT' | translate }}</p>
+      </div>
+    }
+  }
+
+  <!-- Detail Panel -->
+  @if (panelOpen && selectedDish) {
+    <div class="panel-overlay" (click)="closePanel()"></div>
+    <aside class="panel">
+      <div class="panel__header">
+        <h2 class="panel__title">{{ selectedDish.name }}</h2>
+        <button class="panel__close" (click)="closePanel()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="panel__body">
+        <!-- Image viewer: main + thumbnails -->
+        <div class="panel__image-viewer">
+          @if (selectedDish.image || (selectedDish.gallery && selectedDish.gallery.length > 0)) {
+            <img [src]="getImageUrl(activeImage || selectedDish.image)" [alt]="selectedDish.name" class="panel__image" />
+
+            @if (getAllImages(selectedDish).length > 1) {
+              <div class="panel__thumbs">
+                @for (img of getAllImages(selectedDish); track $index; let i = $index) {
+                  <button class="panel__thumb"
+                    [class.panel__thumb--active]="(activeImage || selectedDish.image) === img"
+                    (click)="activeImage = img">
+                    <img [src]="getImageUrl(img)" alt="Thumbnail" />
+                  </button>
+                }
+              </div>
+              <div class="panel__image-counter">
+                {{ getActiveImageIndex(selectedDish) + 1 }} / {{ getAllImages(selectedDish).length }}
+              </div>
+            }
+          }
+        </div>
+
+        <div class="panel__tags">
+          @if (selectedDish.category) {
+            <span class="panel__tag" [style.background-color]="getCategoryColor(selectedDish.category) + '18'" [style.color]="getCategoryColor(selectedDish.category)">
+              {{ getCategoryLabel(selectedDish.category) | translate }}
+            </span>
+          }
+          @if (selectedDish.diet) {
+            <span class="panel__tag panel__tag--diet">
+              {{ getDietLabel(selectedDish.diet) | translate }}
+            </span>
+          }
+          @if (selectedDish.isAvailable !== null) {
+            <span class="panel__tag" [class.panel__tag--available]="selectedDish.isAvailable" [class.panel__tag--unavailable]="!selectedDish.isAvailable">
+              {{ (selectedDish.isAvailable ? 'DISHES.AVAILABLE' : 'DISHES.UNAVAILABLE') | translate }}
+            </span>
+          }
+        </div>
+
+        <div class="panel__price-row">
+          <span class="panel__price">{{ formatPrice(selectedDish.price) }}</span>
+        </div>
+
+        @if (selectedDish.description) {
+          <div class="panel__info-group">
+            <span class="panel__label">{{ 'DISHES.DESCRIPTION' | translate }}</span>
+            <p class="panel__description">{{ selectedDish.description }}</p>
+          </div>
+        }
+
+        <div class="panel__meta-grid">
+          @if (selectedDish.calories) {
+            <div class="panel__meta-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M9 5v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <span class="panel__meta-value">{{ selectedDish.calories }} kcal</span>
+                <span class="panel__meta-label">{{ 'DISHES.CALORIES' | translate }}</span>
+              </div>
+            </div>
+          }
+          @if (selectedDish.preparationTime) {
+            <div class="panel__meta-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M9 5v4h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>
+                <span class="panel__meta-value">{{ selectedDish.preparationTime }} min</span>
+                <span class="panel__meta-label">{{ 'DISHES.PREPARATION_TIME' | translate }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+
+
+        <div class="panel__actions">
+          <button class="btn btn--primary-outline" (click)="navigateToEdit(selectedDish.id)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M11.5 1.5l3 3-9 9H2.5v-3l9-9z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ 'COMMON.EDIT' | translate }}
+          </button>
+          <button class="btn btn--danger-outline" (click)="askDelete(selectedDish.id, $event)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </div>
+      </div>
+    </aside>
+  }
+</div>

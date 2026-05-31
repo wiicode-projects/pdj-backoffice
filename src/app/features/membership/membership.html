@@ -1,0 +1,283 @@
+<div class="membership-page">
+  <div class="membership-page__header">
+    <div>
+      <h1 class="membership-page__title">{{ 'MEMBERSHIP.TITLE' | translate }}</h1>
+      <p class="membership-page__subtitle">{{ 'MEMBERSHIP.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="membership-page__loading"><div class="spinner"></div></div>
+  }
+
+  @if (!loading) {
+    <!-- ═══════════ Current Subscription ═══════════ -->
+    <div class="subscription-card" [class.subscription-card--active]="membership?.isActive" [class.subscription-card--inactive]="!membership?.isActive">
+      <div class="subscription-card__header">
+        <div class="subscription-card__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L14.9 8.6L22 9.5L17 14.4L18.2 21.5L12 18.2L5.8 21.5L7 14.4L2 9.5L9.1 8.6L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="subscription-card__plan-name">
+            {{ membership?.subscription?.name || ('MEMBERSHIP.NO_SUBSCRIPTION' | translate) }}
+          </h2>
+          <span class="subscription-card__status" [class.active]="membership?.isActive" [class.inactive]="!membership?.isActive">
+            {{ (membership?.isActive ? 'COMMON.ACTIVE' : 'COMMON.INACTIVE') | translate }}
+          </span>
+        </div>
+      </div>
+
+      @if (membership) {
+        <div class="subscription-card__details">
+          <div class="detail-item">
+            <span class="detail-item__label">{{ 'MEMBERSHIP.PRICE' | translate }}</span>
+            <span class="detail-item__value detail-item__value--price">{{ formatPrice(membershipPrice) }}</span>
+            <span class="detail-item__period">/ {{ getPeriodLabel(membership.plan?.billingPeriod || 'MONTHLY') | translate }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-item__label">{{ 'MEMBERSHIP.START_DATE' | translate }}</span>
+            <span class="detail-item__value">{{ formatDate(membership.startingAt) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-item__label">{{ 'MEMBERSHIP.END_DATE' | translate }}</span>
+            <span class="detail-item__value">{{ formatDate(membership.endingAt) }}</span>
+          </div>
+
+          @if (daysRemaining !== null) {
+            <div class="detail-item">
+              <span class="detail-item__label">{{ 'MEMBERSHIP.REMAINING' | translate }}</span>
+              <span class="detail-item__value detail-item__value--days" [class.warning]="daysRemaining < 15">
+                {{ daysRemaining }} {{ 'MEMBERSHIP.DAYS' | translate }}
+              </span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="subscription-card__empty">
+          <p>{{ 'MEMBERSHIP.NO_ACTIVE_PLAN' | translate }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- ═══════════ Available Subscriptions ═══════════ -->
+    <div class="plans-section">
+      <h2 class="plans-section__title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        {{ 'MEMBERSHIP.AVAILABLE_PLANS' | translate }}
+      </h2>
+
+      @if (subscriptionsLoading) {
+        <div class="plans-section__loading"><div class="spinner spinner--sm"></div></div>
+      }
+
+      @if (!subscriptionsLoading && subscriptions.length > 0) {
+        <div class="plans-grid">
+          @for (sub of subscriptions; track sub.id; let i = $index) {
+            <div class="plan-card" [class.plan-card--current]="isCurrentSubscription(sub.id)"
+              [style.--card-accent]="getSubColor(sub)"
+              [style.animation-delay]="i * 80 + 'ms'">
+              <!-- Badge -->
+              @if (isCurrentSubscription(sub.id)) {
+                <div class="plan-card__badge plan-card__badge--current">{{ 'MEMBERSHIP.CURRENT' | translate }}</div>
+              }
+
+              <!-- Header -->
+              <div class="plan-card__header">
+                <div class="plan-card__icon" [style.background]="getSubColor(sub) + '18'" [style.color]="getSubColor(sub)">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L14.9 8.6L22 9.5L17 14.4L18.2 21.5L12 18.2L5.8 21.5L7 14.4L2 9.5L9.1 8.6L12 2Z" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h3 class="plan-card__name">{{ sub.name }}</h3>
+                @if (sub.description) {
+                  <p class="plan-card__desc">{{ sub.description }}</p>
+                }
+              </div>
+
+              <!-- Price -->
+              <div class="plan-card__price-block">
+                <span class="plan-card__price" [style.color]="getSubColor(sub)">{{ formatPrice(sub.price) }}</span>
+                <span class="plan-card__price-period">/ {{ 'MEMBERSHIP.PERIOD.MONTHLY' | translate }}</span>
+              </div>
+
+              <!-- Features -->
+              <ul class="plan-card__features">
+                @for (feat of getFeatureList(sub); track feat.label) {
+                  <li class="plan-card__feature" [class.plan-card__feature--disabled]="!feat.enabled">
+                    @if (feat.enabled) {
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="7" [attr.fill]="getSubColor(sub) + '18'"/>
+                        <path d="M5 8l2 2 4-4.5" [attr.stroke]="getSubColor(sub)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="7" fill="#F3F4F6"/>
+                        <path d="M5.5 5.5l5 5" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M10.5 5.5l-5 5" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    }
+                    <span>{{ feat.label }}</span>
+                  </li>
+                }
+              </ul>
+
+              <!-- CTA -->
+              @if (!isCurrentSubscription(sub.id)) {
+                <button class="plan-card__cta" [style.background]="getSubColor(sub)"
+                  (click)="selectSubscription(sub)">
+                  {{ 'MEMBERSHIP.CHOOSE_PLAN' | translate }}
+                </button>
+              } @else {
+                <div class="plan-card__current-label" [style.color]="getSubColor(sub)">
+                  {{ 'MEMBERSHIP.ACTIVE_PLAN' | translate }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (!subscriptionsLoading && subscriptions.length === 0) {
+        <div class="plans-section__empty">
+          <p>{{ 'MEMBERSHIP.NO_PLANS_AVAILABLE' | translate }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- ═══════════ Plan Selection Modal ═══════════ -->
+    @if (selectedSubscription) {
+      <div class="modal-overlay" (click)="closePlanModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          @if (!subscribeSuccess) {
+            <div class="modal__header">
+              <h3 class="modal__title">{{ selectedSubscription.name }}</h3>
+              <button class="modal__close" (click)="closePlanModal()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <p class="modal__subtitle">{{ 'MEMBERSHIP.SELECT_PLAN' | translate }}</p>
+
+            <div class="modal__plans">
+              @for (plan of selectedSubscription.plans; track plan.id) {
+                <button class="modal-plan" [class.modal-plan--selected]="selectedPlanId === plan.id"
+                  [style.--plan-accent]="getSubColor(selectedSubscription)"
+                  (click)="selectPlan(plan.id)">
+                  <div class="modal-plan__radio">
+                    <div class="modal-plan__radio-dot"></div>
+                  </div>
+                  <div class="modal-plan__info">
+                    <span class="modal-plan__period">{{ getPeriodLabel(plan.billingPeriod) | translate }}</span>
+                    @if (plan.discount) {
+                      <span class="modal-plan__discount">-{{ plan.discount }}%</span>
+                    }
+                  </div>
+                  <div class="modal-plan__price">
+                    <span class="modal-plan__amount">{{ formatPrice(getPlanPrice(plan, selectedSubscription)) }}</span>
+                    <span class="modal-plan__frequency">{{ getPeriodShortLabel(plan.billingPeriod) }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+
+            @if (subscribeError) {
+              <div class="modal__error">{{ subscribeError }}</div>
+            }
+
+            <div class="modal__footer">
+              <button class="btn btn--secondary" (click)="closePlanModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+              <button class="btn btn--primary" [disabled]="subscribing || !selectedPlanId"
+                [style.background]="getSubColor(selectedSubscription)"
+                (click)="subscribe()">
+                @if (subscribing) {
+                  <span class="btn__spinner"></span>
+                }
+                {{ 'MEMBERSHIP.SUBSCRIBE' | translate }}
+              </button>
+            </div>
+          } @else {
+            <div class="modal__success">
+              <div class="modal__success-icon">
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                  <circle cx="28" cy="28" r="24" stroke="#10B981" stroke-width="2.5"/>
+                  <path d="M18 28l7 7 13-15" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>{{ 'MEMBERSHIP.SUBSCRIBE_SUCCESS' | translate }}</h3>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════ Invoices ═══════════ -->
+    <div class="invoices-section">
+      <h2 class="invoices-section__title">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M7 6H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M7 10H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M7 14H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        {{ 'MEMBERSHIP.INVOICES' | translate }}
+      </h2>
+
+      @if (invoicesLoading) {
+        <div class="invoices-loading"><div class="spinner spinner--sm"></div></div>
+      }
+
+      @if (!invoicesLoading && invoices.length > 0) {
+        <div class="invoices-table-wrap">
+          <table class="invoices-table">
+            <thead>
+              <tr>
+                <th>{{ 'MEMBERSHIP.INVOICE_DATE' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_AMOUNT' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_STATUS' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_DUE' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (invoice of invoices; track invoice.id) {
+                <tr>
+                  <td>{{ formatDate(invoice.createdAt) }}</td>
+                  <td class="invoices-table__amount">{{ formatPrice(invoice.amount) }}</td>
+                  <td>
+                    <span class="invoice-status" [ngClass]="getInvoiceStatusClass(invoice.status)">
+                      {{ invoice.status }}
+                    </span>
+                  </td>
+                  <td>{{ formatDate(invoice.dueDate) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (!invoicesLoading && invoices.length === 0) {
+        <div class="invoices-empty">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="6" y="4" width="24" height="28" rx="4" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 12H24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M12 18H24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M12 24H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <p>{{ 'MEMBERSHIP.NO_INVOICES' | translate }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

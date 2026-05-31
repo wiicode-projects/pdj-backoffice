@@ -31,6 +31,7 @@ export interface AdminUser {
   phone: string | null;
   address: string | null;
   status: boolean;
+  isActive: boolean;
   isEmailVerified: boolean;
   isDeleted: boolean;
   profilPicture: string | null;
@@ -54,11 +55,31 @@ export interface PaginatedUsers {
   meta: PaginationMeta;
 }
 
+export interface UserInvoice {
+  id: string;
+  status: 'PAID' | 'PENDING' | 'REFUNDED' | 'CANCELLED';
+  endingAt: string | null;
+  createdAt: string;
+  membership: { id: string; plan: { billingPeriod: string; price?: number } | null } | null;
+}
+
+export interface GamePlay {
+  id: string;
+  durationSeconds: number;
+  completed: boolean;
+  pointsEarned: number;
+  rewardUnlocked: boolean;
+  metadata: Record<string, any> | null;
+  createdAt: string;
+  game: { id: string; slug: string; name: string };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   private readonly apiUrl = `${environment.apiUrl}/users`;
+  private readonly gamesUrl = `${environment.apiUrl}/games`;
 
   constructor(private http: HttpClient) {}
 
@@ -72,5 +93,17 @@ export class UserService {
 
   remove(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  toggleActive(id: string, isActive: boolean): Observable<{ status: number; user: AdminUser }> {
+    return this.http.patch<{ status: number; user: AdminUser }>(`${this.apiUrl}/${id}/toggle-active`, { isActive });
+  }
+
+  findInvoices(userId: string): Observable<{ status: number; invoices: UserInvoice[] }> {
+    return this.http.get<{ status: number; invoices: UserInvoice[] }>(`${this.apiUrl}/${userId}/invoices`);
+  }
+
+  findGamePlays(userId: string): Observable<{ status: number; plays: GamePlay[]; summary: { totalPlays: number; totalPoints: number } }> {
+    return this.http.get<{ status: number; plays: GamePlay[]; summary: { totalPlays: number; totalPoints: number } }>(`${this.gamesUrl}/user/${userId}/plays`);
   }
 }

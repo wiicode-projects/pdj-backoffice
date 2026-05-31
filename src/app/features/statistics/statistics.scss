@@ -1,0 +1,813 @@
+// ==========================================
+// Statistics Page — Design System tokens
+// ==========================================
+$bg: #F3F4F6;
+$card: #FFFFFF;
+$text-dark: #1F2937;
+$text-mid: #6B7280;
+$text-light: #9CA3AF;
+$border: #E5E7EB;
+$red: #DC2626;
+
+$green: #10B981;
+$blue: #3B82F6;
+$violet: #8B5CF6;
+$amber: #F59E0B;
+
+// ==========================================
+// Animations
+// ==========================================
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes barGrow {
+  from { height: 0; }
+}
+@keyframes arcPop {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fillBar {
+  from { width: 0; }
+}
+
+// ==========================================
+// Page layout
+// ==========================================
+.stats-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+
+  &__spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #E5E7EB;
+    border-top-color: #DC2626;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+.stats-error {
+  text-align: center;
+  padding: 32px;
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.stats-page {
+  font-family: 'PolySans Trial', -apple-system, sans-serif;
+  animation: fadeUp 0.4s ease both;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 4px;
+  }
+
+  &__subtitle {
+    font-size: 0.88rem;
+    color: $text-mid;
+    margin: 0;
+  }
+
+  // During PDF export: hide interactive elements
+  &--exporting {
+    .kpi-card__tooltip,
+    .btn-export-pdf,
+    .stats-filters,
+    .export-warning {
+      display: none !important;
+    }
+  }
+}
+
+// ── Export PDF Button ──────────────────────
+.btn-export-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: $card;
+  color: $text-dark;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $red;
+    color: $red;
+    box-shadow: 0 2px 10px rgba($red, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid $border;
+    border-top-color: $red;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+}
+
+// ==========================================
+// Export Warning Banner
+// ==========================================
+.export-warning {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  animation: slideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 10px;
+    color: #D97706;
+  }
+
+  &__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 0.85rem;
+      color: #92400E;
+      font-weight: 700;
+    }
+
+    span {
+      font-size: 0.78rem;
+      color: #A16207;
+      line-height: 1.4;
+    }
+  }
+
+  &__btn {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    background: #F59E0B;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: #D97706;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ==========================================
+// Filters
+// ==========================================
+.stats-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-toggle {
+  display: flex;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+
+  &__btn {
+    padding: 7px 18px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-mid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &--active {
+      background: $red;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba($red, 0.3);
+    }
+
+    &:hover:not(&--active) {
+      background: $bg;
+      color: $text-dark;
+    }
+  }
+}
+
+.filter-select {
+  padding: 8px 14px;
+  border: 1px solid $border;
+  border-radius: 10px;
+  background: $card;
+  font-size: 0.85rem;
+  color: $text-dark;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: $red;
+  }
+}
+
+.filter-toggle--source {
+  .filter-toggle__btn--active {
+    background: $violet;
+    box-shadow: 0 2px 8px rgba($violet, 0.3);
+  }
+}
+
+// ==========================================
+// KPI Grid
+// ==========================================
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1400px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px)  { grid-template-columns: 1fr; }
+}
+
+.kpi-card {
+  background: $card;
+  border-radius: 16px;
+  padding: 22px 20px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+  animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+
+  @for $i from 1 through 5 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.1}s; }
+  }
+
+  // Colored left accent bar
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--accent);
+    border-radius: 16px 0 0 16px;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.09);
+
+    .kpi-card__tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  &__tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 12px;
+    right: 12px;
+    background: rgba($text-dark, 0.95);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 20;
+    pointer-events: none;
+    margin-bottom: 8px;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    // Arrow pointing down
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 24px;
+      width: 12px;
+      height: 12px;
+      background: rgba($text-dark, 0.95);
+      transform: rotate(45deg);
+      border-radius: 0 0 3px 0;
+    }
+  }
+
+  &__icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: $text-dark;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: $text-mid;
+    font-weight: 500;
+  }
+
+  &__bar {
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    animation: fillBar 1s cubic-bezier(0.22,1,0.36,1) both 0.5s;
+    transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+  }
+}
+
+// ==========================================
+// Charts Row
+// ==========================================
+.charts-row {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+.chart-card {
+  background: $card;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  animation: fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  &__badge {
+    background: rgba($green, 0.1);
+    color: darken($green, 8%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+}
+
+// ==========================================
+// Donut Chart
+// ==========================================
+.donut-layout {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+
+  @media (max-width: 500px) { flex-direction: column; }
+}
+
+.donut-wrap {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+}
+
+.donut-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.donut-arc {
+  transform-origin: 64px 64px;
+  animation: arcPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.06);
+  }
+}
+
+.donut-center-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'PolySans Trial', sans-serif;
+}
+
+.donut-center-label {
+  font-size: 9px;
+  font-family: 'PolySans Trial', sans-serif;
+}
+
+.donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.15s;
+  animation: fadeLeft 0.4s ease both;
+
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) { animation-delay: #{0.2 + $i * 0.07}s; }
+  }
+
+  &:hover {
+    background: $bg;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text-dark;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__count {
+    font-size: 0.72rem;
+    color: $text-mid;
+  }
+
+  &__revenue {
+    font-size: 0.72rem;
+    color: $green;
+    font-weight: 600;
+  }
+
+  &__free {
+    font-size: 0.72rem;
+    color: $text-light;
+    font-style: italic;
+  }
+
+  &__percent {
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+}
+
+.legend-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 10px;
+  border-top: 1px solid $border;
+  margin-top: 4px;
+
+  span {
+    font-size: 0.78rem;
+    color: $text-mid;
+  }
+
+  strong {
+    font-size: 0.9rem;
+    color: $text-dark;
+    font-weight: 700;
+  }
+}
+
+// ==========================================
+// Bar Chart
+// ==========================================
+.chart-legend-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: $text-mid;
+}
+
+.cli-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+
+  &--paid    { background: $blue; }
+  &--pending { background: $amber; }
+}
+
+.bar-chart {
+  position: relative;
+  height: 200px;
+  margin-bottom: 16px;
+
+  &__grid {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    gap: 6px;
+  }
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+
+  &__bars {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid $border;
+  }
+
+  &__label {
+    font-size: 0.62rem;
+    color: $text-light;
+    margin-top: 5px;
+    text-align: center;
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+}
+
+.bar-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  animation: barGrow 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  transition: height 0.6s cubic-bezier(0.22,1,0.36,1);
+  cursor: pointer;
+
+  &--paid {
+    background: linear-gradient(180deg, lighten($blue, 10%) 0%, $blue 100%);
+    animation-delay: 0.3s;
+
+    &:hover { background: linear-gradient(180deg, lighten($blue, 18%) 0%, $blue 100%); }
+  }
+
+  &--pending {
+    background: linear-gradient(180deg, lighten($amber, 12%) 0%, $amber 100%);
+    animation-delay: 0.4s;
+    opacity: 0.75;
+
+    &:hover { opacity: 1; }
+  }
+}
+
+.bar-summary {
+  display: flex;
+  gap: 20px;
+  padding-top: 14px;
+  border-top: 1px solid $border;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+
+    &--paid    { background: $blue; }
+    &--pending { background: $amber; }
+  }
+
+  &__label { color: $text-mid; }
+
+  &__value {
+    font-weight: 700;
+    color: $text-dark;
+  }
+}
+
+// ==========================================
+// Forecast Banner
+// ==========================================
+.forecast-card {
+  background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #8B5CF6 100%);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) 0.6s both;
+  box-shadow: 0 8px 32px rgba(59,130,246,0.25);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__icon {
+    width: 52px;
+    height: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 4px;
+  }
+
+  &__desc {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    margin: 0;
+  }
+
+  &__right {
+    text-align: right;
+  }
+
+  &__amount {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  &__trend {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.12);
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+}

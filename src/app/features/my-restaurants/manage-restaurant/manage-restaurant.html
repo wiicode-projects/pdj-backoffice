@@ -1,0 +1,254 @@
+<div class="manage-page">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-state__spinner"></div>
+    </div>
+  }
+
+  <!-- Error only -->
+  @if (!loading && error && !restaurant) {
+    <div class="error-state">
+      <div class="error-state__icon">
+        <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 6V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="14" r="0.8" fill="currentColor"/>
+        </svg>
+      </div>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn--primary" (click)="goBack()">← Retour</button>
+    </div>
+  }
+
+  @if (!loading && restaurant) {
+    <!-- Header -->
+    <div class="manage-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Mes restaurants
+      </button>
+      <div class="manage-header__title">
+        <h1>Gérer le restaurant</h1>
+        <span class="type-pill" [class.type-pill--itinerant]="formType === 'ITINERANT'">
+          {{ getTypeLabel(formType) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Success / Error banners -->
+    @if (successMessage) {
+      <div class="banner banner--success">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M6 9L8 11L12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ successMessage }}
+      </div>
+    }
+    @if (error) {
+      <div class="banner banner--error">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="12.5" r="0.6" fill="currentColor"/>
+        </svg>
+        {{ error }}
+      </div>
+    }
+
+    <!-- Restaurant preview + form -->
+    <div class="manage-layout">
+      <!-- Left: Preview card -->
+      <div class="preview-card">
+        <div class="preview-card__image-wrap">
+          @if (restaurant.imagePath) {
+            <img [src]="getImageUrl(restaurant.imagePath)" [alt]="restaurant.name" class="preview-card__image" />
+          } @else {
+            <div class="preview-card__image-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M9 17V11l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          }
+        </div>
+        <div class="preview-card__body">
+          <h2 class="preview-card__name">{{ restaurant.name }}</h2>
+          <p class="preview-card__address">{{ getFullAddress() }}</p>
+          @if (restaurant.phone) {
+            <div class="preview-card__row">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M5.5 2.5L3.5 5L5 7L7 9L9 10.5L11.5 8.5L13 10L11 12.5C6 12 2 8 1.5 3L4 1L5.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              </svg>
+              {{ restaurant.phone }}
+            </div>
+          }
+          @if (restaurant.openingTime && restaurant.closingTime) {
+            <div class="preview-card__row">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M7 4V7L9 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ restaurant.openingTime }} — {{ restaurant.closingTime }}
+            </div>
+          }
+          <div class="preview-card__stats">
+            <span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3C5 3 2.5 5 1 8c1.5 3 4 5 7 5s5.5-2 7-5c-1.5-3-4-5-7-5z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
+              {{ restaurant.viewCount }} vues
+            </span>
+            <span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M7 3L4 7l3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 7h8a3 3 0 010 6h-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              {{ restaurant.clickCount }} clics
+            </span>
+          </div>
+          <div class="preview-card__meta">
+            Créé le {{ formatDate(restaurant.createdAt) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Edit form -->
+      <div class="form-card">
+        <h2 class="form-card__title">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M13 2L16 5L6 15H3V12L13 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          Informations générales
+        </h2>
+
+        <div class="form-group">
+          <label class="form-label">Nom du restaurant *</label>
+          <input type="text" class="form-input" [(ngModel)]="formName" placeholder="Ex: Chez Mario" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type de restaurant *</label>
+          <div class="type-selector">
+            <button class="type-selector__option" [class.type-selector__option--active]="formType === 'FIXE'" (click)="formType = 'FIXE'">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 16V10l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              Fixe
+            </button>
+            <button class="type-selector__option" [class.type-selector__option--active]="formType === 'ITINERANT'" (click)="formType = 'ITINERANT'">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="2" y="6" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="6" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+                <circle cx="14" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M13 6V4H7v2" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Itinérant
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description courte</label>
+          <input type="text" class="form-input" [(ngModel)]="formShortDescription" placeholder="Ex: Cuisine italienne authentique" />
+        </div>
+
+        <div class="form-divider"></div>
+
+        <h3 class="form-section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1C5.8 1 4 2.8 4 5c0 3.5 4 9 4 9s4-5.5 4-9c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="8" cy="5" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          Localisation
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label">Adresse</label>
+          <input type="text" class="form-input" [(ngModel)]="formAddress" placeholder="Rue et numéro" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Code postal</label>
+            <input type="text" class="form-input" [(ngModel)]="formPostalCode" placeholder="1204" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ville</label>
+            <input type="text" class="form-input" [(ngModel)]="formCity" placeholder="Genève" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pays</label>
+            <input type="text" class="form-input" [(ngModel)]="formCountry" placeholder="Suisse" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="text" class="form-input" [(ngModel)]="formPhone" placeholder="+41 22 000 00 00" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL Google Maps</label>
+          <input type="text" class="form-input" [(ngModel)]="formGoogleMapsUrl" placeholder="https://maps.google.com/..." />
+        </div>
+
+        <div class="form-divider"></div>
+
+        <h3 class="form-section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M8 4.5V8L10.5 9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Horaires et réservation
+        </h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ouverture</label>
+            <input type="time" class="form-input" [(ngModel)]="formOpeningTime" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fermeture</label>
+            <input type="time" class="form-input" [(ngModel)]="formClosingTime" />
+          </div>
+        </div>
+
+        <div class="form-group form-group--toggle">
+          <label class="form-toggle">
+            <input type="checkbox" [(ngModel)]="formReservationEnabled" />
+            <span class="form-toggle__slider"></span>
+          </label>
+          <span class="form-toggle-label">Réservation activée</span>
+        </div>
+
+        @if (formReservationEnabled) {
+          <div class="form-row reservation-fields">
+            <div class="form-group">
+              <label class="form-label">Méthode de réservation</label>
+              <select class="form-input form-select" [(ngModel)]="formBookingMethod">
+                <option value="">Aucune</option>
+                <option value="PHONE">Téléphone</option>
+                <option value="EMAIL">Email</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact de réservation</label>
+              <input type="text" class="form-input" [(ngModel)]="formBookingContact" [placeholder]="formBookingMethod === 'EMAIL' ? 'email@restaurant.ch' : '+41 22 000 00 00'" />
+            </div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button class="btn btn--cancel" (click)="goBack()">Annuler</button>
+          <button class="btn btn--primary" [disabled]="saving" (click)="saveChanges()">
+            @if (saving) { <span class="btn__spinner"></span> }
+            Enregistrer les modifications
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,511 @@
+// ── Design tokens ─────────────────────────────────────────────────────────────
+$primary:       #DC2626;
+$primary-light: rgba(220, 38, 38, 0.08);
+$card-bg:       #FFFFFF;
+$text-dark:     #1F2937;
+$text-medium:   #6B7280;
+$text-light:    #9CA3AF;
+$border:        #E5E7EB;
+$border-light:  #F3F4F6;
+$success:       #059669;
+$success-light: rgba(5, 150, 105, 0.10);
+$blue:          #3B82F6;
+$blue-light:    rgba(59, 130, 246, 0.10);
+$amber:         #D97706;
+$amber-light:   rgba(217, 119, 6, 0.10);
+$red:           #EF4444;
+$red-light:     rgba(239, 68, 68, 0.08);
+$frites-gold:   #F59E0B;
+$frites-light:  rgba(245, 158, 11, 0.10);
+$radius-sm:     8px;
+$radius-md:     12px;
+$radius-lg:     16px;
+$shadow-sm:     0 1px 3px rgba(0,0,0,0.05);
+$shadow-md:     0 4px 16px rgba(0,0,0,0.08);
+$font:          'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+.page {
+  font-family: $font;
+  animation: fadeIn 0.35s ease;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    background: $frites-light;
+    color: $frites-gold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 0.85rem;
+    color: $text-medium;
+    margin: 0;
+  }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.loading {
+  display: flex; justify-content: center; padding: 80px 0;
+
+  &__spinner {
+    width: 36px; height: 36px;
+    border: 3px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 80px 24px; text-align: center;
+  background: $card-bg; border: 1px solid $border;
+  border-radius: $radius-lg; box-shadow: $shadow-sm;
+
+  &__icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: $frites-light; color: $frites-gold;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+
+  h3 { font-size: 1.1rem; font-weight: 700; color: $text-dark; margin: 0; }
+  p  { font-size: 0.875rem; color: $text-medium; margin: 0; }
+}
+
+// ── Packs grid ────────────────────────────────────────────────────────────────
+
+.packs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+// ── Pack card (mirrors mobile design) ─────────────────────────────────────────
+
+.pack-card {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-sm;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: cardIn 0.4s ease backwards;
+
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: 0.06s; }
+  &:nth-child(3) { animation-delay: 0.12s; }
+  &:nth-child(4) { animation-delay: 0.18s; }
+
+  &:hover { box-shadow: $shadow-md; transform: translateY(-2px); }
+
+  &--inactive { opacity: 0.6; }
+
+  &__image-wrap {
+    height: 140px;
+    background: $frites-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  &__img { width: 100%; height: 100%; object-fit: cover; }
+  &__img-placeholder { font-size: 3.5rem; }
+
+  &__body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 0.8rem;
+    color: $text-medium;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &__pricing {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid $border-light;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__footer {
+    padding: 10px 16px;
+    border-top: 1px solid $border;
+    background: $border-light;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Badge ─────────────────────────────────────────────────────────────────────
+
+.pack-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  &--sm {
+    position: static;
+    font-size: 0.6rem;
+    padding: 2px 7px;
+  }
+
+  &--red   { background: $primary-light; color: $primary; }
+  &--green { background: $success-light; color: $success; }
+  &--blue  { background: $blue-light;    color: $blue; }
+  &--amber { background: $amber-light;   color: $amber; }
+}
+
+// ── Frites amount ─────────────────────────────────────────────────────────────
+
+.frites-amount {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $frites-gold;
+
+  &--preview {
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+}
+
+.frites-icon { font-size: 1rem; }
+
+.chf-price {
+  font-size: 1rem;
+  font-weight: 800;
+  color: $text-dark;
+}
+
+// ── Sort / status tags ────────────────────────────────────────────────────────
+
+.sort-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: $text-medium;
+  background: $border-light;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.buyers-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $blue;
+  background: $blue-light;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $text-medium;
+
+  &--active { color: $success; }
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: $font;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  &--primary {
+    background: $primary; color: #fff;
+    &:hover { background: #b91c1c; }
+  }
+  &--secondary {
+    background: $card-bg; color: $text-dark;
+    border: 1px solid $border;
+    &:hover { background: $border-light; }
+  }
+  &--danger-outline {
+    background: transparent; color: $red;
+    border: 1px solid rgba(239,68,68,0.3);
+    &:hover { background: $red-light; }
+  }
+  &--danger {
+    background: $red; color: #fff;
+    &:hover { background: #dc2626; }
+  }
+  &--sm { padding: 6px 12px; font-size: 0.8rem; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &__spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+.confirm-delete {
+  display: flex; align-items: center; gap: 6px;
+  span { font-size: 0.8rem; color: $red; font-weight: 500; }
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(2px);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: $card-bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 560px; max-width: 95vw; max-height: 92vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.14);
+
+  &__header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid $border;
+    gap: 12px;
+  }
+
+  &__title { font-size: 1.1rem; font-weight: 700; color: $text-dark; margin: 0 0 2px; }
+  &__subtitle { font-size: 0.82rem; color: $text-medium; margin: 0; }
+
+  &__close {
+    width: 32px; height: 32px; background: none; border: none;
+    color: $text-light; cursor: pointer; border-radius: $radius-sm;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+    &:hover { background: $border-light; color: $text-dark; }
+  }
+
+  &__body {
+    padding: 20px 24px; overflow-y: auto; flex: 1;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  &__footer {
+    padding: 16px 24px; border-top: 1px solid $border;
+    display: flex; justify-content: flex-end; gap: 10px;
+    background: $border-light;
+    border-radius: 0 0 $radius-lg $radius-lg;
+  }
+}
+
+// ── Live preview card (inside modal) ─────────────────────────────────────────
+
+.preview-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  background: $border-light;
+
+  &__image {
+    width: 60px; height: 60px; border-radius: $radius-sm;
+    background: $frites-light;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+  }
+
+  &__img { width: 100%; height: 100%; object-fit: cover; }
+  &__placeholder { font-size: 1.8rem; }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__top {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.9rem; color: $text-dark;
+  }
+
+  &__price {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: $text-dark;
+    white-space: nowrap;
+  }
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────────
+
+.form-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &--full { grid-column: 1 / -1; }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__input {
+    background: $card-bg;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+    color: $text-dark;
+    font-size: 0.875rem;
+    font-family: $font;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-light; }
+    &:focus { border-color: $primary; box-shadow: 0 0 0 3px $primary-light; }
+
+    option { background: $card-bg; color: $text-dark; }
+  }
+}
+
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .field__input { padding-right: 52px; }
+}
+
+.input-unit {
+  position: absolute;
+  right: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-medium;
+  pointer-events: none;
+}
+
+.required { color: $red; }
+
+// ── Image drop ────────────────────────────────────────────────────────────────
+
+.image-drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 16px; border-radius: $radius-md;
+  border: 2px dashed $border; color: $text-light; cursor: pointer;
+  position: relative; overflow: hidden; min-height: 90px;
+  font-size: 0.82rem; transition: border-color 0.15s, background 0.15s;
+
+  &:hover { border-color: $primary; background: $primary-light; }
+  &--filled { padding: 0; border-style: solid; }
+
+  &__preview { width: 100%; height: 90px; object-fit: cover; border-radius: $radius-md - 2px; display: block; }
+  &__change {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 5px; text-align: center; font-size: 0.72rem;
+    background: rgba(0,0,0,0.5); color: #fff;
+  }
+  &__input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin   { to { transform: rotate(360deg); } }

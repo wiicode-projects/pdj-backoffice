@@ -64,6 +64,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
       
+
+      - name: Get short SHA
+        id: vars
+        run: echo "SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      
       - name: copy files to server
         uses: appleboy/scp-action@master
         with:
@@ -71,7 +76,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
-          source: "docker/docker-compose.staging.yml"
+          source: "docker/docker-compose.staging.yml, scripts/deploy-staging.sh"
           target: "${{ vars.DEPLOY_PATH }}"
           strip_components: 1
 
@@ -86,9 +91,9 @@ jobs:
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             cd ${{ vars.DEPLOY_PATH }}
             mv docker-compose.staging.yml docker-compose.yml
-            IMAGE_TAG=${{ steps.vars.outputs.SHA_SHORT }} \
-            docker compose up -d --pull always pdj_backoffice
-            docker image prune -f
+            chmod +x deploy-staging.sh
+            bash deploy-staging.sh ${{ steps.vars.outputs.SHA_SHORT }}
+
 
   # ============================================================
   # JOB 3 — DEPLOY PROD
@@ -118,7 +123,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
-          source: "docker/docker-compose.production.yml"
+          source: "docker/docker-compose.production.yml, scripts/deploy-production.sh"
           target: ${{ vars.DEPLOY_PATH }}
           strip_components: 1
 
@@ -134,8 +139,5 @@ jobs:
             cd ${{ vars.DEPLOY_PATH }}
   
             mv docker-compose.production.yml docker-compose.yml
-
-            IMAGE_TAG=${{ steps.vars.outputs.SHA_SHORT }} \
-            docker compose up -d --pull always pdj_backoffice
-
-            docker image prune -f
+            chmod +x deploy-production.sh
+            bash deploy-production.sh ${{ steps.vars.outputs.SHA_SHORT }}

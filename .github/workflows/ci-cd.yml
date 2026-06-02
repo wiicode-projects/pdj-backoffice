@@ -64,6 +64,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
       
+
+      - name: Get short SHA
+        id: vars
+        run: echo "SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      
       - name: copy files to server
         uses: appleboy/scp-action@master
         with:
@@ -88,6 +93,8 @@ jobs:
             mv docker-compose.staging.yml docker-compose.yml
             chmod +x deploy-staging.sh
             bash deploy-staging.sh ${{ steps.vars.outputs.SHA_SHORT }}
+
+
   # ============================================================
   # JOB 3 — DEPLOY PROD
   # Uniquement sur main (merge depuis dev)

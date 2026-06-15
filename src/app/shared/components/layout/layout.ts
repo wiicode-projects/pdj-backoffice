@@ -1,10 +1,12 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
+import { NotificationsService } from '../../../core/services/notifications.service';
+import { interval, Subscription } from 'rxjs';
 
 export type UserRole = 'ADMIN' | 'RESTAURANT';
 
@@ -30,12 +32,14 @@ export interface NavItem {
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
-export class Layout {
+export class Layout implements OnInit, OnDestroy {
   collapsed    = signal(false);
   profileOpen  = signal(false);
-  openSubmenu  = signal<string | null>(null); // label of the currently-open submenu
+  openSubmenu  = signal<string | null>(null);
+  unreadCount  = signal(0);
 
   private router = inject(Router);
+  private notificationsPoll?: Subscription;
 
   private allNavItems: NavItem[] = [
     { icon: 'dashboard', label: 'NAV.DASHBOARD',    route: '/app/dashboard',    roles: ['ADMIN', 'RESTAURANT'] },
@@ -71,8 +75,11 @@ export class Layout {
     { icon: 'restaurants', label: 'NAV.MY_RESTAURANTS', route: '/app/my-restaurants', roles: ['RESTAURANT'] },
     { icon: 'subscriptions', label: 'NAV.MEMBERSHIP',   route: '/app/membership',      roles: ['RESTAURANT'] },
     { icon: 'dishes',    label: 'NAV.DISHES',    route: '/app/dishes',    roles: ['RESTAURANT'] },
+    { icon: 'planning',  label: 'NAV.PLANNING',  route: '/app/planning',  roles: ['RESTAURANT'] },
     { icon: 'menus',     label: 'NAV.MENUS',     route: '/app/menus',     roles: ['RESTAURANT'] },
     { icon: 'locations', label: 'NAV.LOCATIONS', route: '/app/locations', roles: ['RESTAURANT'] },
+    { icon: 'gift', label: 'NAV.MENU_CADEAU', route: '/app/menu-cadeau', roles: ['RESTAURANT'] },
+    { icon: 'settings', label: 'NAV.ACCOUNT_SETTINGS', route: '/app/account-settings', roles: ['RESTAURANT'] },
   ];
 
   readonly navItems = computed(() => {
@@ -81,9 +88,44 @@ export class Layout {
     return this.allNavItems.filter((item) => item.roles.includes(roleName));
   });
 
-  constructor(public authService: AuthService) {
-    // Auto-expand the submenu if the current route belongs to it
+  constructor(
+    public authService: AuthService,
+    private notificationsService: NotificationsService,
+  ) {
     this.autoExpandActiveSubmenu();
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isRestaurant()) {
+      this.loadUnreadCount();
+      this.notificationsPoll = interval(30000).subscribe(() => this.loadUnreadCount());
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.notificationsPoll?.unsubscribe();
+  }
+
+  private loadUnreadCount(): void {
+    this.notificationsService.getUnreadCount().subscribe({
+      next: (count) => this.unreadCount.set(count || 0),
+      error: () => this.unreadCount.set(0),
+    });
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/app/notifications']);
+    this.closeProfile();
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/app/profile']);
+    this.closeProfile();
+  }
+
+  goToAccountSettings(): void {
+    this.router.navigate(['/app/account-settings']);
+    this.closeProfile();
   }
 
   /** Returns true if any child route is currently active */

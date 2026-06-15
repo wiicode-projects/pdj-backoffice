@@ -30,6 +30,12 @@ export interface RecentRestaurant {
   createdAt: string;
 }
 
+export interface RestaurantStatistics {
+  status: number;
+  views: number;
+  clicks: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -40,5 +46,9 @@ export class DashboardService {
 
   getDashboard(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard`);
+  }
+
+  getRestaurantStatistics(): Observable<RestaurantStatistics> {
+    return this.http.get<RestaurantStatistics>(this.apiUrl);
   }
 }

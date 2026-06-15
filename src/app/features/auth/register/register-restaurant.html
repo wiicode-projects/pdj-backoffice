@@ -1,0 +1,83 @@
+<div class="login-page register-page">
+  <div class="login-page__lang">
+    <pdj-language-switcher />
+  </div>
+
+  <div class="login-page__container">
+    <div class="login-page__logo">
+      <img src="/images/login-logo.png" alt="Le Plat du Jour" class="login-page__logo-img" />
+    </div>
+
+    <div class="login-page__card">
+      <p class="register-page__step">{{ 'AUTH.SIGNUP_STEP_1' | translate }}</p>
+      <h1 class="login-page__title">{{ 'AUTH.SIGNUP_RESTAURANT_TITLE' | translate }}</h1>
+      <p class="login-page__subtitle">{{ 'AUTH.SIGNUP_RESTAURANT_SUBTITLE' | translate }}</p>
+
+      @if (errorMessage()) {
+        <div class="login-page__error">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 4.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+          </svg>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="login-page__form">
+        <div class="login-page__field">
+          <label class="login-page__label" for="restaurant-name">{{ 'AUTH.SIGNUP_RESTAURANT_NAME' | translate }}</label>
+          <div class="login-page__input-wrapper">
+            <input
+              id="restaurant-name"
+              type="text"
+              class="login-page__input login-page__input--plain"
+              [(ngModel)]="name"
+              name="name"
+              [placeholder]="'AUTH.SIGNUP_RESTAURANT_NAME_PLACEHOLDER' | translate"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="login-page__field">
+          <label class="login-page__label" for="restaurant-city">{{ 'AUTH.SIGNUP_CITY' | translate }}</label>
+          <div class="login-page__input-wrapper">
+            <input
+              id="restaurant-city"
+              type="text"
+              class="login-page__input login-page__input--plain"
+              [(ngModel)]="city"
+              name="city"
+              [placeholder]="'AUTH.SIGNUP_CITY_PLACEHOLDER' | translate"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="login-page__field">
+          <label class="login-page__label" for="restaurant-address">{{ 'AUTH.SIGNUP_ADDRESS' | translate }}</label>
+          <div class="login-page__input-wrapper">
+            <input
+              id="restaurant-address"
+              type="text"
+              class="login-page__input login-page__input--plain"
+              [(ngModel)]="address"
+              name="address"
+              [placeholder]="'AUTH.SIGNUP_ADDRESS_PLACEHOLDER' | translate"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="login-page__submit" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="login-page__spinner"></span>
+          }
+          <span>{{ 'AUTH.SIGNUP_NEXT' | translate }}</span>
+        </button>
+      </form>
+
+      <a routerLink="/login" class="register-page__back-link">{{ 'AUTH.BACK_TO_LOGIN' | translate }}</a>
+    </div>
+  </div>
+</div>

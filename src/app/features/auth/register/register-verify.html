@@ -1,0 +1,81 @@
+<div class="verify-otp-page">
+  <div class="verify-otp-card">
+    <div class="verify-otp-card__lang">
+      <pdj-language-switcher />
+    </div>
+
+    <div class="verify-otp-card__logo">
+      <img src="/images/login-logo.png" alt="Le Plat du Jour" />
+    </div>
+
+    <p class="verify-otp-card__step">{{ 'AUTH.SIGNUP_STEP_3' | translate }}</p>
+    <h1 class="verify-otp-card__title">{{ 'AUTH.SIGNUP_VERIFY_TITLE' | translate }}</h1>
+    <p class="verify-otp-card__subtitle">{{ 'AUTH.SIGNUP_VERIFY_SUBTITLE' | translate }}</p>
+
+    @if (email) {
+      <p class="verify-otp-card__email">{{ email }}</p>
+    }
+
+    @if (errorMessage()) {
+      <div class="verify-otp-card__error">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+        </svg>
+        <span>{{ errorMessage() | translate }}</span>
+      </div>
+    }
+
+    @if (resendSuccess()) {
+      <div class="verify-otp-card__success">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 8L7 10L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ resendSuccess() | translate }}</span>
+      </div>
+    }
+
+    <div class="otp-inputs otp-inputs--four">
+      @for (digit of digits; track $index; let i = $index) {
+        <input
+          #otpInput
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          class="otp-inputs__digit"
+          [value]="digits[i]"
+          (input)="onDigitInput($event, i)"
+          (keydown)="onKeyDown($event, i)"
+          (paste)="onPaste($event)"
+          [class.otp-inputs__digit--filled]="digits[i]"
+          [class.otp-inputs__digit--error]="errorMessage()"
+          [disabled]="isSubmitting()"
+          autocomplete="one-time-code"
+        />
+      }
+    </div>
+
+    <button class="verify-otp-card__submit" (click)="onSubmit()" [disabled]="isSubmitting()">
+      @if (isSubmitting()) {
+        <span class="verify-otp-card__spinner"></span>
+      }
+      {{ 'AUTH.VERIFY_CODE' | translate }}
+    </button>
+
+    <div class="verify-otp-card__resend">
+      <span>{{ 'AUTH.OTP_NOT_RECEIVED' | translate }}</span>
+      <button class="verify-otp-card__resend-btn" (click)="resendCode()" [disabled]="isResending()">
+        {{ 'AUTH.OTP_RESEND' | translate }}
+      </button>
+    </div>
+
+    <a class="verify-otp-card__back" routerLink="/login">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ 'AUTH.BACK_TO_LOGIN' | translate }}
+    </a>
+  </div>
+</div>

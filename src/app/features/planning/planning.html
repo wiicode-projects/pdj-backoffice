@@ -1,0 +1,114 @@
+<div class="planning-page">
+  <div class="planning-page__header">
+    <div>
+      <h1 class="planning-page__title">{{ 'PLANNING.TITLE' | translate }}</h1>
+      <p class="planning-page__subtitle">{{ 'PLANNING.SUBTITLE' | translate }}</p>
+    </div>
+    @if (weekOffset !== 0) {
+      <button class="planning-page__today-btn" (click)="goToToday()">
+        {{ 'PLANNING.BACK_TO_CURRENT' | translate }}
+      </button>
+    }
+  </div>
+
+  <!-- Week navigation -->
+  <div class="planning-nav">
+    <button class="planning-nav__btn" (click)="prevWeek()" [attr.aria-label]="'PLANNING.PREV_WEEK' | translate">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+        <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="planning-nav__center">
+      <span class="planning-nav__label">{{ weekLabel }}</span>
+      <span class="planning-nav__range">{{ weekDateRange }}</span>
+    </div>
+
+    <button class="planning-nav__btn" (click)="nextWeek()" [attr.aria-label]="'PLANNING.NEXT_WEEK' | translate">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+        <path d="M8 4L14 10L8 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="planning-page__loading">
+      <div class="planning-page__spinner"></div>
+    </div>
+  }
+
+  @if (!loading) {
+    @if (hasMenusThisWeek) {
+      <div class="planning-days">
+        @for (group of dayGroups; track group.dateKey) {
+          <section class="planning-day">
+            <h2 class="planning-day__label">{{ getDateLabel(group.dateKey) }}</h2>
+            <div class="planning-day__menus">
+              @for (menu of group.menus; track menu.id) {
+                <article class="planning-menu-card">
+                  <div class="planning-menu-card__main">
+                    <div class="planning-menu-card__image-wrap">
+                      @if (menu.image) {
+                        <img [src]="getImageUrl(menu.image)" [alt]="menu.name" class="planning-menu-card__image" />
+                      } @else {
+                        <div class="planning-menu-card__image-placeholder">
+                          <svg width="28" height="28" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                        </div>
+                      }
+                    </div>
+                    <div class="planning-menu-card__content">
+                      <div class="planning-menu-card__top">
+                        <h3 class="planning-menu-card__name">{{ menu.name }}</h3>
+                        @if (menu.isModele) {
+                          <span class="planning-menu-card__badge">{{ 'MENUS.MODEL' | translate }}</span>
+                        }
+                      </div>
+                      <p class="planning-menu-card__desc">{{ getDishDescription(menu) }}</p>
+                      <span class="planning-menu-card__price">{{ formatPrice(menu.price) }}</span>
+                    </div>
+                  </div>
+                  <button class="planning-menu-card__edit" (click)="navigateToEdit(menu)">
+                    {{ 'PLANNING.EDIT' | translate }}
+                  </button>
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <div class="planning-fab-wrap">
+        <button class="planning-fab" (click)="navigateToCreate()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M3 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>{{ 'PLANNING.ADD_MENU' | translate }}</span>
+        </button>
+      </div>
+    } @else {
+      <div class="planning-empty">
+        <div class="planning-empty__card">
+          <div class="planning-empty__icon">
+            <svg width="40" height="40" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 6H13M7 10H13M7 14H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="planning-empty__text">{{ 'PLANNING.EMPTY' | translate }}</p>
+          <button class="planning-empty__cta" (click)="navigateToCreate()">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M3 9H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>{{ 'PLANNING.ADD_MENU' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -137,14 +137,51 @@
             <span class="branches-section__count">{{ branches.length }}</span>
           }
         </h2>
-        <button class="create-branch-btn" (click)="openCreateModal()">
+        <button
+          class="create-branch-btn"
+          [class.create-branch-btn--disabled]="!canCreateBranch"
+          [disabled]="!canCreateBranch"
+          (click)="openCreateModal()"
+        >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
-          Créer une succursale
+          {{ 'MY_RESTAURANTS.CREATE_BRANCH' | translate }}
+          @if (canMultiRestaurant && maxRestaurants > 1) {
+            <span class="create-branch-btn__quota">{{ totalRestaurantCount }}/{{ maxRestaurants }}</span>
+          }
         </button>
       </div>
+
+      @if (!canMultiRestaurant) {
+        <div class="branch-upsell">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="4" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6.5 7V5.5a2.5 2.5 0 015 0V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <p>
+            {{ 'MY_RESTAURANTS.MULTI_UPGRADE' | translate }}
+            <button type="button" class="branch-upsell__link" (click)="goToMembership()">
+              {{ 'MY_RESTAURANTS.UPGRADE_CTA' | translate }}
+            </button>
+          </p>
+        </div>
+      } @else if (branchQuotaReached) {
+        <div class="branch-upsell branch-upsell--quota">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M9 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="9" cy="6" r="0.7" fill="currentColor"/>
+          </svg>
+          <p>
+            {{ 'MY_RESTAURANTS.BRANCH_QUOTA_HINT' | translate:{ max: maxRestaurants } }}
+            <button type="button" class="branch-upsell__link" (click)="goToMembership()">
+              {{ 'MY_RESTAURANTS.UPGRADE_CTA' | translate }}
+            </button>
+          </p>
+        </div>
+      }
 
       @if (branches.length > 0) {
         <div class="branches-grid">
@@ -187,12 +224,16 @@
             </svg>
           </div>
           <p>{{ 'MY_RESTAURANTS.NO_BRANCHES' | translate }}</p>
-          <button class="create-branch-btn create-branch-btn--secondary" (click)="openCreateModal()">
+          <button
+            class="create-branch-btn create-branch-btn--secondary"
+            [disabled]="!canCreateBranch"
+            (click)="openCreateModal()"
+          >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M8 3V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               <path d="M3 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            Créer votre première succursale
+            {{ 'MY_RESTAURANTS.CREATE_FIRST_BRANCH' | translate }}
           </button>
         </div>
       }
@@ -268,7 +309,7 @@
                 <path d="M8 5V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
                 <circle cx="8" cy="11" r="0.6" fill="currentColor"/>
               </svg>
-              {{ createError }}
+              {{ createError | translate }}
             </div>
           }
 
@@ -280,14 +321,26 @@
           <div class="modal__form-group">
             <label class="modal__label">Type de restaurant *</label>
             <div class="modal__type-selector">
-              <button class="modal__type-option" [class.modal__type-option--active]="branchType === 'FIXE'" (click)="branchType = 'FIXE'">
+              <button type="button" class="modal__type-option" [class.modal__type-option--active]="branchType === 'FIXE'" (click)="selectBranchType('FIXE')">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
                   <path d="M7 16V10l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                 </svg>
                 Fixe
               </button>
-              <button class="modal__type-option" [class.modal__type-option--active]="branchType === 'ITINERANT'" (click)="branchType = 'ITINERANT'">
+              <button
+                type="button"
+                class="modal__type-option"
+                [class.modal__type-option--active]="branchType === 'ITINERANT'"
+                [class.modal__type-option--locked]="itinerantLocked"
+                (click)="selectBranchType('ITINERANT')"
+              >
+                @if (itinerantLocked) {
+                  <svg class="modal__type-option__lock" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <rect x="4" y="7" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                  </svg>
+                }
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <rect x="2" y="6" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
                   <circle cx="6" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
@@ -297,6 +350,14 @@
                 Itinérant
               </button>
             </div>
+            @if (itinerantLocked) {
+              <p class="modal__type-hint">
+                {{ 'MY_RESTAURANTS.ITINERANT_UPGRADE' | translate }}
+                <button type="button" class="modal__type-hint-link" (click)="goToMembership()">
+                  {{ 'MY_RESTAURANTS.UPGRADE_CTA' | translate }}
+                </button>
+              </p>
+            }
           </div>
 
           <div class="modal__form-row">

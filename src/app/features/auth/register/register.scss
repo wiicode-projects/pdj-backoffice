@@ -1,0 +1,53 @@
+$primary-red: #DC2626;
+$text-dark: #1F2937;
+$text-medium: #6B7280;
+$border-color: #E5E7EB;
+$input-bg: #F9FAFB;
+$card-bg: #FFFFFF;
+
+.register-page {
+  &__step {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 8px;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  &__terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: $text-medium;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  &__back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: $text-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: $text-dark;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .register-page__row {
+    grid-template-columns: 1fr;
+  }
+}

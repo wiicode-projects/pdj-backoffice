@@ -1,0 +1,129 @@
+<div class="menu-customer-preview">
+  <!-- List card (search result style) -->
+  <section class="preview-section">
+    <div class="preview-section__header">
+      <h3 class="preview-section__title">{{ 'MENUS.PREVIEW.LIST_TITLE' | translate }}</h3>
+      <p class="preview-section__desc">{{ 'MENUS.PREVIEW.LIST_DESC' | translate }}</p>
+    </div>
+
+    <article class="search-card">
+      <div class="search-card__image-wrap">
+        @if (previewImage) {
+          <img [src]="getImageUrl(previewImage)" [alt]="displayName" class="search-card__image" />
+        } @else {
+          <div class="search-card__image-placeholder">
+            <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="11" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 2V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        }
+      </div>
+      <div class="search-card__body">
+        <h4 class="search-card__name">{{ displayName }}</h4>
+        @if (restaurantName) {
+          <p class="search-card__restaurant">{{ restaurantName }}</p>
+        }
+        @if (courseSummary) {
+          <p class="search-card__summary">{{ courseSummary }}</p>
+        }
+        <div class="search-card__badges">
+          <span class="ordering-badge" [class.ordering-badge--mandatory]="menu.isFullMenuMandatory">
+            {{ (menu.isFullMenuMandatory ? 'MENUS.FULL_MENU_MANDATORY' : 'MENUS.ORDERING_PARTIAL') | translate }}
+          </span>
+        </div>
+        <div class="search-card__footer">
+          <span class="search-card__price">{{ formatPrice(menu.price) }}</span>
+          @if (menu.availableAt) {
+            <span class="search-card__date">{{ formatAvailableDate(menu.availableAt) }}</span>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Detail view (menu courses style) -->
+  <section class="preview-section">
+    <div class="preview-section__header">
+      <h3 class="preview-section__title">{{ 'MENUS.PREVIEW.DETAIL_TITLE' | translate }}</h3>
+      <p class="preview-section__desc">{{ 'MENUS.PREVIEW.DETAIL_DESC' | translate }}</p>
+    </div>
+
+    <div class="menu-detail-preview">
+      <div class="menu-detail-preview__hero">
+        <span class="menu-detail-preview__label">{{ 'MENUS.PREVIEW.DAILY_MENU' | translate }}</span>
+        <div class="menu-detail-preview__title-row">
+          <h4 class="menu-detail-preview__name">{{ displayName }}</h4>
+          @if (menu.availableAt) {
+            <span class="menu-detail-preview__date-pill">{{ formatAvailableDate(menu.availableAt) }}</span>
+          }
+        </div>
+        @if (menu.price > 0) {
+          <span class="menu-detail-preview__price">{{ formatPrice(menu.price) }}</span>
+        }
+        @if (menu.isModele) {
+          <span class="menu-detail-preview__model-badge">{{ 'MENUS.MODEL' | translate }}</span>
+        }
+        <span class="menu-detail-preview__ordering-badge" [class.menu-detail-preview__ordering-badge--mandatory]="menu.isFullMenuMandatory">
+          {{ (menu.isFullMenuMandatory ? 'MENUS.FULL_MENU_MANDATORY' : 'MENUS.ORDERING_PARTIAL') | translate }}
+        </span>
+      </div>
+
+      @if (!hasCourses) {
+        <p class="menu-detail-preview__empty">{{ 'MENUS.PREVIEW.NO_DISHES' | translate }}</p>
+      } @else {
+        <div class="menu-detail-preview__courses">
+          @if (menu.appetizer; as dish) {
+            <ng-container *ngTemplateOutlet="courseSection; context: { dish, labelKey: 'MENUS.APPETIZER' }"></ng-container>
+          }
+          @if (menu.mainCourse; as dish) {
+            <ng-container *ngTemplateOutlet="mainCourseSection; context: { dish }"></ng-container>
+          }
+          @if (menu.dessert; as dish) {
+            <ng-container *ngTemplateOutlet="courseSection; context: { dish, labelKey: 'MENUS.DESSERT_LABEL' }"></ng-container>
+          }
+        </div>
+      }
+    </div>
+  </section>
+</div>
+
+<ng-template #courseSection let-dish="dish" let-labelKey="labelKey">
+  <div class="course-block">
+    <div class="course-block__divider">
+      <span class="course-block__label">{{ labelKey | translate }}</span>
+      <span class="course-block__line"></span>
+    </div>
+    <div class="course-block__content course-block__content--row">
+      @if (dish.image) {
+        <img [src]="getImageUrl(dish.image)" [alt]="dish.name" class="course-block__thumb" />
+      }
+      <div class="course-block__text">
+        <h5 class="course-block__name">{{ dish.name }}</h5>
+        @if (dish.description) {
+          <p class="course-block__desc">{{ dish.description }}</p>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #mainCourseSection let-dish="dish">
+  <div class="course-block">
+    <div class="course-block__divider">
+      <span class="course-block__label">{{ 'MENUS.MAIN_COURSE' | translate }}</span>
+      <span class="course-block__line"></span>
+    </div>
+    <div class="course-block__content course-block__content--main">
+      @if (dish.image) {
+        <img [src]="getImageUrl(dish.image)" [alt]="dish.name" class="course-block__hero-image" />
+      }
+      <div class="course-block__text">
+        <h5 class="course-block__name course-block__name--main">{{ dish.name }}</h5>
+        @if (dish.description) {
+          <p class="course-block__desc">{{ dish.description }}</p>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>

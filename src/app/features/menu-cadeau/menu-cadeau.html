@@ -1,0 +1,173 @@
+<div class="menu-cadeau-page">
+  <div class="menu-cadeau-page__header">
+    <div>
+      <h1 class="menu-cadeau-page__title">{{ 'MENU_CADEAU.TITLE' | translate }}</h1>
+      <p class="menu-cadeau-page__subtitle">{{ 'MENU_CADEAU.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="menu-cadeau-page__loading">
+      <div class="spinner"></div>
+    </div>
+  }
+
+  @if (!loading && !canHaveGift) {
+    <div class="gift-locked">
+      <div class="gift-locked__icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>{{ 'MENU_CADEAU.LOCKED_TITLE' | translate }}</h2>
+      <p>{{ 'MENU_CADEAU.LOCKED_DESC' | translate }}</p>
+      <button type="button" class="btn btn--primary" (click)="goToMembership()">
+        {{ 'MENU_CADEAU.UPGRADE_CTA' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (!loading && canHaveGift) {
+    @if (successMessage) {
+      <div class="banner banner--success">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M6 9L8 11L12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ successMessage | translate }}
+      </div>
+    }
+
+    @if (error) {
+      <div class="banner banner--error">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="9" cy="12.5" r="0.6" fill="currentColor"/>
+        </svg>
+        {{ error | translate }}
+      </div>
+    }
+
+    <div class="gift-booster">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M11 2L12.5 7.5L18 8.5L14 12.5L15 18L10 15.5L5 18L6 12.5L2 8.5L7.5 7.5L9 2L11 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <span class="gift-booster__label">{{ 'MENU_CADEAU.BOOSTER_LABEL' | translate }}</span>
+        <p>{{ 'MENU_CADEAU.BOOSTER_DESC' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-card__text">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3v9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8.5 4.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M6 12h12v8H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ 'MENU_CADEAU.STATUS_TITLE' | translate }}</span>
+      </div>
+      <button
+        type="button"
+        class="form-toggle-switch"
+        [class.form-toggle-switch--on]="isActive"
+        (click)="toggleActive()"
+        [attr.aria-pressed]="isActive"
+      >
+        <span class="form-toggle-switch__thumb"></span>
+      </button>
+    </div>
+
+    <section class="gift-section">
+      <h2 class="gift-section__title">{{ 'MENU_CADEAU.TYPE_SECTION' | translate }}</h2>
+      <div class="gift-grid">
+        @for (option of giftOptions; track option.id) {
+          <button
+            type="button"
+            class="gift-card"
+            [class.gift-card--selected]="selectedGift === option.id"
+            [style.--gift-color]="option.color"
+            [style.--gift-bg]="option.bg"
+            (click)="selectGiftType(option.id)"
+          >
+            @if (selectedGift === option.id) {
+              <span class="gift-card__check">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            }
+            <span class="gift-card__icon">
+              @switch (option.id) {
+                @case ('CAFE') {
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 8h12v6a4 4 0 01-4 4H9a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M17 10h1a2 2 0 010 4h-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M8 4v2M12 4v2M16 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('DESSERT') {
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 4c-3 0-5 2-5 4.5S9 13 12 13s5-2 5-4.5S15 4 12 4z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M7 13h10v3a2 2 0 01-2 2H9a2 2 0 01-2-2v-3z" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                }
+                @case ('DIGESTIF') {
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 4h6v12a3 3 0 01-6 0V4z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10 20h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('AUTRE') {
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3l1.2 3.6L17 7.8l-3 2.2L15 14l-3-2-3 2 .8-4-3-2.2 3.8-1.2L12 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  </svg>
+                }
+              }
+            </span>
+            <span class="gift-card__label">{{ option.labelKey | translate }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    @if (isAutreSelected) {
+      <section class="gift-section">
+        <h2 class="gift-section__title">{{ 'MENU_CADEAU.LABEL_SECTION' | translate }}</h2>
+        <div class="text-field">
+          <input
+            type="text"
+            class="text-field__input"
+            [(ngModel)]="customGiftLabel"
+            [maxlength]="maxLabelChars"
+            [placeholder]="'MENU_CADEAU.LABEL_PLACEHOLDER' | translate"
+          />
+          <span class="text-field__counter">{{ customGiftLabel.length }}/{{ maxLabelChars }}</span>
+        </div>
+      </section>
+    }
+
+    <section class="gift-section">
+      <h2 class="gift-section__title">{{ 'MENU_CADEAU.DESCRIPTION_SECTION' | translate }}</h2>
+      <div class="text-field text-field--textarea">
+        <textarea
+          class="text-field__textarea"
+          [(ngModel)]="offerText"
+          [maxlength]="maxChars"
+          rows="4"
+          [placeholder]="'MENU_CADEAU.DESCRIPTION_PLACEHOLDER' | translate"
+        ></textarea>
+        <span class="text-field__counter">{{ offerText.length }}/{{ maxChars }}</span>
+      </div>
+    </section>
+
+    <div class="menu-cadeau-page__actions">
+      <button type="button" class="btn btn--primary" [disabled]="saving" (click)="saveGift()">
+        @if (saving) { <span class="btn__spinner"></span> }
+        {{ (existingGift ? 'MENU_CADEAU.SAVE_UPDATE' : 'MENU_CADEAU.SAVE_CREATE') | translate }}
+      </button>
+    </div>
+  }
+</div>

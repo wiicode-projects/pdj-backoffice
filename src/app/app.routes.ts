@@ -27,6 +27,24 @@ export const routes: Routes = [
       import('./features/auth/verify-otp/verify-otp').then((m) => m.VerifyOtp),
   },
   {
+    path: 'register',
+    canActivate: [loginGuard],
+    loadComponent: () =>
+      import('./features/auth/register/register-restaurant').then((m) => m.RegisterRestaurant),
+  },
+  {
+    path: 'register/account',
+    canActivate: [loginGuard],
+    loadComponent: () =>
+      import('./features/auth/register/register-account').then((m) => m.RegisterAccount),
+  },
+  {
+    path: 'register/verify',
+    canActivate: [loginGuard],
+    loadComponent: () =>
+      import('./features/auth/register/register-verify').then((m) => m.RegisterVerify),
+  },
+  {
     path: 'events/:id',
     loadComponent: () =>
       import('./features/events/public-event/public-event').then((m) => m.PublicEvent),
@@ -229,6 +247,12 @@ export const routes: Routes = [
           import('./features/dishes/dishes').then((m) => m.Dishes),
       },
       {
+        path: 'planning',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/planning/planning').then((m) => m.Planning),
+      },
+      {
         path: 'menus/:id',
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
@@ -245,6 +269,30 @@ export const routes: Routes = [
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>
           import('./features/locations/locations').then((m) => m.Locations),
+      },
+      {
+        path: 'menu-cadeau',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/menu-cadeau/menu-cadeau').then((m) => m.MenuCadeau),
+      },
+      {
+        path: 'profile',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/profile/profile').then((m) => m.Profile),
+      },
+      {
+        path: 'account-settings',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/account-settings/account-settings').then((m) => m.AccountSettings),
+      },
+      {
+        path: 'notifications',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/notifications/notifications').then((m) => m.Notifications),
       },
       {
         path: '',

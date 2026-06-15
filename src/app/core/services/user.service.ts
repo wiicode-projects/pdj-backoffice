@@ -106,4 +106,20 @@ export class UserService {
   findGamePlays(userId: string): Observable<{ status: number; plays: GamePlay[]; summary: { totalPlays: number; totalPoints: number } }> {
     return this.http.get<{ status: number; plays: GamePlay[]; summary: { totalPlays: number; totalPoints: number } }>(`${this.gamesUrl}/user/${userId}/plays`);
   }
+
+  updateProfile(userId: string, payload: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  }): Observable<{ status: number; user: AdminUser }> {
+    return this.http.patch<{ status: number; user: AdminUser }>(`${this.apiUrl}/${userId}`, payload);
+  }
+
+  changePassword(userId: string, password: string, confirmPassword: string): Observable<{ status: number; user: AdminUser }> {
+    return this.http.patch<{ status: number; user: AdminUser }>(`${this.apiUrl}/${userId}`, {
+      password,
+      confirmPassword,
+    });
+  }
 }

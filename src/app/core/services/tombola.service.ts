@@ -50,6 +50,7 @@ export interface TombolaParticipantUser {
   firstName: string | null;
   lastName: string | null;
   email: string;
+  tombolaUsername: string | null;
 }
 
 export interface TombolaWinner {
@@ -150,6 +151,20 @@ export class TombolaService {
       poolSize: number;
       poolTickets: number;
     }>(`${this.apiUrl}/${id}/draw`, { rank });
+  }
+
+  autoRunDraw(id: string): Observable<{
+    status: number;
+    tombola: TombolaItem;
+    winners: TombolaWinner[];
+    skippedRanks: TombolaRewardRank[];
+  }> {
+    return this.http.post<{
+      status: number;
+      tombola: TombolaItem;
+      winners: TombolaWinner[];
+      skippedRanks: TombolaRewardRank[];
+    }>(`${this.apiUrl}/${id}/auto-draw`, {});
   }
 
   getLiveHolders(

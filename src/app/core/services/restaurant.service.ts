@@ -9,7 +9,7 @@ export interface RestaurantMembership {
   status: string;
   isActive: boolean;
   endingAt: string | null;
-  subscription: { id: string; name: string; targetType: string } | null;
+  subscription: { id: string; name: string; targetType: string; maxProfilePhotos?: number | null } | null;
 }
 
 export interface AdminRestaurant {
@@ -66,6 +66,10 @@ export class RestaurantService {
 
   remove(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  deleteImage(restaurantId: string, imageId: string): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${this.apiUrl}/${restaurantId}/images/${imageId}`);
   }
 
   toggleActive(id: string, isActive: boolean): Observable<{ status: number; restaurant: AdminRestaurant }> {

@@ -221,6 +221,62 @@ $font: 'PolySans Trial', -apple-system, sans-serif;
   &--secondary {
     margin-top: 16px;
   }
+
+  &--disabled,
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    &:hover {
+      background: $card-bg;
+      border-color: rgba($primary-red, 0.3);
+    }
+  }
+
+  &__quota {
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: $primary-light;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+}
+
+.branch-upsell {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: $primary-light;
+  color: $text-medium;
+
+  svg { flex-shrink: 0; color: $primary-red; margin-top: 1px; }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  &__link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: $primary-red;
+    font-weight: 700;
+    font-family: $font;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &--quota {
+    background: rgba(#F59E0B, 0.08);
+
+    svg { color: #D97706; }
+  }
 }
 
 .branches-grid {
@@ -455,6 +511,43 @@ $font: 'PolySans Trial', -apple-system, sans-serif;
 
       svg { color: $primary-red; }
     }
+
+    &--locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      position: relative;
+
+      &:hover {
+        border-color: $border-color;
+        background: $card-bg;
+      }
+    }
+
+    &__lock {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      color: $text-light;
+    }
+  }
+
+  &__type-hint {
+    margin: 10px 0 0;
+    font-size: 0.82rem;
+    color: $text-medium;
+    line-height: 1.45;
+  }
+
+  &__type-hint-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: $primary-red;
+    font-weight: 700;
+    font-family: $font;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
   }
 
   &__footer {

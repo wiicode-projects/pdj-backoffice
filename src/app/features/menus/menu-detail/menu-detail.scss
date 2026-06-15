@@ -234,6 +234,16 @@ $shadow-md:   0 4px 16px rgba(0,0,0,0.06);
     background: $purple-light;
     color: $purple;
   }
+
+  &--full-menu {
+    background: rgba(#7C3AED, 0.12);
+    color: #7C3AED;
+  }
+
+  &:not(.badge--model):not(.badge--full-menu) {
+    background: #F3F4F6;
+    color: #525252;
+  }
 }
 
 // ── Info grid ───────────────────────────────────────────────────────────────────
@@ -640,6 +650,14 @@ $shadow-md:   0 4px 16px rgba(0,0,0,0.06);
     &:hover { background: #E5E7EB; }
   }
 
+  &--outline {
+    background: transparent;
+    color: $primary-red;
+    border: 1.5px solid rgba($primary-red, 0.35);
+    &:hover:not(:disabled) { background: rgba($primary-red, 0.06); border-color: $primary-red; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
   &__spinner {
     width: 14px;
     height: 14px;
@@ -825,6 +843,20 @@ $shadow-md:   0 4px 16px rgba(0,0,0,0.06);
   font-size: 0.88rem;
   font-weight: 500;
   color: $text-dark;
+}
+
+.form-hint {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: $text-medium;
+  line-height: 1.4;
+}
+
+.form-toggle-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 // ── Animations ──────────────────────────────────────────────────────────────────

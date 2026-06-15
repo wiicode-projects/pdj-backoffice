@@ -31,6 +31,9 @@
         </svg>
         Menus
       </button>
+      <button class="btn btn--edit" (click)="openSavedMenuPreview()">
+        {{ 'MENUS.PREVIEW.BUTTON' | translate }}
+      </button>
       <button class="btn btn--edit" (click)="openEditForm()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
@@ -69,6 +72,9 @@
                 Modèle
               </span>
             }
+            <span class="badge" [class.badge--full-menu]="menu.isFullMenuMandatory">
+              {{ (menu.isFullMenuMandatory ? 'MENUS.FULL_MENU_MANDATORY' : 'MENUS.ORDERING_PARTIAL') | translate }}
+            </span>
           </div>
         </div>
       </div>
@@ -144,14 +150,9 @@
       @for (entry of getDishes(); track entry.dish.id) {
         <div class="dish-detail-card" [class.dish-detail-card--main]="entry.role === 'Plat principal'">
           <div class="dish-detail-card__header">
-            <div class="dish-detail-card__role-badge" [style.background]="getCategoryColor(entry.dish.category) + '14'" [style.color]="getCategoryColor(entry.dish.category)">
+            <div class="dish-detail-card__role-badge" [style.background]="getMenuRoleColor(entry.role) + '14'" [style.color]="getMenuRoleColor(entry.role)">
               {{ entry.role }}
             </div>
-            @if (entry.dish.category) {
-              <div class="dish-detail-card__category-badge" [style.background]="getCategoryColor(entry.dish.category) + '14'" [style.color]="getCategoryColor(entry.dish.category)">
-                {{ getCategoryLabel(entry.dish.category) }}
-              </div>
-            }
             @if (entry.dish.diet) {
               <div class="dish-detail-card__diet-badge">
                 {{ getDietLabel(entry.dish.diet) }}
@@ -263,6 +264,7 @@
           <div class="form-group">
             <label class="form-label">Prix (CHF)</label>
             <input type="number" class="form-input" [(ngModel)]="menuPrice" min="0" step="0.5" />
+            <p class="form-hint">{{ 'MENUS.PRICE_AUTO_HINT' | translate }}</p>
           </div>
         </div>
         <div class="form-group">
@@ -270,7 +272,7 @@
           @if (dishesLoading) {
             <div class="form-input form-input--loading">Chargement...</div>
           } @else {
-            <select class="form-input form-select" [(ngModel)]="menuMainCourseId">
+            <select class="form-input form-select" [(ngModel)]="menuMainCourseId" (ngModelChange)="onDishSelectionChange()">
               <option value="">Sélectionner un plat</option>
               @for (dish of allDishes; track dish.id) {
                 <option [value]="dish.id">{{ dish.name }} — {{ formatPrice(dish.price) }}</option>
@@ -281,7 +283,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Entrée</label>
-            <select class="form-input form-select" [(ngModel)]="menuAppetizerId">
+            <select class="form-input form-select" [(ngModel)]="menuAppetizerId" (ngModelChange)="onDishSelectionChange()">
               <option value="">Aucune</option>
               @for (dish of allDishes; track dish.id) {
                 <option [value]="dish.id">{{ dish.name }}</option>
@@ -290,12 +292,22 @@
           </div>
           <div class="form-group">
             <label class="form-label">Dessert</label>
-            <select class="form-input form-select" [(ngModel)]="menuDessertId">
+            <select class="form-input form-select" [(ngModel)]="menuDessertId" (ngModelChange)="onDishSelectionChange()">
               <option value="">Aucun</option>
               @for (dish of allDishes; track dish.id) {
                 <option [value]="dish.id">{{ dish.name }}</option>
               }
             </select>
+          </div>
+        </div>
+        <div class="form-group form-group--toggle">
+          <label class="form-toggle">
+            <input type="checkbox" [(ngModel)]="menuIsFullMenuMandatory" />
+            <span class="form-toggle__slider"></span>
+          </label>
+          <div class="form-toggle-copy">
+            <span class="form-toggle-label">{{ 'MENUS.FULL_MENU_MANDATORY' | translate }}</span>
+            <p class="form-hint">{{ 'MENUS.FULL_MENU_MANDATORY_DESC' | translate }}</p>
           </div>
         </div>
         <div class="form-group form-group--toggle">
@@ -308,6 +320,9 @@
       </div>
       <div class="modal__footer">
         <button class="btn btn--cancel" (click)="closeForm()">Annuler</button>
+        <button class="btn btn--outline" [disabled]="!menuMainCourseId" (click)="openPreview()">
+          {{ 'MENUS.PREVIEW.BUTTON' | translate }}
+        </button>
         <button class="btn btn--primary" [disabled]="formSubmitting" (click)="submitForm()">
           @if (formSubmitting) { <span class="btn__spinner"></span> }
           Enregistrer
@@ -315,6 +330,16 @@
       </div>
     </div>
   }
+
+  <pdj-menu-preview-modal
+    [open]="previewOpen"
+    [menu]="previewMenu"
+    [submitting]="formSubmitting"
+    [isEdit]="!previewReadOnly"
+    [readOnly]="previewReadOnly"
+    (closed)="closePreview()"
+    (confirmed)="confirmPreview()"
+  />
 
   <!-- Lightbox -->
   @if (lightboxOpen) {
@@ -342,6 +367,32 @@
         @if (lightboxImages.length > 1) {
           <div class="lightbox__counter">{{ lightboxIndex + 1 }} / {{ lightboxImages.length }}</div>
         }
+      </div>
+    </div>
+  }
+
+  @if (premiumModalOpen) {
+    <div class="modal-overlay" (click)="closePremiumModal()"></div>
+    <div class="premium-modal">
+      <div class="premium-modal__icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="premium-modal__title">
+        {{ (premiumModalReason === 'default' ? 'MENUS.PREMIUM_MODAL.TITLE' : 'MENUS.PREMIUM_MODAL.LIMIT_TITLE') | translate }}
+      </h2>
+      <p class="premium-modal__desc">
+        {{ (premiumModalReason === 'default' ? 'MENUS.PREMIUM_MODAL.DESC' : 'MENUS.PREMIUM_MODAL.LIMIT_DESC') | translate: { max: maxMenusPerDay } }}
+      </p>
+      <div class="premium-modal__actions">
+        <button type="button" class="btn btn--cancel" (click)="closePremiumModal()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button type="button" class="btn btn--primary" (click)="goToMembership()">
+          {{ 'MENUS.PREMIUM_MODAL.CTA' | translate }}
+        </button>
       </div>
     </div>
   }

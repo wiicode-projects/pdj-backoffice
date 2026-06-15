@@ -1,17 +1,27 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { HttpClient } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { MenuService, Menu, CreateMenuPayload } from '../../core/services/menu.service';
 import { DishService, Dish } from '../../core/services/dish.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MenuPreviewModal } from './menu-preview-modal/menu-preview-modal';
+import { buildDraftMenu, calculateMenuPriceFromDishes } from './build-draft-menu.util';
+import { canPublishMenu, countMenusForDate, MenuSubscriptionLimits } from './menu-subscription.util';
+import { environment } from '../../../environments/environment';
+
+interface ActiveSubscription {
+  isDefault?: boolean;
+  maxMenusPerDay?: number | null;
+}
 
 @Component({
   selector: 'pdj-menus',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MenuPreviewModal],
   templateUrl: './menus.html',
   styleUrl: './menus.scss',
 })
@@ -34,6 +44,7 @@ export class Menus implements OnInit {
   menuPrice = 0;
   menuAvailableAt = '';
   menuIsModele = false;
+  menuIsFullMenuMandatory = false;
   menuMainCourseId = '';
   menuAppetizerId = '';
   menuDessertId = '';
@@ -46,16 +57,39 @@ export class Menus implements OnInit {
   selectedMenu: Menu | null = null;
   panelOpen = false;
 
+  // Customer preview
+  previewOpen = false;
+  previewMenu: Menu | null = null;
+
+  // Subscription gating
+  subscriptionLimits: MenuSubscriptionLimits | null = null;
+  premiumModalOpen = false;
+  premiumModalReason: 'default' | 'limit' = 'default';
+
   constructor(
     private menuService: MenuService,
     private dishService: DishService,
     private authService: AuthService,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.loadMenus();
+    this.loadActiveSubscription();
+    this.route.queryParams.subscribe(params => {
+      if (params['create'] === '1') {
+        this.openCreateForm();
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { create: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      }
+    });
   }
 
   get restaurantId(): string | null {
@@ -134,9 +168,101 @@ export class Menus implements OnInit {
     return this.menus.filter(m => m.isModele);
   }
 
+  get isDefaultPlan(): boolean {
+    return this.subscriptionLimits?.isDefault === true;
+  }
+
+  get maxMenusPerDay(): number {
+    return this.subscriptionLimits?.maxMenusPerDay ?? 1;
+  }
+
+  get menusForSelectedDate(): number {
+    const date = this.menuAvailableAt || new Date().toISOString().split('T')[0];
+    return countMenusForDate(this.menus, date);
+  }
+
+  get isMenuLimitReached(): boolean {
+    if (this.editingMenu) return false;
+    return this.menusForSelectedDate >= this.maxMenusPerDay;
+  }
+
+  get shouldHideCreateForm(): boolean {
+    return this.isMenuLimitReached && !this.isDefaultPlan && !this.editingMenu;
+  }
+
+  // ── Subscription ───────────────────────────────────────────────────────────
+
+  private loadActiveSubscription(): void {
+    const id = this.restaurantId;
+    if (!id) return;
+
+    this.http.get<{ status: number; membership: { subscription: ActiveSubscription | null } }>(
+      `${environment.apiUrl}/restaurants/${id}/subscriptions/active`,
+    ).subscribe({
+      next: (res) => {
+        const sub = res.membership?.subscription;
+        if (sub) {
+          this.subscriptionLimits = {
+            isDefault: sub.isDefault === true,
+            maxMenusPerDay: sub.maxMenusPerDay ?? 1,
+          };
+        } else {
+          this.subscriptionLimits = { isDefault: true, maxMenusPerDay: 1 };
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.subscriptionLimits = { isDefault: true, maxMenusPerDay: 1 };
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  goToMembership(): void {
+    this.closePremiumModal();
+    this.router.navigate(['/app/membership']);
+  }
+
+  closePremiumModal(): void {
+    this.premiumModalOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  private showPremiumModal(reason: 'default' | 'limit'): void {
+    this.premiumModalReason = reason;
+    this.premiumModalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  private guardPublish(): boolean {
+    const check = canPublishMenu(
+      this.subscriptionLimits,
+      this.menus,
+      this.menuAvailableAt,
+      !this.editingMenu,
+      this.editingMenu?.id,
+    );
+    if (!check.allowed && check.reason) {
+      this.showPremiumModal(check.reason);
+      return false;
+    }
+    return true;
+  }
+
   // ── Form ─────────────────────────────────────────────────────────────────────
 
   openCreateForm(): void {
+    const check = canPublishMenu(
+      this.subscriptionLimits,
+      this.menus,
+      new Date().toISOString().split('T')[0],
+      true,
+    );
+    if (!check.allowed && check.reason) {
+      this.showPremiumModal(check.reason);
+      return;
+    }
+
     this.editingMenu = null;
     this.resetForm();
     this.menuAvailableAt = new Date().toISOString().split('T')[0];
@@ -150,6 +276,7 @@ export class Menus implements OnInit {
     this.menuPrice = menu.price || 0;
     this.menuAvailableAt = menu.availableAt ? new Date(menu.availableAt).toISOString().split('T')[0] : '';
     this.menuIsModele = menu.isModele || false;
+    this.menuIsFullMenuMandatory = menu.isFullMenuMandatory ?? false;
     this.menuMainCourseId = menu.mainCourse?.id || '';
     this.menuAppetizerId = menu.appetizer?.id || '';
     this.menuDessertId = menu.dessert?.id || '';
@@ -159,6 +286,8 @@ export class Menus implements OnInit {
 
   closeForm(): void {
     this.formOpen = false;
+    this.previewOpen = false;
+    this.previewMenu = null;
     this.editingMenu = null;
     this.formError = '';
     this.resetForm();
@@ -169,6 +298,7 @@ export class Menus implements OnInit {
     this.menuPrice = 0;
     this.menuAvailableAt = '';
     this.menuIsModele = false;
+    this.menuIsFullMenuMandatory = false;
     this.menuMainCourseId = '';
     this.menuAppetizerId = '';
     this.menuDessertId = '';
@@ -180,22 +310,9 @@ export class Menus implements OnInit {
       this.formError = 'MENUS.FORM_REQUIRED';
       return;
     }
+    if (!this.guardPublish()) return;
 
-    const payload: CreateMenuPayload = {
-      name: this.menuName.trim(),
-      price: Number(this.menuPrice) || 0,
-      mainCourseId: this.menuMainCourseId,
-      isModele: this.menuIsModele,
-      availableAt: this.menuAvailableAt || new Date().toISOString().split('T')[0],
-    };
-
-    if (this.menuAppetizerId) {
-      payload.appetizerId = this.menuAppetizerId;
-    }
-    if (this.menuDessertId) {
-      payload.dessertId = this.menuDessertId;
-    }
-
+    const payload = this.buildPayload();
     this.formSubmitting = true;
     this.formError = '';
 
@@ -218,6 +335,75 @@ export class Menus implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  openPreview(): void {
+    if (!this.menuName.trim() || !this.menuMainCourseId) {
+      this.formError = 'MENUS.FORM_REQUIRED';
+      return;
+    }
+    if (!this.guardPublish()) return;
+
+    this.formError = '';
+    this.previewMenu = this.buildPreviewMenu();
+    this.previewOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closePreview(): void {
+    this.previewOpen = false;
+    this.previewMenu = null;
+  }
+
+  confirmPreview(): void {
+    this.submitForm();
+  }
+
+  private buildPayload(): CreateMenuPayload {
+    const payload: CreateMenuPayload = {
+      name: this.menuName.trim(),
+      price: Number(this.menuPrice) || 0,
+      mainCourseId: this.menuMainCourseId,
+      isModele: this.menuIsModele,
+      isFullMenuMandatory: this.menuIsFullMenuMandatory,
+      availableAt: this.menuAvailableAt || new Date().toISOString().split('T')[0],
+    };
+
+    if (this.menuAppetizerId) {
+      payload.appetizerId = this.menuAppetizerId;
+    }
+    if (this.menuDessertId) {
+      payload.dessertId = this.menuDessertId;
+    }
+
+    return payload;
+  }
+
+  private buildPreviewMenu(): Menu {
+    const restaurant = this.authService.user()?.restaurant;
+    return buildDraftMenu({
+      name: this.menuName,
+      price: this.menuPrice,
+      availableAt: this.menuAvailableAt || new Date().toISOString().split('T')[0],
+      mainCourse: this.getDishById(this.menuMainCourseId),
+      appetizer: this.menuAppetizerId ? this.getDishById(this.menuAppetizerId) : null,
+      dessert: this.menuDessertId ? this.getDishById(this.menuDessertId) : null,
+      restaurant: restaurant ? { id: restaurant.id, name: restaurant.name } : null,
+      isModele: this.menuIsModele,
+      isFullMenuMandatory: this.menuIsFullMenuMandatory,
+    });
+  }
+
+  onDishSelectionChange(): void {
+    this.menuPrice = calculateMenuPriceFromDishes(
+      this.menuAppetizerId ? this.getDishById(this.menuAppetizerId) : null,
+      this.menuMainCourseId ? this.getDishById(this.menuMainCourseId) : null,
+      this.menuDessertId ? this.getDishById(this.menuDessertId) : null,
+    );
+  }
+
+  private getDishById(id: string): Dish | null {
+    return this.allDishes.find(d => d.id === id) ?? null;
   }
 
   // ── Delete ──────────────────────────────────────────────────────────────────

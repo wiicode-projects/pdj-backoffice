@@ -29,6 +29,7 @@ export class TombolaDetail implements OnInit, OnDestroy {
   loading = true;
   loadingRows = false;
   drawingRank: TombolaRewardRank | null = null;
+  runningAutoDraw = false;
   savingStatus = false;
   statusError = '';
   resettingTickets = false;
@@ -490,6 +491,47 @@ export class TombolaDetail implements OnInit, OnDestroy {
 
   getFullName(firstName: string | null, lastName: string | null): string {
     return `${firstName ?? ''} ${lastName ?? ''}`.trim() || 'Utilisateur';
+  }
+
+  getTombolaDisplayName(user: {
+    tombolaUsername?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+  }): string {
+    if (user.tombolaUsername?.trim()) return user.tombolaUsername;
+    return this.getFullName(user.firstName ?? null, user.lastName ?? null);
+  }
+
+  runAutoDraw(): void {
+    if (!this.tombola || this.runningAutoDraw || this.isDrawn) return;
+    if (!confirm('Lancer le tirage automatique complet (tous les rangs) ?')) return;
+
+    this.runningAutoDraw = true;
+    this.drawError = '';
+    this.drawSuccess = '';
+
+    this.tombolaService.autoRunDraw(this.tombola.id)
+      .pipe(finalize(() => {
+        this.runningAutoDraw = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (result) => {
+          this.tombola = result.tombola;
+          this.selectedStatus = result.tombola.status;
+          this.winners = (result.winners ?? []).sort((a, b) => a.rank - b.rank);
+          this.revealedWinnerRanks = new Set(this.winners.map((winner) => winner.rank));
+          this.drawSuccess = result.skippedRanks.length > 0
+            ? `Tirage terminé (${result.skippedRanks.length} rang(s) ignoré(s))`
+            : 'Tirage automatique terminé';
+          this.loadTombola();
+          this.cdr.detectChanges();
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.drawError = err?.error?.message ?? 'Erreur lors du tirage automatique';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   getRewardForRank(rank: TombolaRewardRank): TombolaReward | undefined {

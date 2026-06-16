@@ -45,6 +45,62 @@ export interface UserInfoResponse {
   token: string;
 }
 
+export interface Role {
+  id: string;
+  name: string;
+}
+
+export interface RolesResponse {
+  status: number;
+  roles: Role[];
+}
+
+export interface SignupRestaurantPayload {
+  name: string;
+  city: string;
+  address?: string;
+  type: 'FIXE' | 'ITINERANT';
+  reservationEnabled: boolean;
+  googleMapsUrl?: string;
+}
+
+export interface SignupPayload {
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    password1: string;
+    roleId: string;
+    phone?: string;
+  };
+  restaurant: SignupRestaurantPayload;
+}
+
+export interface SignupResponse {
+  token: string;
+  statutCode: number;
+  message: string;
+  referralValid?: boolean;
+}
+
+export interface VerifyEmailOtpPayload {
+  token: string;
+  code: string;
+  type: 'VERIFYEMAIL';
+}
+
+export interface ResendOtpPayload {
+  email: string;
+  type: 'VERIFYEMAIL';
+}
+
+export interface ResendOtpResponse {
+  status: number;
+  token: string;
+  message: string;
+}
+
 const AUTH_TOKEN_KEY = 'pdj_auth_token';
 const REFRESH_TOKEN_KEY = 'pdj_refresh_token';
 const USER_KEY = 'pdj_user';
@@ -133,6 +189,27 @@ export class AuthService {
     this.clearStorage();
     this.currentUser.set(null);
     this.router.navigate(['/login']);
+  }
+
+  getRoles(): Observable<RolesResponse> {
+    return this.http.get<RolesResponse>(`${environment.apiUrl}/roles`);
+  }
+
+  signup(payload: SignupPayload): Observable<SignupResponse> {
+    return this.http.post<SignupResponse>(`${environment.apiUrl}/auth/signup`, payload);
+  }
+
+  verifyEmailOtp(payload: VerifyEmailOtpPayload): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/verify-otp`, payload);
+  }
+
+  resendSignupOtp(payload: ResendOtpPayload): Observable<ResendOtpResponse> {
+    return this.http.post<ResendOtpResponse>(`${environment.apiUrl}/auth/send-otp`, payload);
+  }
+
+  completeSignupAfterOtp(response: LoginResponse): Observable<UserInfoResponse> {
+    this.storeTokens(response.authToken, response.refreshToken);
+    return this.fetchAndStoreUserInfo();
   }
 
   refreshTokens(): Observable<LoginResponse> {

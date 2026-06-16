@@ -21,3 +21,11 @@ Restaurant:
         - Dishes 
         - Menus 
         - Geo location 
+
+---
+
+## Plan détaillé (parité mobile ↔ backoffice)
+
+Suivi feature par feature avec checkboxes :
+
+→ **[restaurant-backoffice-parity-plan.md](../plan-implementation/restaurant-backoffice-parity-plan.md)**

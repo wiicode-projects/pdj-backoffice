@@ -1,0 +1,40 @@
+<div class="notifications-page">
+  <div class="notifications-page__header">
+    <h1 class="notifications-page__title">{{ 'NOTIFICATIONS.TITLE' | translate }}</h1>
+    <p class="notifications-page__subtitle">{{ 'NOTIFICATIONS.SUBTITLE' | translate }}</p>
+  </div>
+
+  @if (loading) {
+    <div class="notifications-page__loading"><div class="spinner"></div></div>
+  }
+
+  @if (!loading && error) {
+    <div class="banner banner--error">{{ error | translate }}</div>
+  }
+
+  @if (!loading && !error && notifications.length === 0) {
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3C9.2 3 7 5.2 7 8v5l-2 2h14l-2-2V8c0-2.8-2.2-5-5-5z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 19a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h2>{{ 'NOTIFICATIONS.EMPTY_TITLE' | translate }}</h2>
+      <p>{{ 'NOTIFICATIONS.EMPTY_DESC' | translate }}</p>
+    </div>
+  }
+
+  @if (!loading && notifications.length > 0) {
+    <div class="notifications-list">
+      @for (item of notifications; track item.id) {
+        <article class="notification-item" [class.notification-item--unread]="!item.isRead">
+          <div class="notification-item__dot"></div>
+          <div class="notification-item__body">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.body }}</p>
+            <span class="notification-item__meta">{{ formatDate(item.createdAt) }}</span>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

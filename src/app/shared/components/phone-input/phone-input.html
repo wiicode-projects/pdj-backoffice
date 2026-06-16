@@ -1,0 +1,72 @@
+<div class="pdj-phone-input" [class.pdj-phone-input--error]="hasError">
+  <div class="pdj-phone-input__control">
+    <button
+      type="button"
+      class="pdj-phone-input__selector"
+      (click)="toggleDropdown($event)"
+      [attr.aria-expanded]="dropdownOpen"
+      [attr.aria-label]="selectedCountry.name"
+    >
+      <span class="pdj-phone-input__flag" aria-hidden="true">{{ selectedCountry.flag }}</span>
+      <span class="pdj-phone-input__dial-code">+{{ selectedCountry.dialCode }}</span>
+      <svg class="pdj-phone-input__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <input
+      #nationalInput
+      class="pdj-phone-input__number"
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel-national"
+      [id]="inputId"
+      [(ngModel)]="nationalNumber"
+      [ngModelOptions]="{ standalone: true }"
+      (input)="onNumberInput()"
+      (blur)="onBlur()"
+      [placeholder]="placeholder"
+    />
+  </div>
+
+  @if (dropdownOpen) {
+    <div class="pdj-phone-input__dropdown">
+      <div class="pdj-phone-input__search-wrap">
+        <svg class="pdj-phone-input__search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input
+          class="pdj-phone-input__search"
+          type="search"
+          [(ngModel)]="searchQuery"
+          [ngModelOptions]="{ standalone: true }"
+          (input)="onSearchChange()"
+          [placeholder]="'AUTH.PHONE_SEARCH' | translate"
+        />
+      </div>
+
+      @if (filteredCountries.length === 0) {
+        <p class="pdj-phone-input__empty">{{ 'AUTH.PHONE_NO_RESULTS' | translate }}</p>
+      } @else {
+        <ul class="pdj-phone-input__list" role="listbox">
+          @for (country of filteredCountries; track country.iso2) {
+            <li>
+              <button
+                type="button"
+                class="pdj-phone-input__option"
+                [class.pdj-phone-input__option--selected]="country.iso2 === selectedCountry.iso2"
+                (click)="selectCountry(country, $event)"
+                role="option"
+              >
+                <span class="pdj-phone-input__flag" aria-hidden="true">{{ country.flag }}</span>
+                <span class="pdj-phone-input__name">{{ country.name }}</span>
+                <span class="pdj-phone-input__option-code">(+{{ country.dialCode }})</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

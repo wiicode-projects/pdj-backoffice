@@ -11,6 +11,7 @@ export interface LocationSlot {
   dayOfWeek: number | null;
   startTime: string | null;
   endTime: string | null;
+  googleMapsUrl?: string | null;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -21,6 +22,7 @@ export interface WeeklyPlanSlot {
   dayOfWeek: number;
   startTime: string;
   endTime: string;
+  googleMapsUrl?: string;
 }
 
 @Injectable({

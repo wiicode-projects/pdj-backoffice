@@ -13,6 +13,7 @@ export interface Menu {
   type: string | null;
   isDeleted: boolean;
   isModele: boolean;
+  isFullMenuMandatory?: boolean;
   availableAt: string;
   createdAt: string;
   updatedAt: string;
@@ -48,6 +49,7 @@ export interface CreateMenuPayload {
   appetizerId?: string;
   dessertId?: string;
   isModele: boolean;
+  isFullMenuMandatory?: boolean;
   availableAt: string;
 }
 

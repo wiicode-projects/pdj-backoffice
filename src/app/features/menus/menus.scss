@@ -164,7 +164,6 @@ $border-color: #E5E7EB;
     .menu-card__actions { opacity: 1; transform: translateY(0); }
   }
 
-  &--today { border-left: 3px solid #10B981; }
   &--past { opacity: 0.65; &:hover { opacity: 1; } }
 
   &__image-wrap {
@@ -359,6 +358,20 @@ $border-color: #E5E7EB;
   padding-right: 36px;
 }
 
+.form-hint {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: $text-medium;
+  line-height: 1.4;
+}
+
+.form-toggle-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .form-toggle {
   position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;
   input {
@@ -397,6 +410,11 @@ $border-color: #E5E7EB;
     background: #F3F4F6; color: $text-medium;
     &:hover { background: #E5E7EB; }
   }
+  &--outline {
+    background: transparent; color: $primary-red; border: 1.5px solid rgba($primary-red, 0.35);
+    &:hover:not(:disabled) { background: rgba($primary-red, 0.06); border-color: $primary-red; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
   &--danger {
     background: $primary-red; color: #fff;
     &:hover:not(:disabled) { background: #B91C1C; }
@@ -431,6 +449,74 @@ $border-color: #E5E7EB;
 @keyframes modalSlideUp {
   from { opacity: 0; transform: translate(-50%, -45%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.menu-limit-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: #fef3c7; }
+  svg { flex-shrink: 0; margin-top: 1px; }
+}
+
+.premium-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100;
+  width: min(420px, calc(100vw - 32px));
+  padding: 32px 28px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  animation: modalSlideUp 0.25s ease;
+
+  &__icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.08);
+    color: #DC2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1F2937;
+  }
+
+  &__desc {
+    margin: 0 0 24px;
+    font-size: 0.9rem;
+    color: #6B7280;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+
+    .btn { min-width: 120px; }
+  }
 }
 
 // Responsive

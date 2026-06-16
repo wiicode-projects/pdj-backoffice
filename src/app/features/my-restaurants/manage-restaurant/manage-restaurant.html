@@ -46,7 +46,7 @@
           <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
           <path d="M6 9L8 11L12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        {{ successMessage }}
+        {{ successMessage | translate }}
       </div>
     }
     @if (error) {
@@ -56,17 +56,128 @@
           <path d="M9 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           <circle cx="9" cy="12.5" r="0.6" fill="currentColor"/>
         </svg>
-        {{ error }}
+        {{ error | translate }}
       </div>
     }
+
+    <!-- Media: cover + gallery -->
+    <section class="media-section">
+      <div class="media-card">
+        <div class="media-card__header">
+          <h2 class="media-card__title">{{ 'MANAGE_RESTAURANT.COVER_TITLE' | translate }}</h2>
+          <p class="media-card__desc">{{ 'MANAGE_RESTAURANT.COVER_DESC' | translate }}</p>
+        </div>
+
+        <label class="cover-picker" [class.cover-picker--has-image]="coverDisplayUrl">
+          <input type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
+          @if (coverDisplayUrl) {
+            <img [src]="coverDisplayUrl" [alt]="restaurant.name" class="cover-picker__image" />
+          } @else {
+            <div class="cover-picker__placeholder">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="9" cy="11" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M21 16l-5-5-4 4-2-2-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>{{ 'MANAGE_RESTAURANT.COVER_CHOOSE' | translate }}</span>
+            </div>
+          }
+          <span class="cover-picker__action">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M14 4l2 2-8 8H6v-2l8-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </label>
+
+        @if (coverImageFile) {
+          <button type="button" class="cover-picker__reset" (click)="removeCoverSelection()">
+            {{ 'MANAGE_RESTAURANT.COVER_RESET' | translate }}
+          </button>
+        }
+      </div>
+
+      <div class="media-card">
+        <div class="media-card__header media-card__header--row">
+          <div>
+            <h2 class="media-card__title">{{ 'MANAGE_RESTAURANT.GALLERY_TITLE' | translate }}</h2>
+            <p class="media-card__desc">{{ 'MANAGE_RESTAURANT.GALLERY_DESC' | translate }}</p>
+          </div>
+          @if (maxProfilePhotos !== null && maxProfilePhotos > 0) {
+            <span class="media-card__counter">
+              {{ 'MANAGE_RESTAURANT.GALLERY_COUNT' | translate:{ used: totalPhotoCount, max: maxProfilePhotos } }}
+            </span>
+          }
+        </div>
+
+        @if (galleryLocked) {
+          <div class="gallery-locked">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <p>{{ 'MANAGE_RESTAURANT.GALLERY_LOCKED' | translate }}</p>
+            <button type="button" class="btn btn--outline btn--sm" (click)="goToMembership()">
+              {{ 'MANAGE_RESTAURANT.GALLERY_UPGRADE' | translate }}
+            </button>
+          </div>
+        } @else {
+          <div class="gallery-grid">
+            @for (photo of existingPhotos; track photo.id) {
+              <div class="gallery-grid__item">
+                <img [src]="getImageUrl(photo.path)" [alt]="restaurant.name" class="gallery-grid__img" />
+                <button
+                  type="button"
+                  class="gallery-grid__remove"
+                  [disabled]="deletingImageId === photo.id"
+                  (click)="deleteGalleryPhoto(photo.id)"
+                >
+                  @if (deletingImageId === photo.id) {
+                    <span class="gallery-grid__spinner"></span>
+                  } @else {
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M9 3L3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            }
+
+            @for (preview of pendingGalleryPreviews; track $index; let i = $index) {
+              <div class="gallery-grid__item gallery-grid__item--pending">
+                <img [src]="preview" [alt]="restaurant.name" class="gallery-grid__img" />
+                <span class="gallery-grid__badge">{{ 'MANAGE_RESTAURANT.GALLERY_PENDING' | translate }}</span>
+                <button type="button" class="gallery-grid__remove gallery-grid__remove--pending" (click)="removePendingGallery(i)">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9 3L3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            }
+
+            @if (canAddPhoto) {
+              <label class="gallery-grid__add">
+                <input type="file" accept="image/*" multiple (change)="onGallerySelected($event)" hidden />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 4v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ 'COMMON.ADD' | translate }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+    </section>
 
     <!-- Restaurant preview + form -->
     <div class="manage-layout">
       <!-- Left: Preview card -->
       <div class="preview-card">
         <div class="preview-card__image-wrap">
-          @if (restaurant.imagePath) {
-            <img [src]="getImageUrl(restaurant.imagePath)" [alt]="restaurant.name" class="preview-card__image" />
+          @if (coverDisplayUrl) {
+            <img [src]="coverDisplayUrl" [alt]="restaurant.name" class="preview-card__image" />
           } @else {
             <div class="preview-card__image-placeholder">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
@@ -78,22 +189,15 @@
         </div>
         <div class="preview-card__body">
           <h2 class="preview-card__name">{{ restaurant.name }}</h2>
-          <p class="preview-card__address">{{ getFullAddress() }}</p>
-          @if (restaurant.phone) {
+          @if (!isItinerant) {
+            <p class="preview-card__address">{{ getFullAddress() }}</p>
+          }
+          @if (restaurant.phone && !isItinerant) {
             <div class="preview-card__row">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M5.5 2.5L3.5 5L5 7L7 9L9 10.5L11.5 8.5L13 10L11 12.5C6 12 2 8 1.5 3L4 1L5.5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
               </svg>
               {{ restaurant.phone }}
-            </div>
-          }
-          @if (restaurant.openingTime && restaurant.closingTime) {
-            <div class="preview-card__row">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M7 4V7L9 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ restaurant.openingTime }} — {{ restaurant.closingTime }}
             </div>
           }
           <div class="preview-card__stats">
@@ -129,14 +233,26 @@
         <div class="form-group">
           <label class="form-label">Type de restaurant *</label>
           <div class="type-selector">
-            <button class="type-selector__option" [class.type-selector__option--active]="formType === 'FIXE'" (click)="formType = 'FIXE'">
+            <button type="button" class="type-selector__option" [class.type-selector__option--active]="formType === 'FIXE'" (click)="selectFormType('FIXE')">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M7 16V10l3-3 3 3v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
               </svg>
               Fixe
             </button>
-            <button class="type-selector__option" [class.type-selector__option--active]="formType === 'ITINERANT'" (click)="formType = 'ITINERANT'">
+            <button
+              type="button"
+              class="type-selector__option"
+              [class.type-selector__option--active]="formType === 'ITINERANT'"
+              [class.type-selector__option--locked]="itinerantLocked"
+              (click)="selectFormType('ITINERANT')"
+            >
+              @if (itinerantLocked) {
+                <svg class="type-selector__option__lock" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <rect x="4" y="7" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+              }
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="2" y="6" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
                 <circle cx="6" cy="14" r="1.5" stroke="currentColor" stroke-width="1.2"/>
@@ -146,6 +262,21 @@
               Itinérant
             </button>
           </div>
+          @if (itinerantLocked) {
+            <div class="subscription-hint">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M9 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="9" cy="6" r="0.7" fill="currentColor"/>
+              </svg>
+              <p>
+                {{ 'MANAGE_RESTAURANT.ITINERANT_UPGRADE' | translate }}
+                <button type="button" class="subscription-hint__link" (click)="goToMembership()">
+                  {{ 'MANAGE_RESTAURANT.GALLERY_UPGRADE' | translate }}
+                </button>
+              </p>
+            </div>
+          }
         </div>
 
         <div class="form-group">
@@ -153,75 +284,74 @@
           <input type="text" class="form-input" [(ngModel)]="formShortDescription" placeholder="Ex: Cuisine italienne authentique" />
         </div>
 
+        @if (!isItinerant) {
+          <div class="form-divider"></div>
+
+          <h3 class="form-section-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1C5.8 1 4 2.8 4 5c0 3.5 4 9 4 9s4-5.5 4-9c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="8" cy="5" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            Localisation
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+            <input type="text" class="form-input" [(ngModel)]="formAddress" placeholder="Rue et numéro" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Code postal</label>
+              <input type="text" class="form-input" [(ngModel)]="formPostalCode" placeholder="1204" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ville</label>
+              <input type="text" class="form-input" [(ngModel)]="formCity" placeholder="Genève" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pays</label>
+              <input type="text" class="form-input" [(ngModel)]="formCountry" placeholder="Suisse" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Téléphone</label>
+              <input type="text" class="form-input" [(ngModel)]="formPhone" placeholder="+41 22 000 00 00" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">URL Google Maps</label>
+            <input type="text" class="form-input" [(ngModel)]="formGoogleMapsUrl" placeholder="https://maps.google.com/..." />
+          </div>
+        }
+
         <div class="form-divider"></div>
 
         <h3 class="form-section-title">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1C5.8 1 4 2.8 4 5c0 3.5 4 9 4 9s4-5.5 4-9c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="8" cy="5" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 4h12v8H2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Localisation
+          {{ 'MANAGE_RESTAURANT.RESERVATION_SECTION' | translate }}
         </h3>
 
-        <div class="form-group">
-          <label class="form-label">Adresse</label>
-          <input type="text" class="form-input" [(ngModel)]="formAddress" placeholder="Rue et numéro" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Code postal</label>
-            <input type="text" class="form-input" [(ngModel)]="formPostalCode" placeholder="1204" />
+        <div class="reservation-toggle">
+          <div class="reservation-toggle__text">
+            <span class="reservation-toggle__title">{{ 'MANAGE_RESTAURANT.RESERVATION_TITLE' | translate }}</span>
+            <span class="reservation-toggle__desc">{{ 'MANAGE_RESTAURANT.RESERVATION_DESC' | translate }}</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Ville</label>
-            <input type="text" class="form-input" [(ngModel)]="formCity" placeholder="Genève" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Pays</label>
-            <input type="text" class="form-input" [(ngModel)]="formCountry" placeholder="Suisse" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Téléphone</label>
-            <input type="text" class="form-input" [(ngModel)]="formPhone" placeholder="+41 22 000 00 00" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">URL Google Maps</label>
-          <input type="text" class="form-input" [(ngModel)]="formGoogleMapsUrl" placeholder="https://maps.google.com/..." />
-        </div>
-
-        <div class="form-divider"></div>
-
-        <h3 class="form-section-title">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/>
-            <path d="M8 4.5V8L10.5 9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Horaires et réservation
-        </h3>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Ouverture</label>
-            <input type="time" class="form-input" [(ngModel)]="formOpeningTime" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fermeture</label>
-            <input type="time" class="form-input" [(ngModel)]="formClosingTime" />
-          </div>
-        </div>
-
-        <div class="form-group form-group--toggle">
-          <label class="form-toggle">
-            <input type="checkbox" [(ngModel)]="formReservationEnabled" />
-            <span class="form-toggle__slider"></span>
-          </label>
-          <span class="form-toggle-label">Réservation activée</span>
+          <button
+            type="button"
+            class="form-toggle-switch"
+            [class.form-toggle-switch--on]="formReservationEnabled"
+            (click)="toggleReservation()"
+            [attr.aria-pressed]="formReservationEnabled"
+          >
+            <span class="form-toggle-switch__thumb"></span>
+          </button>
         </div>
 
         @if (formReservationEnabled) {
@@ -246,6 +376,49 @@
           <button class="btn btn--primary" [disabled]="saving" (click)="saveChanges()">
             @if (saving) { <span class="btn__spinner"></span> }
             Enregistrer les modifications
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <section class="danger-section">
+      <h2 class="danger-section__title">{{ 'MANAGE_RESTAURANT.DANGER_TITLE' | translate }}</h2>
+      <p class="danger-section__desc">{{ 'MANAGE_RESTAURANT.DANGER_DESC' | translate }}</p>
+      <button type="button" class="btn btn--danger-outline" (click)="openDeleteDialog()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 4H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M6 4V2.5C6 2.22 6.22 2 6.5 2H9.5C9.78 2 10 2.22 10 2.5V4" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M4.5 4L5 13.5C5 13.78 5.22 14 5.5 14H10.5C10.78 14 11 13.78 11 13.5L11.5 4" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        {{ 'MANAGE_RESTAURANT.DELETE_CTA' | translate }}
+      </button>
+    </section>
+  }
+
+  @if (showDeleteDialog && restaurant) {
+    <div class="dialog-overlay" (click)="closeDeleteDialog()">
+      <div class="dialog dialog--delete" (click)="$event.stopPropagation()">
+        <div class="dialog__header">
+          <h2>{{ 'MANAGE_RESTAURANT.DELETE_TITLE' | translate }}</h2>
+          <button type="button" class="dialog__close" (click)="closeDeleteDialog()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="dialog__body">
+          <p class="dialog__text">{{ 'MANAGE_RESTAURANT.DELETE_CONFIRM' | translate }}</p>
+          <p class="dialog__name">« {{ restaurant.name }} »</p>
+        </div>
+        <div class="dialog__footer">
+          <button type="button" class="btn btn--cancel" (click)="closeDeleteDialog()">
+            {{ 'COMMON.CANCEL' | translate }}
+          </button>
+          <button type="button" class="btn btn--danger" [disabled]="deleting" (click)="confirmDelete()">
+            @if (deleting) { <span class="btn__spinner"></span> }
+            {{ 'COMMON.DELETE' | translate }}
           </button>
         </div>
       </div>

@@ -5,6 +5,11 @@
       <h1 class="locations-page__title">{{ 'LOCATIONS.TITLE' | translate }}</h1>
       <p class="locations-page__subtitle">{{ 'LOCATIONS.SUBTITLE' | translate }}</p>
     </div>
+    @if (restaurant && canMultiRestaurant && selectedRestaurantId) {
+      <button type="button" class="change-establishment-btn" (click)="backToPicker()">
+        {{ 'LOCATIONS.CHANGE_ESTABLISHMENT' | translate }}
+      </button>
+    }
     @if (restaurant) {
       <span class="type-badge" [class.type-badge--fixe]="isFixe" [class.type-badge--itinerant]="isItinerant">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -27,8 +32,34 @@
     </div>
   }
 
+  @if (!loading && showPicker) {
+    <div class="multi-picker animate-in">
+      <div class="multi-picker__banner">
+        <h2>{{ 'LOCATIONS.MULTI_TITLE' | translate }}</h2>
+        <p>{{ 'LOCATIONS.MULTI_BODY' | translate }}</p>
+      </div>
+      <p class="multi-picker__count">
+        {{ 'LOCATIONS.MULTI_SECTION_COUNT' | translate: { count: pickerRestaurants.length } }}
+      </p>
+      <div class="multi-picker__grid">
+        @for (r of pickerRestaurants; track r.id) {
+          <button type="button" class="establishment-card" (click)="selectEstablishment(r.id)">
+            <div class="establishment-card__top">
+              <h3>{{ r.name }}</h3>
+              @if (r.id === mainRestaurantId) {
+                <span class="establishment-card__badge">{{ 'LOCATIONS.MAIN_BADGE' | translate }}</span>
+              }
+            </div>
+            <span class="establishment-card__type">{{ getTypeBadge(r.type) | translate }}</span>
+            <p class="establishment-card__address">{{ getFullAddress(r) }}</p>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
   <!-- ═══════════ FIXE VIEW ═══════════ -->
-  @if (!loading && isFixe) {
+  @if (!loading && !showPicker && isFixe) {
     <div class="fixe-view animate-in">
       <!-- Map preview -->
       <div class="map-preview" (click)="openInMaps()">
@@ -151,7 +182,7 @@
   }
 
   <!-- ═══════════ ITINERANT VIEW ═══════════ -->
-  @if (!loading && isItinerant) {
+  @if (!loading && !showPicker && isItinerant) {
     <div class="itinerant-view animate-in">
       <!-- Stats bar -->
       <div class="itinerant-stats">
@@ -226,6 +257,14 @@
                       </svg>
                       {{ slot.address }}
                     </div>
+                    @if (slot.googleMapsUrl?.trim()) {
+                      <button type="button" class="slot-row__maps-link" (click)="openSlotGoogleMaps(slot.googleMapsUrl)">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <path d="M4.5 7.5L7.5 4.5M7.5 4.5H5.5M7.5 4.5v2" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ 'LOCATIONS.OPEN_MAPS' | translate }}
+                      </button>
+                    }
                   </div>
                   <div class="slot-row__actions">
                     <button class="slot-action slot-action--edit" (click)="openEditSlot(day.dayIndex, i)">
@@ -305,6 +344,31 @@
               <circle cx="8" cy="6" r="1.5" stroke="currentColor" stroke-width="1.3"/>
             </svg>
             <input type="text" [(ngModel)]="slotAddress" [placeholder]="'LOCATIONS.SLOT_ADDRESS_PLACEHOLDER' | translate" />
+          </div>
+        </div>
+
+        <!-- Google Maps URL -->
+        <div class="modal-field">
+          <label>{{ 'LOCATIONS.GOOGLE_MAPS_URL' | translate }}</label>
+          <div class="modal-input-wrap">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 2h4v4H6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M3 6h10v8H3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              <path d="M6 9h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <input
+              type="url"
+              [(ngModel)]="slotGoogleMapsUrl"
+              [placeholder]="'LOCATIONS.SLOT_GOOGLE_MAPS_PLACEHOLDER' | translate"
+            />
+            @if (slotGoogleMapsUrl.trim()) {
+              <button type="button" class="modal-input-wrap__link" (click)="openSlotGoogleMaps()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 10L10 6M10 6H7M10 6v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            }
           </div>
         </div>
 

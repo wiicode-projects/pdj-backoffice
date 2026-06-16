@@ -1,0 +1,30 @@
+@if (open && menu) {
+  <div class="preview-modal-overlay" (click)="onClose()"></div>
+  <div class="preview-modal" role="dialog" aria-modal="true">
+    <div class="preview-modal__header">
+      <h2 class="preview-modal__title">{{ 'MENUS.PREVIEW.MODAL_TITLE' | translate }}</h2>
+      <button class="preview-modal__close" (click)="onClose()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M5 5L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="preview-modal__body">
+      <pdj-menu-customer-preview [menu]="menu" />
+    </div>
+
+    <div class="preview-modal__footer">
+      @if (readOnly) {
+        <button class="btn btn--primary" (click)="onClose()">{{ 'COMMON.CLOSE' | translate }}</button>
+      } @else {
+        <button class="btn btn--cancel" (click)="onClose()">{{ 'MENUS.PREVIEW.BACK_TO_EDIT' | translate }}</button>
+        <button class="btn btn--primary" [disabled]="submitting" (click)="onConfirm()">
+          @if (submitting) { <span class="btn__spinner"></span> }
+          {{ (isEdit ? 'MENUS.PREVIEW.CONFIRM_UPDATE' : 'MENUS.PREVIEW.CONFIRM_CREATE') | translate }}
+        </button>
+      }
+    </div>
+  </div>
+}

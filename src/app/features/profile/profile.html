@@ -1,0 +1,63 @@
+<div class="profile-page">
+  <div class="profile-page__header">
+    <h1 class="profile-page__title">{{ 'PROFILE.TITLE' | translate }}</h1>
+    <p class="profile-page__subtitle">{{ 'PROFILE.SUBTITLE' | translate }}</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="banner banner--success">{{ successMessage | translate }}</div>
+  }
+  @if (error) {
+    <div class="banner banner--error">{{ error | translate }}</div>
+  }
+
+  <section class="profile-card">
+    <h2 class="profile-card__title">{{ 'PROFILE.PERSONAL_SECTION' | translate }}</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.FIRST_NAME' | translate }}</label>
+        <input type="text" class="form-input" [(ngModel)]="firstName" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.LAST_NAME' | translate }}</label>
+        <input type="text" class="form-input" [(ngModel)]="lastName" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.EMAIL' | translate }}</label>
+        <input type="email" class="form-input" [(ngModel)]="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.PHONE' | translate }}</label>
+        <input type="tel" class="form-input" [(ngModel)]="phone" />
+      </div>
+    </div>
+    <button type="button" class="btn btn--primary" [disabled]="saving" (click)="saveProfile()">
+      @if (saving) { <span class="btn__spinner"></span> }
+      {{ 'COMMON.SAVE' | translate }}
+    </button>
+  </section>
+
+  <section class="profile-card">
+    <h2 class="profile-card__title">{{ 'PROFILE.SECURITY_SECTION' | translate }}</h2>
+    @if (passwordSuccess) {
+      <div class="banner banner--success">{{ passwordSuccess | translate }}</div>
+    }
+    @if (passwordError) {
+      <div class="banner banner--error">{{ passwordError | translate }}</div>
+    }
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+        <input type="password" class="form-input" [(ngModel)]="password" autocomplete="new-password" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }}</label>
+        <input type="password" class="form-input" [(ngModel)]="confirmPassword" autocomplete="new-password" />
+      </div>
+    </div>
+    <button type="button" class="btn btn--outline" [disabled]="savingPassword" (click)="savePassword()">
+      @if (savingPassword) { <span class="btn__spinner"></span> }
+      {{ 'PROFILE.CHANGE_PASSWORD' | translate }}
+    </button>
+  </section>
+</div>

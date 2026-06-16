@@ -8,7 +8,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getAuthToken();
 
   // Skip adding token for auth endpoints
-  if (req.url.includes('/auth/login') || req.url.includes('/auth/signup')) {
+  if (
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/signup') ||
+    req.url.includes('/auth/send-otp') ||
+    req.url.includes('/auth/verify-otp') ||
+    req.url.includes('/roles')
+  ) {
     return next(req);
   }
 

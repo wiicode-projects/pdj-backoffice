@@ -1,0 +1,20 @@
+@import '../verify-otp/verify-otp.scss';
+
+.verify-otp-card__step {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.otp-inputs--four {
+  justify-content: center;
+  gap: 12px;
+}
+
+.otp-inputs--four .otp-inputs__digit {
+  width: 56px;
+  height: 56px;
+}

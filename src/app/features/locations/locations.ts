@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -23,6 +24,7 @@ interface DaySlot {
   address: string;
   startTime: string;
   endTime: string;
+  googleMapsUrl?: string;
 }
 
 interface DayPlan {
@@ -45,6 +47,7 @@ interface RestaurantInfo {
   phone: string | null;
   openingTime: string | null;
   closingTime: string | null;
+  imagePath?: string | null;
   locations: {
     id: string;
     address: string;
@@ -54,6 +57,11 @@ interface RestaurantInfo {
     startTime: string | null;
     endTime: string | null;
   }[] | null;
+  branches?: RestaurantInfo[];
+}
+
+interface ActiveSubscription {
+  isMultiRestaurant?: boolean;
 }
 
 @Component({
@@ -68,6 +76,10 @@ export class Locations implements OnInit {
   saving = false;
   saveSuccess = false;
   restaurant: RestaurantInfo | null = null;
+  mainRestaurant: RestaurantInfo | null = null;
+  branches: RestaurantInfo[] = [];
+  canMultiRestaurant = false;
+  selectedRestaurantId: string | null = null;
 
   // ── FIXE fields ─────────────────────────────────────────────────────
   fixeAddress = '';
@@ -93,6 +105,7 @@ export class Locations implements OnInit {
   slotModalDayIndex = -1;
   slotModalEditIndex = -1; // -1 = add, >= 0 = edit
   slotAddress = '';
+  slotGoogleMapsUrl = '';
   slotStartTime = '11:30';
   slotEndTime = '14:30';
   slotError = '';
@@ -109,28 +122,48 @@ export class Locations implements OnInit {
     private authService: AuthService,
     private locationService: LocationService,
     private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.loadRestaurant();
+    this.route.queryParams.subscribe((params) => {
+      this.selectedRestaurantId = params['restaurantId'] || null;
+      this.loadPage();
+    });
   }
 
-  get restaurantId(): string {
+  get mainRestaurantId(): string {
     return this.authService.user()?.restaurant?.id || '';
   }
 
+  get effectiveRestaurantId(): string {
+    return this.selectedRestaurantId || this.mainRestaurantId;
+  }
+
+  get showPicker(): boolean {
+    return this.canMultiRestaurant && !this.selectedRestaurantId;
+  }
+
+  get pickerRestaurants(): RestaurantInfo[] {
+    const list: RestaurantInfo[] = [];
+    if (this.mainRestaurant) list.push(this.mainRestaurant);
+    return list.concat(this.branches);
+  }
+
   get isFixe(): boolean {
-    return this.restaurant?.type === 'FIXE';
+    return this.normalizeType(this.restaurant?.type) === 'FIXE';
   }
 
   get isItinerant(): boolean {
-    return this.restaurant?.type === 'ITINERANT';
+    return this.normalizeType(this.restaurant?.type) === 'ITINERANT';
   }
 
   get typeLabel(): string {
-    if (this.restaurant?.type === 'FIXE') return 'LOCATIONS.TYPE_FIXE';
-    if (this.restaurant?.type === 'ITINERANT') return 'LOCATIONS.TYPE_ITINERANT';
+    const type = this.normalizeType(this.restaurant?.type || '');
+    if (type === 'FIXE') return 'LOCATIONS.TYPE_FIXE';
+    if (type === 'ITINERANT') return 'LOCATIONS.TYPE_ITINERANT';
     return 'LOCATIONS.TYPE_MULTI';
   }
 
@@ -143,13 +176,86 @@ export class Locations implements OnInit {
   }
 
   // ── Data loading ──────────────────────────────────────────────────────
-  loadRestaurant(): void {
-    const id = this.restaurantId;
-    if (!id) {
+  private loadPage(): void {
+    const mainId = this.mainRestaurantId;
+    if (!mainId) {
       this.loading = false;
       return;
     }
+
     this.loading = true;
+    this.http.get<{ status: number; membership: { subscription: ActiveSubscription | null } }>(
+      `${environment.apiUrl}/restaurants/${mainId}/subscriptions/active`,
+    )
+      .subscribe({
+        next: (subRes) => {
+          this.canMultiRestaurant = subRes.membership?.subscription?.isMultiRestaurant === true;
+          if (this.showPicker) {
+            this.loadPickerData(mainId);
+          } else {
+            this.loadSelectedRestaurant(true);
+          }
+        },
+        error: () => {
+          if (this.showPicker) {
+            this.loadPickerData(mainId);
+          } else {
+            this.loadSelectedRestaurant(true);
+          }
+        },
+      });
+  }
+
+  private loadPickerData(mainId: string): void {
+    this.loading = true;
+    this.http.get<any>(`${environment.apiUrl}/restaurants/${mainId}`)
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          this.mainRestaurant = res.restaurant;
+          this.branches = res.restaurant?.branches || [];
+          this.restaurant = null;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Failed to load restaurants:', err),
+      });
+  }
+
+  selectEstablishment(id: string): void {
+    this.router.navigate(['/app/locations'], { queryParams: { restaurantId: id } });
+  }
+
+  backToPicker(): void {
+    this.router.navigate(['/app/locations']);
+  }
+
+  normalizeType(type?: string): string {
+    if (!type) return '';
+    if (type === 'FIXED') return 'FIXE';
+    return type;
+  }
+
+  getTypeBadge(type: string): string {
+    const normalized = this.normalizeType(type);
+    if (normalized === 'ITINERANT') return 'LOCATIONS.TYPE_ITINERANT';
+    if (normalized === 'MULTI') return 'LOCATIONS.TYPE_MULTI';
+    return 'LOCATIONS.TYPE_FIXE';
+  }
+
+  getFullAddress(r: RestaurantInfo): string {
+    return [r.address, r.postalCode, r.city].filter(Boolean).join(', ') || '—';
+  }
+
+  loadSelectedRestaurant(setLoading = true): void {
+    const id = this.effectiveRestaurantId;
+    if (!id) {
+      if (setLoading) this.loading = false;
+      return;
+    }
+    if (setLoading) this.loading = true;
     this.http.get<any>(`${environment.apiUrl}/restaurants/${id}`)
       .pipe(finalize(() => {
         this.loading = false;
@@ -189,7 +295,7 @@ export class Locations implements OnInit {
   }
 
   private loadWeeklyPlan(): void {
-    const id = this.restaurantId;
+    const id = this.effectiveRestaurantId;
     if (!id) return;
     this.locationService.findByRestaurant(id).subscribe({
       next: (res) => {
@@ -211,6 +317,7 @@ export class Locations implements OnInit {
           address: l.address,
           startTime: l.startTime!,
           endTime: l.endTime!,
+          googleMapsUrl: l.googleMapsUrl ?? undefined,
         }));
       return {
         dayIndex: d.index,
@@ -271,6 +378,7 @@ export class Locations implements OnInit {
     this.slotModalDayIndex = dayIndex;
     this.slotModalEditIndex = -1;
     this.slotAddress = '';
+    this.slotGoogleMapsUrl = '';
     this.slotStartTime = '11:30';
     this.slotEndTime = '14:30';
     this.slotError = '';
@@ -285,6 +393,7 @@ export class Locations implements OnInit {
     this.slotModalDayIndex = dayIndex;
     this.slotModalEditIndex = slotIndex;
     this.slotAddress = slot.address;
+    this.slotGoogleMapsUrl = slot.googleMapsUrl ?? '';
     this.slotStartTime = slot.startTime;
     this.slotEndTime = slot.endTime;
     this.slotError = '';
@@ -334,6 +443,9 @@ export class Locations implements OnInit {
       address: this.slotAddress.trim(),
       startTime: this.slotStartTime,
       endTime: this.slotEndTime,
+      ...(this.slotGoogleMapsUrl.trim()
+        ? { googleMapsUrl: this.slotGoogleMapsUrl.trim() }
+        : {}),
     };
 
     if (this.slotModalEditIndex >= 0) {
@@ -397,7 +509,7 @@ export class Locations implements OnInit {
 
   // ── ITINERANT: Save plan ──────────────────────────────────────────────
   saveWeeklyPlan(): void {
-    const id = this.restaurantId;
+    const id = this.effectiveRestaurantId;
     if (!id) return;
 
     this.savingPlan = true;
@@ -412,6 +524,9 @@ export class Locations implements OnInit {
           dayOfWeek: day.dayIndex,
           startTime: slot.startTime,
           endTime: slot.endTime,
+          ...(slot.googleMapsUrl?.trim()
+            ? { googleMapsUrl: slot.googleMapsUrl.trim() }
+            : {}),
         });
       }
     }
@@ -471,5 +586,12 @@ export class Locations implements OnInit {
       this.fixeGoogleMapsUrl || `${this.fixeAddress}, ${this.fixeCity}`
     );
     window.open(`https://maps.google.com/?q=${query}`, '_blank');
+  }
+
+  openSlotGoogleMaps(url?: string): void {
+    const target = (url ?? this.slotGoogleMapsUrl).trim();
+    if (target) {
+      window.open(target, '_blank');
+    }
   }
 }

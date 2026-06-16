@@ -9,6 +9,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { RestaurantService } from '../../core/services/restaurant.service';
 import { environment } from '../../../environments/environment';
 
+interface RestaurantSubscription {
+  id: string;
+  name: string;
+  maxRestaurants?: number | null;
+  isAllowedToBeItinerant?: boolean;
+  isMultiRestaurant?: boolean;
+}
+
 interface Restaurant {
   id: string;
   name: string;
@@ -36,8 +44,14 @@ interface Restaurant {
     id: string;
     isActive: boolean;
     endingAt: string | null;
-    subscription: { id: string; name: string } | null;
+    subscription: RestaurantSubscription | null;
   } | null;
+}
+
+interface ActiveSubscription {
+  maxRestaurants?: number | null;
+  isAllowedToBeItinerant?: boolean;
+  isMultiRestaurant?: boolean;
 }
 
 @Component({
@@ -63,6 +77,10 @@ export class MyRestaurants implements OnInit {
   branchCity = '';
   branchAddress = '';
   branchType: 'FIXE' | 'ITINERANT' = 'FIXE';
+
+  canMultiRestaurant = false;
+  canBeItinerant = false;
+  maxRestaurants = 1;
 
   constructor(
     private http: HttpClient,
@@ -95,6 +113,8 @@ export class MyRestaurants implements OnInit {
     .subscribe({
       next: (res) => {
         this.restaurant = res.restaurant;
+        this.applySubscription(res.restaurant.membership?.subscription ?? null);
+        this.loadActiveSubscription(id);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -105,6 +125,22 @@ export class MyRestaurants implements OnInit {
 
   get branches(): Restaurant[] {
     return this.restaurant?.branches || [];
+  }
+
+  get totalRestaurantCount(): number {
+    return 1 + this.branches.length;
+  }
+
+  get canCreateBranch(): boolean {
+    return this.canMultiRestaurant && this.totalRestaurantCount < this.maxRestaurants;
+  }
+
+  get branchQuotaReached(): boolean {
+    return this.canMultiRestaurant && this.totalRestaurantCount >= this.maxRestaurants;
+  }
+
+  get itinerantLocked(): boolean {
+    return !this.canBeItinerant;
   }
 
   // ── Panel ───────────────────────────────────────────────────────────────────
@@ -126,9 +162,33 @@ export class MyRestaurants implements OnInit {
     this.router.navigate(['/app/manage-restaurant']);
   }
 
+  goToMembership(): void {
+    this.router.navigate(['/app/membership']);
+  }
+
+  private loadActiveSubscription(restaurantId: string): void {
+    this.http.get<{ status: number; membership: { subscription: ActiveSubscription | null } }>(
+      `${environment.apiUrl}/restaurants/${restaurantId}/subscriptions/active`
+    ).subscribe({
+      next: (res) => {
+        this.applySubscription(res.membership?.subscription ?? null);
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
+  }
+
+  private applySubscription(subscription: ActiveSubscription | RestaurantSubscription | null): void {
+    this.canMultiRestaurant = subscription?.isMultiRestaurant === true;
+    this.canBeItinerant = subscription?.isAllowedToBeItinerant === true;
+    this.maxRestaurants = subscription?.maxRestaurants ?? 1;
+  }
+
   // ── Create branch ──────────────────────────────────────────────────────────
 
   openCreateModal(): void {
+    if (!this.canCreateBranch) return;
+
     this.showCreateModal = true;
     this.createError = '';
     this.branchName = '';
@@ -143,13 +203,27 @@ export class MyRestaurants implements OnInit {
     this.createError = '';
   }
 
+  selectBranchType(type: 'FIXE' | 'ITINERANT'): void {
+    if (type === 'ITINERANT' && this.itinerantLocked) return;
+    this.branchType = type;
+    this.cdr.detectChanges();
+  }
+
   createBranch(): void {
+    if (!this.canCreateBranch) {
+      this.createError = 'MY_RESTAURANTS.BRANCH_QUOTA_REACHED';
+      return;
+    }
     if (!this.branchName.trim()) {
-      this.createError = 'Le nom est requis.';
+      this.createError = 'MY_RESTAURANTS.BRANCH_NAME_REQUIRED';
       return;
     }
     if (!this.branchCity.trim()) {
-      this.createError = 'La ville est requise.';
+      this.createError = 'MY_RESTAURANTS.BRANCH_CITY_REQUIRED';
+      return;
+    }
+    if (this.branchType === 'ITINERANT' && this.itinerantLocked) {
+      this.createError = 'MY_RESTAURANTS.ITINERANT_LOCKED';
       return;
     }
 
@@ -180,7 +254,7 @@ export class MyRestaurants implements OnInit {
         },
         error: (err) => {
           console.error('Failed to create branch:', err);
-          this.createError = err.error?.message || 'Erreur lors de la création.';
+          this.createError = err.error?.message || 'MY_RESTAURANTS.BRANCH_CREATE_ERROR';
           this.cdr.detectChanges();
         },
       });

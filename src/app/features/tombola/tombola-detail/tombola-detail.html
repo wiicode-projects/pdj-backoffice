@@ -25,6 +25,15 @@
         @if (isOpen) {
           <button
             type="button"
+            class="btn btn--secondary"
+            [disabled]="runningAutoDraw || showDrawModal || drawingRank !== null"
+            (click)="runAutoDraw()"
+          >
+            @if (runningAutoDraw) { <span class="btn__spinner"></span> }
+            Tirage auto complet
+          </button>
+          <button
+            type="button"
             class="btn btn--primary btn--draw"
             [disabled]="showDrawModal || drawingRank !== null || !canRunDraw"
             (click)="runDraw()"
@@ -139,7 +148,10 @@
                 <div class="reward-card__winner">
                   <div class="avatar">{{ getInitials(winnerEntry.user.firstName, winnerEntry.user.lastName) }}</div>
                   <div class="reward-card__winner-info">
-                    <strong>{{ getFullName(winnerEntry.user.firstName, winnerEntry.user.lastName) }}</strong>
+                    <strong>{{ getTombolaDisplayName(winnerEntry.user) }}</strong>
+                    @if (winnerEntry.user.tombolaUsername) {
+                      <span class="text-muted">{{ getFullName(winnerEntry.user.firstName, winnerEntry.user.lastName) }}</span>
+                    }
                     <span>{{ winnerEntry.ticketCount }} {{ 'TOMBOLA.TICKETS' | translate }}</span>
                   </div>
                 </div>
@@ -404,11 +416,14 @@
             {{ getInitials(pendingDrawResult.winner.user.firstName, pendingDrawResult.winner.user.lastName) }}
           </div>
           <h2 class="draw-modal__winner-name">
-            {{ getFullName(pendingDrawResult.winner.user.firstName, pendingDrawResult.winner.user.lastName) }}
+            {{ getTombolaDisplayName(pendingDrawResult.winner.user) }}
           </h2>
           <p class="draw-modal__winner-meta">
             {{ pendingDrawResult.winner.ticketCount }} {{ 'TOMBOLA.TICKETS' | translate }}
             · {{ pendingDrawResult.winner.user.email }}
+            @if (pendingDrawResult.winner.user.tombolaUsername) {
+              · @{{ pendingDrawResult.winner.user.tombolaUsername }}
+            }
           </p>
           <p class="draw-modal__close-hint">{{ 'TOMBOLA.DRAW_CLOSE_HINT' | translate }}</p>
           <button type="button" class="btn btn--primary draw-modal__close-btn" (click)="closeDrawModal()">

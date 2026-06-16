@@ -215,6 +215,22 @@ $bg-page: #F9FAFB;
     font-size: 0.82rem; color: $text-medium;
     svg { flex-shrink: 0; color: $text-light; }
   }
+  &__maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $primary-red;
+    cursor: pointer;
+    font-family: inherit;
+
+    &:hover { text-decoration: underline; }
+  }
   &__actions { display: flex; gap: 4px; }
 }
 
@@ -319,6 +335,23 @@ $bg-page: #F9FAFB;
     color: $text-dark; font-family: inherit; background: transparent;
     &:focus { outline: none; }
     &::placeholder { color: $text-light; }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba($primary-red, 0.08);
+    color: $primary-red;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover { background: rgba($primary-red, 0.14); }
   }
 }
 
@@ -459,6 +492,98 @@ $bg-page: #F9FAFB;
 }
 
 .animate-in { animation: cardSlideUp 0.5s ease both; }
+
+.change-establishment-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid $border-color;
+  background: #fff;
+  color: $text-dark;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.multi-picker {
+  &__banner {
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: #fff;
+    border-left: 4px solid $primary-red;
+    margin-bottom: 16px;
+    h2 { margin: 0 0 8px; font-size: 1rem; color: $text-dark; }
+    p { margin: 0; font-size: 0.88rem; color: $text-medium; line-height: 1.45; }
+  }
+
+  &__count {
+    margin: 0 0 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-light;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+}
+
+.establishment-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1.5px solid $border-color;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-red;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    h3 { margin: 0; font-size: 0.95rem; color: $text-dark; }
+  }
+
+  &__badge {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba($primary-red, 0.08);
+    color: $primary-red;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  &__type {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $primary-red;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__address {
+    margin: 0;
+    font-size: 0.82rem;
+    color: $text-medium;
+    line-height: 1.4;
+  }
+}
 
 // ── RESPONSIVE ───────────────────────────────────────────────────────
 @media (max-width: 600px) {

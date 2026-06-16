@@ -68,7 +68,8 @@
               "buildTarget": "pdj-backoffice:build:production"
             },
             "development": {
-              "buildTarget": "pdj-backoffice:build:development"
+              "buildTarget": "pdj-backoffice:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

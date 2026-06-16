@@ -33,7 +33,7 @@
     "LOGOUT": "Déconnexion",
     "EMAIL": "Adresse e-mail",
     "EMAIL_LABEL": "Username ou E-mail",
-    "EMAIL_PLACEHOLDER": "Admin@leplatdujour.ch",
+    "EMAIL_PLACEHOLDER": "restaurant@gmail.com",
     "PASSWORD": "Mot de passe",
     "SIGN_IN": "Se connecter",
     "ACCESS_DASHBOARD": "Accéder au Dashboard",

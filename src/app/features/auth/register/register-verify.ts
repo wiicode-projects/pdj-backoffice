@@ -6,6 +6,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignupService } from '../../../core/services/signup.service';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
+import {
+  createEmptyOtpDigits,
+  OTP_CODE_LENGTH,
+} from '../../../core/constants/otp.constants';
 
 @Component({
   selector: 'pdj-register-verify',
@@ -17,7 +21,7 @@ import { LanguageSwitcher } from '../../../shared/components/language-switcher/l
 export class RegisterVerify implements AfterViewInit, OnInit {
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  digits: string[] = ['', '', '', ''];
+  digits: string[] = createEmptyOtpDigits();
   token = '';
   email = '';
   isSubmitting = signal(false);
@@ -60,7 +64,7 @@ export class RegisterVerify implements AfterViewInit, OnInit {
     this.digits[index] = value;
     this.errorMessage.set('');
 
-    if (value && index < 3) {
+    if (value && index < OTP_CODE_LENGTH - 1) {
       const inputs = this.otpInputs.toArray();
       inputs[index + 1].nativeElement.focus();
     }
@@ -80,14 +84,14 @@ export class RegisterVerify implements AfterViewInit, OnInit {
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const text = event.clipboardData?.getData('text') || '';
-    const pasted = text.replace(/\D/g, '').split('').slice(0, 4);
+    const pasted = text.replace(/\D/g, '').split('').slice(0, OTP_CODE_LENGTH);
 
     pasted.forEach((d, i) => {
       this.digits[i] = d;
     });
 
     const inputs = this.otpInputs.toArray();
-    const nextIndex = Math.min(pasted.length, 3);
+    const nextIndex = Math.min(pasted.length, OTP_CODE_LENGTH - 1);
     inputs[nextIndex]?.nativeElement.focus();
 
     if (this.digits.every((d) => d !== '')) {
@@ -97,7 +101,7 @@ export class RegisterVerify implements AfterViewInit, OnInit {
 
   onSubmit(): void {
     const code = this.digits.join('');
-    if (code.length !== 4) {
+    if (code.length !== OTP_CODE_LENGTH) {
       this.errorMessage.set('AUTH.SIGNUP_OTP_INCOMPLETE');
       return;
     }
@@ -125,7 +129,7 @@ export class RegisterVerify implements AfterViewInit, OnInit {
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        this.digits = ['', '', '', ''];
+        this.digits = createEmptyOtpDigits();
         const inputs = this.otpInputs.toArray();
         if (inputs.length > 0) inputs[0].nativeElement.focus();
 
@@ -155,7 +159,7 @@ export class RegisterVerify implements AfterViewInit, OnInit {
         this.signupService.saveOtpSession(response.token, this.email);
         this.isResending.set(false);
         this.resendSuccess.set('AUTH.OTP_RESENT');
-        this.digits = ['', '', '', ''];
+        this.digits = createEmptyOtpDigits();
         const inputs = this.otpInputs.toArray();
         if (inputs.length > 0) inputs[0].nativeElement.focus();
       },

@@ -196,6 +196,15 @@ $success-border: #BBF7D0;
   gap: 10px;
   margin-top: 4px;
 
+  &--four {
+    gap: 12px;
+
+    .otp-inputs__digit {
+      width: 56px;
+      height: 56px;
+    }
+  }
+
   &__digit {
     width: 52px;
     height: 60px;

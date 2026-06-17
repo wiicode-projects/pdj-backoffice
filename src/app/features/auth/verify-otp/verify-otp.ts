@@ -6,6 +6,10 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
 import { environment } from '../../../../environments/environment';
+import {
+  createEmptyOtpDigits,
+  OTP_CODE_LENGTH,
+} from '../../../core/constants/otp.constants';
 
 @Component({
   selector: 'pdj-verify-otp',
@@ -17,7 +21,8 @@ import { environment } from '../../../../environments/environment';
 export class VerifyOtp implements AfterViewInit {
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  digits: string[] = ['', '', '', '', '', ''];
+  readonly otpLength = OTP_CODE_LENGTH;
+  digits: string[] = createEmptyOtpDigits();
   token = '';
   email = '';
   isSubmitting = signal(false);
@@ -47,7 +52,6 @@ export class VerifyOtp implements AfterViewInit {
     const input = event.target as HTMLInputElement;
     const value = input.value;
 
-    // Only allow digits
     if (!/^\d*$/.test(value)) {
       input.value = '';
       this.digits[index] = '';
@@ -57,20 +61,17 @@ export class VerifyOtp implements AfterViewInit {
     this.digits[index] = value;
     this.errorMessage.set('');
 
-    // Auto-advance to next input
-    if (value && index < 5) {
+    if (value && index < this.otpLength - 1) {
       const inputs = this.otpInputs.toArray();
       inputs[index + 1].nativeElement.focus();
     }
 
-    // Auto-submit when all 6 digits are filled
     if (this.digits.every((d) => d !== '')) {
       this.onSubmit();
     }
   }
 
   onKeyDown(event: KeyboardEvent, index: number): void {
-    // Handle backspace — go to previous input
     if (event.key === 'Backspace' && !this.digits[index] && index > 0) {
       const inputs = this.otpInputs.toArray();
       inputs[index - 1].nativeElement.focus();
@@ -80,15 +81,15 @@ export class VerifyOtp implements AfterViewInit {
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const text = event.clipboardData?.getData('text') || '';
-    const digits = text.replace(/\D/g, '').split('').slice(0, 6);
+    const pasted = text.replace(/\D/g, '').split('').slice(0, this.otpLength);
 
-    digits.forEach((d, i) => {
+    pasted.forEach((d, i) => {
       this.digits[i] = d;
     });
 
     const inputs = this.otpInputs.toArray();
-    const nextIndex = Math.min(digits.length, 5);
-    inputs[nextIndex].nativeElement.focus();
+    const nextIndex = Math.min(pasted.length, this.otpLength - 1);
+    inputs[nextIndex]?.nativeElement.focus();
 
     if (this.digits.every((d) => d !== '')) {
       this.onSubmit();
@@ -97,7 +98,7 @@ export class VerifyOtp implements AfterViewInit {
 
   onSubmit(): void {
     const code = this.digits.join('');
-    if (code.length !== 6) {
+    if (code.length !== this.otpLength) {
       this.errorMessage.set('AUTH.OTP_INCOMPLETE');
       return;
     }
@@ -119,10 +120,7 @@ export class VerifyOtp implements AfterViewInit {
         },
         error: (err) => {
           this.isSubmitting.set(false);
-          this.digits = ['', '', '', '', '', ''];
-          const inputs = this.otpInputs.toArray();
-          if (inputs.length > 0) inputs[0].nativeElement.focus();
-
+          this.resetDigits();
           if (err.status === 404) {
             this.errorMessage.set('AUTH.OTP_INVALID');
           } else if (err.status === 403) {
@@ -150,14 +148,20 @@ export class VerifyOtp implements AfterViewInit {
           this.token = response.token;
           this.isResending.set(false);
           this.resendSuccess.set('AUTH.OTP_RESENT');
-          this.digits = ['', '', '', '', '', ''];
-          const inputs = this.otpInputs.toArray();
-          if (inputs.length > 0) inputs[0].nativeElement.focus();
+          this.resetDigits();
         },
         error: () => {
           this.isResending.set(false);
           this.errorMessage.set('AUTH.SERVER_ERROR');
         },
       });
+  }
+
+  private resetDigits(): void {
+    this.digits = createEmptyOtpDigits();
+    const inputs = this.otpInputs.toArray();
+    if (inputs.length > 0) {
+      inputs[0].nativeElement.focus();
+    }
   }
 }

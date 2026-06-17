@@ -1,0 +1,260 @@
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">{{ 'WEBSITE.TITLE' | translate }}</h1>
+      <span class="page-header__count">{{ 'WEBSITE.SUBTITLE' | translate }}</span>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-state__spinner"></div>
+    </div>
+  }
+
+  @if (!loading) {
+    <section class="panel">
+      <div class="panel__header">
+        <h2>{{ 'WEBSITE.VISIBILITY_TITLE' | translate }}</h2>
+        <p>{{ 'WEBSITE.VISIBILITY_DESC' | translate }}</p>
+      </div>
+
+      <div class="visibility-rows">
+        <div class="visibility-row">
+          <div>
+            <strong>{{ 'WEBSITE.STATS_SECTION' | translate }}</strong>
+            <p>{{ 'WEBSITE.STATS_SECTION_DESC' | translate }}</p>
+          </div>
+          <label class="toggle" for="toggle-stats">
+            <input type="checkbox" id="toggle-stats" [(ngModel)]="statsSectionEnabled" class="toggle__input"/>
+            <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          </label>
+        </div>
+
+        <div class="visibility-row">
+          <div>
+            <strong>{{ 'WEBSITE.TESTIMONIALS_SECTION' | translate }}</strong>
+            <p>{{ 'WEBSITE.TESTIMONIALS_SECTION_DESC' | translate }}</p>
+          </div>
+          <label class="toggle" for="toggle-testimonials">
+            <input type="checkbox" id="toggle-testimonials" [(ngModel)]="testimonialsSectionEnabled" class="toggle__input"/>
+            <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel__actions">
+        @if (visibilitySuccess) {
+          <span class="save-msg save-msg--success">{{ 'WEBSITE.SAVED' | translate }}</span>
+        }
+        @if (visibilityError) {
+          <span class="save-msg save-msg--error">{{ visibilityError }}</span>
+        }
+        <button class="btn btn--primary" [disabled]="savingVisibility" (click)="saveVisibility()">
+          @if (savingVisibility) { <div class="btn__spinner"></div> }
+          {{ 'WEBSITE.SAVE_VISIBILITY' | translate }}
+        </button>
+      </div>
+
+      <div class="stats-preview">
+        <div class="stats-preview__header">
+          <div>
+            <h3>{{ 'WEBSITE.STATS_PREVIEW' | translate }}</h3>
+            <p class="stats-preview__hint">{{ 'WEBSITE.STATS_PREVIEW_HINT' | translate }}</p>
+          </div>
+        </div>
+        <div class="stats-preview__grid">
+          @for (stat of statsPreview; track stat.key) {
+            <div class="stats-preview__card stats-preview__card--editable">
+              <label class="stats-preview__label" [for]="'stat-' + stat.key">{{ statLabels[stat.key] }}</label>
+              <div class="stats-preview__input-row">
+                <input
+                  class="stats-preview__input"
+                  [id]="'stat-' + stat.key"
+                  type="number"
+                  [(ngModel)]="stat.val"
+                  [step]="stat.isDecimal ? 0.1 : 1"
+                  [min]="0"
+                  [max]="stat.isDecimal ? 5 : null"
+                />
+                @if (stat.suffix) {
+                  <span class="stats-preview__suffix">{{ stat.suffix }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <div class="panel__actions stats-preview__actions">
+          @if (statsSuccess) {
+            <span class="save-msg save-msg--success">{{ 'WEBSITE.STATS_SAVED' | translate }}</span>
+          }
+          @if (statsError) {
+            <span class="save-msg save-msg--error">{{ statsError }}</span>
+          }
+          <button class="btn btn--secondary" [disabled]="syncingStats" (click)="syncStatsFromDatabase()">
+            @if (syncingStats) { <div class="btn__spinner"></div> }
+            {{ 'WEBSITE.SYNC_STATS' | translate }}
+          </button>
+          <button class="btn btn--primary" [disabled]="savingStats" (click)="saveStats()">
+            @if (savingStats) { <div class="btn__spinner"></div> }
+            {{ 'WEBSITE.SAVE_STATS' | translate }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel--spaced">
+      <div class="panel__header panel__header--row">
+        <div>
+          <h2>{{ 'WEBSITE.TESTIMONIALS_TITLE' | translate }}</h2>
+          <p>{{ 'WEBSITE.TESTIMONIALS_DESC' | translate }}</p>
+        </div>
+        <button class="btn btn--primary" (click)="openCreate()">
+          {{ 'WEBSITE.ADD_TESTIMONIAL' | translate }}
+        </button>
+      </div>
+
+      @if (loadingTestimonials) {
+        <div class="loading-state loading-state--compact">
+          <div class="loading-state__spinner"></div>
+        </div>
+      }
+
+      @if (!loadingTestimonials && testimonials.length === 0) {
+        <div class="empty-state">
+          <h3>{{ 'WEBSITE.NO_TESTIMONIALS' | translate }}</h3>
+          <p>{{ 'WEBSITE.NO_TESTIMONIALS_DESC' | translate }}</p>
+          <button class="btn btn--primary" (click)="openCreate()">{{ 'WEBSITE.ADD_TESTIMONIAL' | translate }}</button>
+        </div>
+      }
+
+      @if (!loadingTestimonials && testimonials.length > 0) {
+        <div class="testimonials-table-wrap">
+          <table class="testimonials-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>{{ 'WEBSITE.COL_NAME' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_ROLE' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_LOCATION' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_RATING' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_STATUS' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of testimonials; track item.id; let i = $index) {
+                <tr [class.testimonials-table__row--inactive]="!item.isActive">
+                  <td>
+                    @if (getImageUrl(item)) {
+                      <img [src]="getImageUrl(item)!" [alt]="item.name" class="testimonials-table__avatar">
+                    } @else {
+                      <div class="testimonials-table__avatar testimonials-table__avatar--empty"></div>
+                    }
+                  </td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.role }}</td>
+                  <td>{{ item.location }}</td>
+                  <td>{{ item.rating }}/5</td>
+                  <td>
+                    <span class="status-pill" [class.status-pill--inactive]="!item.isActive">
+                      {{ item.isActive ? ('WEBSITE.ACTIVE' | translate) : ('WEBSITE.INACTIVE' | translate) }}
+                    </span>
+                  </td>
+                  <td class="testimonials-table__actions">
+                    <button class="btn btn--sm btn--secondary" (click)="moveTestimonial(item, -1)" [disabled]="i === 0">↑</button>
+                    <button class="btn btn--sm btn--secondary" (click)="moveTestimonial(item, 1)" [disabled]="i === testimonials.length - 1">↓</button>
+                    <button class="btn btn--sm btn--secondary" (click)="openEdit(item)">{{ 'WEBSITE.EDIT' | translate }}</button>
+                    @if (confirmDeleteId !== item.id) {
+                      <button class="btn btn--sm btn--danger" (click)="askDelete(item.id)">{{ 'WEBSITE.DELETE' | translate }}</button>
+                    } @else {
+                      <div class="confirm-delete">
+                        <button class="btn btn--sm btn--danger" [disabled]="deleting" (click)="confirmDelete(item.id)">{{ 'WEBSITE.CONFIRM' | translate }}</button>
+                        <button class="btn btn--sm btn--secondary" (click)="cancelDelete()">{{ 'WEBSITE.CANCEL' | translate }}</button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+</div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ editing ? ('WEBSITE.EDIT_TESTIMONIAL' | translate) : ('WEBSITE.ADD_TESTIMONIAL' | translate) }}</h2>
+        <button class="modal__close" (click)="closeModal()">×</button>
+      </div>
+
+      <div class="modal__body">
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_IMAGE' | translate }}</label>
+          <label class="image-drop" [class.image-drop--filled]="imagePreview">
+            @if (imagePreview) {
+              <img [src]="imagePreview" class="image-drop__preview" alt="aperçu">
+              <span class="image-drop__change">{{ 'WEBSITE.CHANGE_IMAGE' | translate }}</span>
+            } @else {
+              <span>{{ 'WEBSITE.CHOOSE_IMAGE' | translate }}</span>
+            }
+            <input type="file" accept="image/*" class="image-drop__input" (change)="onFileChange($event)">
+          </label>
+        </div>
+
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_NAME' | translate }} *</label>
+          <input class="field__input" type="text" [(ngModel)]="form.name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label">{{ 'WEBSITE.FIELD_ROLE' | translate }}</label>
+            <input class="field__input" type="text" [(ngModel)]="form.role">
+          </div>
+          <div class="field">
+            <label class="field__label">{{ 'WEBSITE.FIELD_LOCATION' | translate }}</label>
+            <input class="field__input" type="text" [(ngModel)]="form.location">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_QUOTE' | translate }} *</label>
+          <textarea class="field__input field__input--textarea" [(ngModel)]="form.quote" rows="4"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label">{{ 'WEBSITE.FIELD_RATING' | translate }}</label>
+            <select class="field__input" [(ngModel)]="form.rating">
+              @for (r of [1,2,3,4,5]; track r) {
+                <option [ngValue]="r">{{ r }}/5</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label">{{ 'WEBSITE.FIELD_STATUS' | translate }}</label>
+            <select class="field__input" [(ngModel)]="form.isActive">
+              <option [ngValue]="true">{{ 'WEBSITE.ACTIVE' | translate }}</option>
+              <option [ngValue]="false">{{ 'WEBSITE.INACTIVE' | translate }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="closeModal()">{{ 'WEBSITE.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" [disabled]="saving || !form.name.trim() || !form.quote.trim()" (click)="save()">
+          @if (saving) { <div class="btn__spinner"></div> }
+          {{ editing ? ('WEBSITE.SAVE' | translate) : ('WEBSITE.CREATE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

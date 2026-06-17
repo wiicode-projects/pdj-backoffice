@@ -56,6 +56,7 @@ export class Layout implements OnInit, OnDestroy {
       ],
     },
     { icon: 'ads',     label: 'NAV.ADS',            route: '/app/ads',          roles: ['ADMIN'] },
+    { icon: 'ads',     label: 'NAV.WEBSITE',        route: '/app/website',      roles: ['ADMIN'] },
     // ── Boutique submenu ────────────────────────────────────────────────────
     {
       icon: 'shop', label: 'NAV.SHOP_SECTION', route: '', roles: ['ADMIN'],

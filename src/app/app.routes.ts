@@ -139,6 +139,12 @@ export const routes: Routes = [
           import('./features/ads/ads').then((m) => m.Ads),
       },
       {
+        path: 'website',
+        canActivate: [roleGuard('ADMIN')],
+        loadComponent: () =>
+          import('./features/website/website').then((m) => m.Website),
+      },
+      {
         path: 'frites-packs',
         canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>

@@ -42,6 +42,17 @@
             <span class="toggle__track"><span class="toggle__thumb"></span></span>
           </label>
         </div>
+
+        <div class="visibility-row">
+          <div>
+            <strong>{{ 'WEBSITE.FAQ_SECTION' | translate }}</strong>
+            <p>{{ 'WEBSITE.FAQ_SECTION_DESC' | translate }}</p>
+          </div>
+          <label class="toggle" for="toggle-faq">
+            <input type="checkbox" id="toggle-faq" [(ngModel)]="faqSectionEnabled" class="toggle__input"/>
+            <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          </label>
+        </div>
       </div>
 
       <div class="panel__actions">
@@ -182,6 +193,71 @@
         </div>
       }
     </section>
+
+    <section class="panel panel--spaced">
+      <div class="panel__header panel__header--row">
+        <div>
+          <h2>{{ 'WEBSITE.FAQ_TITLE' | translate }}</h2>
+          <p>{{ 'WEBSITE.FAQ_DESC' | translate }}</p>
+        </div>
+        <button class="btn btn--primary" (click)="openCreateFaq()">
+          {{ 'WEBSITE.ADD_FAQ' | translate }}
+        </button>
+      </div>
+
+      @if (loadingFaqItems) {
+        <div class="loading-state loading-state--compact">
+          <div class="loading-state__spinner"></div>
+        </div>
+      }
+
+      @if (!loadingFaqItems && faqItems.length === 0) {
+        <div class="empty-state">
+          <h3>{{ 'WEBSITE.NO_FAQ' | translate }}</h3>
+          <p>{{ 'WEBSITE.NO_FAQ_DESC' | translate }}</p>
+          <button class="btn btn--primary" (click)="openCreateFaq()">{{ 'WEBSITE.ADD_FAQ' | translate }}</button>
+        </div>
+      }
+
+      @if (!loadingFaqItems && faqItems.length > 0) {
+        <div class="testimonials-table-wrap">
+          <table class="testimonials-table">
+            <thead>
+              <tr>
+                <th>{{ 'WEBSITE.COL_FAQ_QUESTION' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_STATUS' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of faqItems; track item.id; let i = $index) {
+                <tr [class.testimonials-table__row--inactive]="!item.isActive">
+                  <td>{{ item.translations.fr.question }}</td>
+                  <td>
+                    <span class="status-pill" [class.status-pill--inactive]="!item.isActive">
+                      {{ item.isActive ? ('WEBSITE.ACTIVE' | translate) : ('WEBSITE.INACTIVE' | translate) }}
+                    </span>
+                  </td>
+                  <td class="testimonials-table__actions">
+                    <button class="btn btn--sm btn--secondary" (click)="moveFaqItem(item, -1)" [disabled]="i === 0">↑</button>
+                    <button class="btn btn--sm btn--secondary" (click)="moveFaqItem(item, 1)" [disabled]="i === faqItems.length - 1">↓</button>
+                    <button class="btn btn--sm btn--secondary" (click)="openEditFaq(item)">{{ 'WEBSITE.EDIT' | translate }}</button>
+                    @if (confirmDeleteFaqId !== item.id) {
+                      <button class="btn btn--sm btn--danger" (click)="askDeleteFaq(item.id)">{{ 'WEBSITE.DELETE' | translate }}</button>
+                    } @else {
+                      <div class="confirm-delete">
+                        <button class="btn btn--sm btn--danger" [disabled]="deletingFaq" (click)="confirmDeleteFaq(item.id)">{{ 'WEBSITE.CONFIRM' | translate }}</button>
+                        <button class="btn btn--sm btn--secondary" (click)="cancelDeleteFaq()">{{ 'WEBSITE.CANCEL' | translate }}</button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
   }
 
 </div>
@@ -253,6 +329,60 @@
         <button class="btn btn--primary" [disabled]="saving || !form.name.trim() || !form.quote.trim()" (click)="save()">
           @if (saving) { <div class="btn__spinner"></div> }
           {{ editing ? ('WEBSITE.SAVE' | translate) : ('WEBSITE.CREATE' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showFaqModal) {
+  <div class="modal-overlay" (click)="closeFaqModal()">
+    <div class="modal modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ editingFaq ? ('WEBSITE.EDIT_FAQ' | translate) : ('WEBSITE.ADD_FAQ' | translate) }}</h2>
+        <button class="modal__close" (click)="closeFaqModal()">×</button>
+      </div>
+
+      <div class="modal__body">
+        <div class="lang-tabs">
+          @for (locale of faqLocales; track locale.code) {
+            <button
+              type="button"
+              class="lang-tabs__btn"
+              [class.lang-tabs__btn--active]="faqActiveTab === locale.code"
+              (click)="faqActiveTab = locale.code"
+            >
+              {{ locale.label }}
+            </button>
+          }
+        </div>
+
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_FAQ_QUESTION' | translate }} *</label>
+          <input class="field__input" type="text" [(ngModel)]="faqForm[faqActiveTab].question">
+        </div>
+
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_FAQ_ANSWER' | translate }} *</label>
+          <textarea class="field__input field__input--textarea" [(ngModel)]="faqForm[faqActiveTab].answer" rows="5"></textarea>
+        </div>
+
+        <p class="field__hint">{{ 'WEBSITE.FAQ_ALL_LANGS_HINT' | translate }}</p>
+
+        <div class="field">
+          <label class="field__label">{{ 'WEBSITE.FIELD_STATUS' | translate }}</label>
+          <select class="field__input" [(ngModel)]="faqIsActive">
+            <option [ngValue]="true">{{ 'WEBSITE.ACTIVE' | translate }}</option>
+            <option [ngValue]="false">{{ 'WEBSITE.INACTIVE' | translate }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="closeFaqModal()">{{ 'WEBSITE.CANCEL' | translate }}</button>
+        <button class="btn btn--primary" [disabled]="savingFaq || !isFaqFormValid()" (click)="saveFaq()">
+          @if (savingFaq) { <div class="btn__spinner"></div> }
+          {{ editingFaq ? ('WEBSITE.SAVE' | translate) : ('WEBSITE.CREATE' | translate) }}
         </button>
       </div>
     </div>

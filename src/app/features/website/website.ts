@@ -6,6 +6,9 @@ import { finalize } from 'rxjs';
 import {
   WebsiteService,
   Testimonial,
+  FaqItem,
+  FaqLocale,
+  FaqItemTranslations,
   LandingStatPreview,
 } from '../../core/services/website.service';
 import { environment } from '../../../environments/environment';
@@ -29,10 +32,14 @@ export class Website implements OnInit {
 
   statsSectionEnabled = false;
   testimonialsSectionEnabled = false;
+  faqSectionEnabled = false;
   statsPreview: LandingStatPreview[] = [];
 
   testimonials: Testimonial[] = [];
   loadingTestimonials = true;
+
+  faqItems: FaqItem[] = [];
+  loadingFaqItems = true;
 
   showModal = false;
   editing: Testimonial | null = null;
@@ -52,6 +59,23 @@ export class Website implements OnInit {
   confirmDeleteId: string | null = null;
   deleting = false;
 
+  showFaqModal = false;
+  editingFaq: FaqItem | null = null;
+  savingFaq = false;
+  faqActiveTab: FaqLocale = 'fr';
+  confirmDeleteFaqId: string | null = null;
+  deletingFaq = false;
+
+  readonly faqLocales: { code: FaqLocale; label: string }[] = [
+    { code: 'fr', label: 'Français' },
+    { code: 'en', label: 'English' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'it', label: 'Italiano' },
+  ];
+
+  faqForm: FaqItemTranslations = this.emptyFaqTranslations();
+  faqIsActive = true;
+
   readonly apiBase = environment.apiUrl.replace('/api/v1', '');
 
   constructor(
@@ -62,6 +86,16 @@ export class Website implements OnInit {
   ngOnInit(): void {
     this.loadSettings();
     this.loadTestimonials();
+    this.loadFaqItems();
+  }
+
+  private emptyFaqTranslations(): FaqItemTranslations {
+    return {
+      fr: { question: '', answer: '' },
+      en: { question: '', answer: '' },
+      de: { question: '', answer: '' },
+      it: { question: '', answer: '' },
+    };
   }
 
   loadSettings(): void {
@@ -72,6 +106,7 @@ export class Website implements OnInit {
         next: (settings) => {
           this.statsSectionEnabled = settings.statsSectionEnabled;
           this.testimonialsSectionEnabled = settings.testimonialsSectionEnabled;
+          this.faqSectionEnabled = settings.faqSectionEnabled;
           this.statsPreview = settings.statsPreview ?? [];
           this.cdr.detectChanges();
         },
@@ -94,6 +129,18 @@ export class Website implements OnInit {
       });
   }
 
+  loadFaqItems(): void {
+    this.loadingFaqItems = true;
+    this.websiteService.findAllFaqItems()
+      .pipe(finalize(() => { this.loadingFaqItems = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (r) => {
+          this.faqItems = r.faqItems;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   saveVisibility(): void {
     if (this.savingVisibility) return;
     this.savingVisibility = true;
@@ -103,6 +150,7 @@ export class Website implements OnInit {
     this.websiteService.updateVisibility({
       statsSectionEnabled: this.statsSectionEnabled,
       testimonialsSectionEnabled: this.testimonialsSectionEnabled,
+      faqSectionEnabled: this.faqSectionEnabled,
     }).pipe(finalize(() => {
       this.savingVisibility = false;
       this.cdr.detectChanges();
@@ -110,6 +158,7 @@ export class Website implements OnInit {
       next: (settings) => {
         this.statsSectionEnabled = settings.statsSectionEnabled;
         this.testimonialsSectionEnabled = settings.testimonialsSectionEnabled;
+        this.faqSectionEnabled = settings.faqSectionEnabled;
         this.visibilitySuccess = true;
         this.cdr.detectChanges();
         setTimeout(() => {
@@ -336,6 +385,110 @@ export class Website implements OnInit {
       },
       error: () => {
         this.deleting = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  openCreateFaq(): void {
+    this.editingFaq = null;
+    this.faqActiveTab = 'fr';
+    this.faqForm = this.emptyFaqTranslations();
+    this.faqIsActive = true;
+    this.showFaqModal = true;
+    this.cdr.detectChanges();
+  }
+
+  openEditFaq(item: FaqItem): void {
+    this.editingFaq = item;
+    this.faqActiveTab = 'fr';
+    this.faqForm = {
+      fr: { ...item.translations.fr },
+      en: { ...item.translations.en },
+      de: { ...item.translations.de },
+      it: { ...item.translations.it },
+    };
+    this.faqIsActive = item.isActive;
+    this.showFaqModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeFaqModal(): void {
+    this.showFaqModal = false;
+    this.cdr.detectChanges();
+  }
+
+  isFaqFormValid(): boolean {
+    return this.faqLocales.every(
+      ({ code }) =>
+        this.faqForm[code].question.trim().length > 0 &&
+        this.faqForm[code].answer.trim().length > 0,
+    );
+  }
+
+  saveFaq(): void {
+    if (!this.isFaqFormValid() || this.savingFaq) return;
+    this.savingFaq = true;
+
+    const payload = {
+      translations: this.faqForm,
+      isActive: this.faqIsActive,
+    };
+
+    const req$ = this.editingFaq
+      ? this.websiteService.updateFaqItem(this.editingFaq.id, payload)
+      : this.websiteService.createFaqItem(payload);
+
+    req$.subscribe({
+      next: () => {
+        this.savingFaq = false;
+        this.showFaqModal = false;
+        this.cdr.detectChanges();
+        this.loadFaqItems();
+      },
+      error: () => {
+        this.savingFaq = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  moveFaqItem(item: FaqItem, direction: -1 | 1): void {
+    const index = this.faqItems.findIndex((f) => f.id === item.id);
+    const swapIndex = index + direction;
+    if (swapIndex < 0 || swapIndex >= this.faqItems.length) return;
+
+    const swap = this.faqItems[swapIndex];
+    this.websiteService.updateFaqItem(item.id, { sortOrder: swap.sortOrder }).subscribe({
+      next: () => {
+        this.websiteService.updateFaqItem(swap.id, { sortOrder: item.sortOrder }).subscribe({
+          next: () => this.loadFaqItems(),
+        });
+      },
+    });
+  }
+
+  askDeleteFaq(id: string): void {
+    this.confirmDeleteFaqId = id;
+    this.cdr.detectChanges();
+  }
+
+  cancelDeleteFaq(): void {
+    this.confirmDeleteFaqId = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteFaq(id: string): void {
+    this.deletingFaq = true;
+    this.websiteService.removeFaqItem(id).subscribe({
+      next: () => {
+        this.deletingFaq = false;
+        this.confirmDeleteFaqId = null;
+        this.cdr.detectChanges();
+        this.loadFaqItems();
+      },
+      error: () => {
+        this.deletingFaq = false;
         this.cdr.detectChanges();
       },
     });

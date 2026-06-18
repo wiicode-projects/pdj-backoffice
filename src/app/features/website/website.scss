@@ -338,6 +338,8 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   flex-direction: column;
 
+  &--wide { width: 640px; }
+
   &__header {
     display: flex;
     align-items: center;
@@ -381,6 +383,36 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     box-sizing: border-box;
 
     &--textarea { min-height: 80px; resize: vertical; }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: $text-medium;
+  }
+}
+
+.lang-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  &__btn {
+    padding: 8px 14px;
+    border: 1px solid $border;
+    border-radius: 999px;
+    background: $card-bg;
+    color: $text-medium;
+    font-family: $font;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &--active {
+      background: $primary-light;
+      border-color: rgba(220, 38, 38, 0.25);
+      color: $primary;
+    }
   }
 }
 

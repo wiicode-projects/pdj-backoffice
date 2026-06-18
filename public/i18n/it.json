@@ -539,13 +539,15 @@
   },
   "WEBSITE": {
     "TITLE": "Sito web",
-    "SUBTITLE": "Sezioni statistiche e testimonianze",
+    "SUBTITLE": "Sezioni statistiche, testimonianze e FAQ",
     "VISIBILITY_TITLE": "Visibilità delle sezioni",
     "VISIBILITY_DESC": "Controlla quali blocchi appaiono sulla homepage pubblica.",
     "STATS_SECTION": "Statistiche",
     "STATS_SECTION_DESC": "Mostra i numeri chiave (download, ristoranti, ecc.).",
     "TESTIMONIALS_SECTION": "Testimonianze",
     "TESTIMONIALS_SECTION_DESC": "Mostra il carosello delle testimonianze.",
+    "FAQ_SECTION": "FAQ",
+    "FAQ_SECTION_DESC": "Mostra la sezione domande frequenti sulla homepage.",
     "SAVE_VISIBILITY": "Salva visibilità",
     "SAVED": "Impostazioni salvate",
     "STATS_PREVIEW": "Anteprima statistiche visualizzate",
@@ -580,6 +582,16 @@
     "FIELD_RATING": "Valutazione",
     "FIELD_STATUS": "Stato",
     "CHOOSE_IMAGE": "Clicca per scegliere un'immagine",
-    "CHANGE_IMAGE": "Cambia immagine"
+    "CHANGE_IMAGE": "Cambia immagine",
+    "FAQ_TITLE": "FAQ",
+    "FAQ_DESC": "Gestisci le domande frequenti in francese, inglese, tedesco e italiano.",
+    "ADD_FAQ": "Aggiungi domanda",
+    "EDIT_FAQ": "Modifica domanda",
+    "NO_FAQ": "Nessuna domanda",
+    "NO_FAQ_DESC": "Aggiungi la prima domanda FAQ per la homepage.",
+    "COL_FAQ_QUESTION": "Domanda (FR)",
+    "FIELD_FAQ_QUESTION": "Domanda",
+    "FIELD_FAQ_ANSWER": "Risposta",
+    "FAQ_ALL_LANGS_HINT": "Compila domanda e risposta in tutte e 4 le lingue prima di salvare."
   }
 }

@@ -13,7 +13,26 @@ export interface LandingStatPreview {
 export interface WebsiteSettings {
   statsSectionEnabled: boolean;
   testimonialsSectionEnabled: boolean;
+  faqSectionEnabled: boolean;
   statsPreview: LandingStatPreview[];
+}
+
+export type FaqLocale = 'fr' | 'en' | 'de' | 'it';
+
+export type FaqItemTranslation = {
+  question: string;
+  answer: string;
+};
+
+export type FaqItemTranslations = Record<FaqLocale, FaqItemTranslation>;
+
+export interface FaqItem {
+  id: string;
+  translations: FaqItemTranslations;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Testimonial {
@@ -34,6 +53,7 @@ export interface Testimonial {
 export interface UpdateVisibilityDto {
   statsSectionEnabled?: boolean;
   testimonialsSectionEnabled?: boolean;
+  faqSectionEnabled?: boolean;
 }
 
 export interface UpdateStatsDto {
@@ -79,5 +99,27 @@ export class WebsiteService {
 
   remove(id: string): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(`${this.url}/testimonials/${id}`);
+  }
+
+  findAllFaqItems(): Observable<{ status: number; faqItems: FaqItem[] }> {
+    return this.http.get<{ status: number; faqItems: FaqItem[] }>(`${this.url}/faq`);
+  }
+
+  createFaqItem(body: {
+    translations: FaqItemTranslations;
+    isActive?: boolean;
+  }): Observable<{ status: number; faqItem: FaqItem }> {
+    return this.http.post<{ status: number; faqItem: FaqItem }>(`${this.url}/faq`, body);
+  }
+
+  updateFaqItem(
+    id: string,
+    body: Partial<{ translations: FaqItemTranslations; sortOrder: number; isActive: boolean }>,
+  ): Observable<{ status: number; faqItem: FaqItem }> {
+    return this.http.patch<{ status: number; faqItem: FaqItem }>(`${this.url}/faq/${id}`, body);
+  }
+
+  removeFaqItem(id: string): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${this.url}/faq/${id}`);
   }
 }

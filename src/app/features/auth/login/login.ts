@@ -45,7 +45,14 @@ export class Login {
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        if (err.status === 401 || err.status === 403) {
+        const message = err.error?.message ?? '';
+        const isInvalidCredentials =
+          err.status === 401 ||
+          err.status === 403 ||
+          err.status === 404 ||
+          message.includes("Erreur sur l'email ou le mot de passe");
+
+        if (isInvalidCredentials) {
           this.errorMessage.set('AUTH.LOGIN_ERROR');
         } else {
           this.errorMessage.set('AUTH.SERVER_ERROR');

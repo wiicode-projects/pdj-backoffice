@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -54,6 +54,7 @@ export interface FaqItem {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  statsPreview: LandingStatPreview[];
 }
 
 export interface Testimonial {

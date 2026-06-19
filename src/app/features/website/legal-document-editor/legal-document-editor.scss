@@ -1,0 +1,257 @@
+.legal-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__input {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: #1F2937;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: #9CA3AF;
+    }
+
+    &:hover {
+      border-color: #D1D5DB;
+    }
+
+    &:focus {
+      border-color: rgba(220, 38, 38, 0.45);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+    }
+
+    &--textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    &--sm {
+      max-width: 220px;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6B7280;
+  }
+}
+
+.legal-editor__grid .field {
+  margin-bottom: 0;
+}
+
+.legal-editor__grid {
+  margin-bottom: 12px;
+}
+
+.legal-block .field {
+  margin-bottom: 10px;
+}
+
+.legal-block pdj-rich-text-field {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.nested-card .field__input,
+.nested-card textarea.field__input {
+  margin-bottom: 0;
+}
+
+.list-row .field__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.legal-section__title.field__input {
+  font-weight: 600;
+}
+
+select.field__input {
+  cursor: pointer;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.legal-editor__panel {
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  background: #FAFAFA;
+}
+
+.legal-editor__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.legal-editor__heading {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.legal-editor__panel-header .legal-editor__heading {
+  margin-bottom: 0;
+}
+
+.legal-editor__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #6B7280;
+}
+
+.legal-section {
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.legal-section__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.legal-section__title {
+  flex: 1;
+  font-weight: 600;
+}
+
+.legal-section__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.legal-block {
+  border: 1px dashed #D1D5DB;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #F9FAFB;
+}
+
+.legal-block__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.legal-block__type {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6B7280;
+}
+
+.legal-block__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.legal-block__hr {
+  border: none;
+  border-top: 1px solid #D1D5DB;
+  margin: 8px 0;
+}
+
+.legal-block-add {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.list-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+
+  &--2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+  }
+}
+
+.nested-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid #E5E7EB;
+  color: #6B7280;
+  min-width: 32px;
+  padding: 4px 8px;
+}
+
+.btn--danger {
+  color: #DC2626;
+}
+
+@media (max-width: 768px) {
+  .legal-editor__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .list-row--2 {
+    grid-template-columns: 1fr;
+  }
+}

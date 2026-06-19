@@ -728,3 +728,158 @@ $teal: #0B7285;
   &--invoice        { background: rgba($teal,   0.1); color: $teal; }
   &--subscription   { background: rgba($red,    0.1); color: $red; }
 }
+
+// ── Admins tab ─────────────────────────────
+.settings-section__header--row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.btn-save--secondary {
+  background: #fff;
+  color: $teal;
+  border: 1.5px solid $teal;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: rgba($teal, 0.06);
+  }
+}
+
+.settings-feedback--block {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+
+  &.settings-feedback--success {
+    background: rgba($green, 0.1);
+    color: darken($green, 12%);
+  }
+
+  &.settings-feedback--error {
+    background: rgba($red, 0.08);
+    color: $red;
+  }
+}
+
+.settings-actions--inline {
+  margin-top: 16px;
+  justify-content: flex-start;
+}
+
+.admin-form-card {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid $border;
+  border-radius: 12px;
+  background: rgba($teal, 0.03);
+
+  &__title {
+    margin: 0 0 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-dark;
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.88rem;
+    color: $text-mid;
+    cursor: pointer;
+  }
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid $border;
+  border-radius: 12px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid $border;
+  }
+
+  th {
+    background: #F9FAFB;
+    font-weight: 600;
+    color: $text-mid;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  &__name {
+    font-weight: 600;
+    color: $text-dark;
+  }
+
+  &__badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba($teal, 0.12);
+    color: $teal;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba($green, 0.12);
+    color: darken($green, 10%);
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    &--inactive {
+      background: rgba($text-light, 0.15);
+      color: $text-mid;
+    }
+  }
+
+  &__action {
+    padding: 7px 12px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: #fff;
+    color: $teal;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) {
+      background: rgba($teal, 0.06);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: $text-mid;
+    padding: 32px 16px !important;
+  }
+}

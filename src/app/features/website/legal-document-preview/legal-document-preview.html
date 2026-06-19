@@ -1,0 +1,158 @@
+<article class="legal-preview">
+  @if (document.meta.eyebrow) {
+    <p class="legal-preview__eyebrow">{{ document.meta.eyebrow }}</p>
+  }
+
+  <h1 class="legal-preview__title">{{ document.meta.title || '—' }}</h1>
+
+  @if (document.meta.subtitle) {
+    <p class="legal-preview__subtitle">{{ document.meta.subtitle }}</p>
+  }
+
+  @if (document.meta.version) {
+    <p class="legal-preview__version">
+      Version {{ document.meta.version }}
+      @if (document.meta.effectiveDate) {
+        · {{ 'WEBSITE.PREVIEW_APPLICABLE' | translate }} {{ document.meta.effectiveDate }}
+      }
+    </p>
+  }
+
+  @if (lastUpdate) {
+    <p class="legal-preview__updated">{{ 'WEBSITE.FIELD_PAGE_LAST_UPDATE' | translate }}: {{ lastUpdate }}</p>
+  }
+
+  @if (document.meta.intro) {
+    <p class="legal-preview__intro" [innerHTML]="document.meta.intro | legalInlineHtml"></p>
+  }
+
+  @if (document.toc?.items?.length) {
+    <nav class="legal-preview__toc">
+      <p class="legal-preview__toc-label">{{ document.toc!.label }}</p>
+      <ol>
+        @for (item of document.toc!.items; track $index) {
+          <li>{{ item }}</li>
+        }
+      </ol>
+    </nav>
+  }
+
+  <div class="legal-preview__body">
+    @for (section of document.sections; track sectionTrack($index, section)) {
+      <section class="legal-preview__section">
+        @if (section.title) {
+          <h2 class="legal-preview__section-title">{{ section.title }}</h2>
+        }
+        <div class="legal-preview__blocks">
+          @for (block of section.blocks; track blockTrack($index, block)) {
+            @switch (block.kind) {
+              @case ('p') {
+                <p class="legal-preview__p" [innerHTML]="block.text | legalInlineHtml"></p>
+              }
+              @case ('h3') {
+                <h3 class="legal-preview__h3" [innerHTML]="block.text | legalInlineHtml"></h3>
+              }
+              @case ('ul') {
+                <ul class="legal-preview__ul">
+                  @for (item of block.items; track $index) {
+                    <li [innerHTML]="item | legalInlineHtml"></li>
+                  }
+                </ul>
+              }
+              @case ('ol') {
+                <ol class="legal-preview__ol">
+                  @for (item of block.items; track $index) {
+                    <li [innerHTML]="item | legalInlineHtml"></li>
+                  }
+                </ol>
+              }
+              @case ('callout') {
+                <div
+                  class="legal-preview__callout"
+                  [class.legal-preview__callout--warning]="block.variant === 'warning'"
+                  [class.legal-preview__callout--info]="block.variant === 'info'"
+                >
+                  <p [innerHTML]="block.text | legalInlineHtml"></p>
+                </div>
+              }
+              @case ('table') {
+                <div class="legal-preview__table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        @for (h of block.headers; track $index) {
+                          <th>{{ h }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (row of block.rows; track $index) {
+                        <tr>
+                          @for (cell of row; track $index) {
+                            <td [innerHTML]="cell | legalInlineHtml"></td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+              @case ('subscriptionPricingTable') {
+                <div class="legal-preview__pricing-placeholder">
+                  <p class="legal-preview__pricing-title">{{ 'WEBSITE.PREVIEW_PRICING_TABLE' | translate }}</p>
+                  <table>
+                    <thead>
+                      <tr>
+                        @for (h of block.headers; track $index) {
+                          <th>{{ h }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td [attr.colspan]="block.headers.length">
+                          {{ 'WEBSITE.PREVIEW_PRICING_DYNAMIC' | translate }}
+                          ({{ block.targetType === 'USER' ? ('WEBSITE.LEGAL_PRICING_USER' | translate) : ('WEBSITE.LEGAL_PRICING_RESTAURANT' | translate) }})
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              }
+              @case ('card') {
+                <div class="legal-preview__card">
+                  <p class="legal-preview__card-title">{{ block.title }}</p>
+                  <p class="legal-preview__card-text" [innerHTML]="block.text | legalInlineHtml"></p>
+                </div>
+              }
+              @case ('cards') {
+                <div class="legal-preview__cards">
+                  @for (card of block.items; track $index) {
+                    <div class="legal-preview__card">
+                      <p class="legal-preview__card-title">{{ card.title }}</p>
+                      <p class="legal-preview__card-text" [innerHTML]="card.text | legalInlineHtml"></p>
+                    </div>
+                  }
+                </div>
+              }
+              @case ('keyValue') {
+                <div class="legal-preview__kv">
+                  @for (item of block.items; track $index) {
+                    <p><strong>{{ item.label }}</strong> <span [innerHTML]="item.value | legalInlineHtml"></span></p>
+                  }
+                </div>
+              }
+              @case ('hr') {
+                <hr class="legal-preview__hr">
+              }
+            }
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (document.meta.footerLine) {
+    <p class="legal-preview__footer">{{ document.meta.footerLine }}</p>
+  }
+</article>

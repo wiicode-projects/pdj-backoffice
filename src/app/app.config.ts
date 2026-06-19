@@ -4,6 +4,8 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader, provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { provideQuillConfig } from 'ngx-quill/config';
+
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
@@ -20,5 +22,6 @@ export const appConfig: ApplicationConfig = {
       defaultLanguage: 'fr',
       loader: { provide: TranslateLoader, useClass: TranslateHttpLoader },
     }),
+    provideQuillConfig({}),
   ],
 };

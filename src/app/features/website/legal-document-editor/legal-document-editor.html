@@ -1,0 +1,247 @@
+<div class="legal-editor">
+  <div class="legal-editor__panel">
+    <h3 class="legal-editor__heading">{{ 'WEBSITE.LEGAL_META' | translate }}</h3>
+    <div class="legal-editor__grid">
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_TITLE' | translate }} *</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.title" (ngModelChange)="emitChange()">
+      </div>
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_SUBTITLE' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.subtitle" (ngModelChange)="emitChange()">
+      </div>
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_EYEBROW' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.eyebrow" (ngModelChange)="emitChange()">
+      </div>
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_VERSION' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.version" (ngModelChange)="emitChange()">
+      </div>
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_EFFECTIVE_DATE' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.effectiveDate" (ngModelChange)="emitChange()">
+      </div>
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_META_FOOTER' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.meta.footerLine" (ngModelChange)="emitChange()">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field__label">{{ 'WEBSITE.LEGAL_META_INTRO' | translate }}</label>
+      <pdj-rich-text-field
+        [value]="doc.meta.intro ?? ''"
+        (valueChange)="doc.meta.intro = $event; emitChange()"
+      />
+    </div>
+  </div>
+
+  <div class="legal-editor__panel">
+    <div class="legal-editor__panel-header">
+      <h3 class="legal-editor__heading">{{ 'WEBSITE.LEGAL_TOC' | translate }}</h3>
+      <label class="toggle-inline">
+        <input type="checkbox" [(ngModel)]="showToc" (ngModelChange)="onTocToggle()">
+        <span>{{ 'WEBSITE.LEGAL_TOC_ENABLE' | translate }}</span>
+      </label>
+    </div>
+
+    @if (showToc && doc.toc) {
+      <div class="field">
+        <label class="field__label">{{ 'WEBSITE.LEGAL_TOC_LABEL' | translate }}</label>
+        <input class="field__input" type="text" [(ngModel)]="doc.toc.label" (ngModelChange)="emitChange()">
+      </div>
+      @for (item of doc.toc.items; track $index) {
+        <div class="list-row">
+          <input
+            class="field__input"
+            type="text"
+            [(ngModel)]="doc.toc.items[$index]"
+            (ngModelChange)="emitChange()"
+          >
+          <button type="button" class="btn btn--sm btn--ghost" (click)="removeTocItem($index)">×</button>
+        </div>
+      }
+      <button type="button" class="btn btn--sm btn--secondary" (click)="addTocItem()">
+        {{ 'WEBSITE.LEGAL_ADD_ITEM' | translate }}
+      </button>
+    }
+  </div>
+
+  <div class="legal-editor__panel">
+    <div class="legal-editor__panel-header">
+      <h3 class="legal-editor__heading">{{ 'WEBSITE.LEGAL_SECTIONS' | translate }}</h3>
+      <button type="button" class="btn btn--sm btn--secondary" (click)="addSection()">
+        {{ 'WEBSITE.LEGAL_ADD_SECTION' | translate }}
+      </button>
+    </div>
+
+    @for (section of doc.sections; track $index; let si = $index) {
+      <div class="legal-section">
+        <div class="legal-section__header">
+          <input
+            class="field__input legal-section__title"
+            type="text"
+            [(ngModel)]="section.title"
+            (ngModelChange)="emitChange()"
+            [placeholder]="'WEBSITE.LEGAL_SECTION_TITLE' | translate"
+          >
+          <div class="legal-section__actions">
+            <button type="button" class="btn btn--sm btn--ghost" [disabled]="si === 0" (click)="moveSection(si, -1)">↑</button>
+            <button type="button" class="btn btn--sm btn--ghost" [disabled]="si === doc.sections.length - 1" (click)="moveSection(si, 1)">↓</button>
+            <button type="button" class="btn btn--sm btn--ghost btn--danger" (click)="removeSection(si)">×</button>
+          </div>
+        </div>
+
+        @for (block of section.blocks; track $index; let bi = $index) {
+          <div class="legal-block">
+            <div class="legal-block__header">
+              <span class="legal-block__type">{{ blockLabel(block) | translate }}</span>
+              <div class="legal-block__actions">
+                <button type="button" class="btn btn--sm btn--ghost" [disabled]="bi === 0" (click)="moveBlock(section, bi, -1)">↑</button>
+                <button type="button" class="btn btn--sm btn--ghost" [disabled]="bi === section.blocks.length - 1" (click)="moveBlock(section, bi, 1)">↓</button>
+                <button type="button" class="btn btn--sm btn--ghost btn--danger" (click)="removeBlock(section, bi)">×</button>
+              </div>
+            </div>
+
+            @switch (block.kind) {
+              @case ('p') {
+                <pdj-rich-text-field
+                  [value]="block.text"
+                  (valueChange)="block.text = $event; emitChange()"
+                />
+              }
+              @case ('h3') {
+                <input class="field__input" type="text" [(ngModel)]="block.text" (ngModelChange)="emitChange()">
+              }
+              @case ('ul') {
+                @for (item of block.items; track $index; let li = $index) {
+                  <div class="list-row">
+                    <input class="field__input" type="text" [(ngModel)]="block.items[li]" (ngModelChange)="emitChange()">
+                    <button type="button" class="btn btn--sm btn--ghost" (click)="removeListItem(block, li)">×</button>
+                  </div>
+                }
+                <button type="button" class="btn btn--sm btn--secondary" (click)="addListItem(block)">
+                  {{ 'WEBSITE.LEGAL_ADD_ITEM' | translate }}
+                </button>
+              }
+              @case ('ol') {
+                @for (item of block.items; track $index; let li = $index) {
+                  <div class="list-row">
+                    <input class="field__input" type="text" [(ngModel)]="block.items[li]" (ngModelChange)="emitChange()">
+                    <button type="button" class="btn btn--sm btn--ghost" (click)="removeListItem(block, li)">×</button>
+                  </div>
+                }
+                <button type="button" class="btn btn--sm btn--secondary" (click)="addListItem(block)">
+                  {{ 'WEBSITE.LEGAL_ADD_ITEM' | translate }}
+                </button>
+              }
+              @case ('callout') {
+                <div class="field">
+                  <label class="field__label">{{ 'WEBSITE.LEGAL_CALLOUT_VARIANT' | translate }}</label>
+                  <select class="field__input" [(ngModel)]="block.variant" (ngModelChange)="emitChange()">
+                    <option value="info">{{ 'WEBSITE.LEGAL_CALLOUT_INFO' | translate }}</option>
+                    <option value="warning">{{ 'WEBSITE.LEGAL_CALLOUT_WARNING' | translate }}</option>
+                  </select>
+                </div>
+                <pdj-rich-text-field
+                  [value]="block.text"
+                  (valueChange)="block.text = $event; emitChange()"
+                />
+              }
+              @case ('table') {
+                <div class="field">
+                  <label class="field__label">{{ 'WEBSITE.LEGAL_TABLE_HEADERS' | translate }}</label>
+                  <input
+                    class="field__input"
+                    type="text"
+                    [ngModel]="formatPipeSeparated(block.headers)"
+                    (ngModelChange)="onTableHeadersInput(block, $event)"
+                  >
+                </div>
+                @for (row of block.rows; track $index; let ri = $index) {
+                  <div class="list-row">
+                    <input
+                      class="field__input"
+                      type="text"
+                      [ngModel]="formatPipeSeparated(row)"
+                      (ngModelChange)="onTableRowInput(block, ri, $event)"
+                    >
+                    <button type="button" class="btn btn--sm btn--ghost" (click)="removeTableRow(block, ri)">×</button>
+                  </div>
+                }
+                <button type="button" class="btn btn--sm btn--secondary" (click)="addTableRow(block)">
+                  {{ 'WEBSITE.LEGAL_ADD_ROW' | translate }}
+                </button>
+              }
+              @case ('subscriptionPricingTable') {
+                <p class="field__hint">{{ 'WEBSITE.LEGAL_PRICING_TABLE_HINT' | translate }}</p>
+                <div class="field">
+                  <label class="field__label">{{ 'WEBSITE.LEGAL_TABLE_HEADERS' | translate }}</label>
+                  <input
+                    class="field__input"
+                    type="text"
+                    [ngModel]="formatPipeSeparated(block.headers)"
+                    (ngModelChange)="onPricingHeadersInput(block, $event)"
+                  >
+                </div>
+                <div class="field">
+                  <label class="field__label">{{ 'WEBSITE.LEGAL_PRICING_TARGET' | translate }}</label>
+                  <select class="field__input" [(ngModel)]="block.targetType" (ngModelChange)="emitChange()">
+                    <option value="USER">{{ 'WEBSITE.LEGAL_PRICING_USER' | translate }}</option>
+                    <option value="RESTAURANT">{{ 'WEBSITE.LEGAL_PRICING_RESTAURANT' | translate }}</option>
+                  </select>
+                </div>
+              }
+              @case ('card') {
+                <input class="field__input" type="text" [(ngModel)]="block.title" (ngModelChange)="emitChange()" [placeholder]="'WEBSITE.LEGAL_CARD_TITLE' | translate">
+                <textarea class="field__input field__input--textarea" rows="3" [(ngModel)]="block.text" (ngModelChange)="emitChange()"></textarea>
+              }
+              @case ('cards') {
+                @for (card of block.items; track $index; let ci = $index) {
+                  <div class="nested-card">
+                    <input class="field__input" type="text" [(ngModel)]="block.items[ci].title" (ngModelChange)="emitChange()" [placeholder]="'WEBSITE.LEGAL_CARD_TITLE' | translate">
+                    <textarea class="field__input field__input--textarea" rows="3" [(ngModel)]="block.items[ci].text" (ngModelChange)="emitChange()"></textarea>
+                    <button type="button" class="btn btn--sm btn--ghost btn--danger" (click)="removeCard(block, ci)">×</button>
+                  </div>
+                }
+                <button type="button" class="btn btn--sm btn--secondary" (click)="addCard(block)">
+                  {{ 'WEBSITE.LEGAL_ADD_CARD' | translate }}
+                </button>
+              }
+              @case ('keyValue') {
+                @for (kv of block.items; track $index; let ki = $index) {
+                  <div class="list-row list-row--2">
+                    <input class="field__input" type="text" [(ngModel)]="block.items[ki].label" (ngModelChange)="emitChange()" [placeholder]="'WEBSITE.LEGAL_KV_LABEL' | translate">
+                    <input class="field__input" type="text" [(ngModel)]="block.items[ki].value" (ngModelChange)="emitChange()" [placeholder]="'WEBSITE.LEGAL_KV_VALUE' | translate">
+                    <button type="button" class="btn btn--sm btn--ghost" (click)="removeKeyValue(block, ki)">×</button>
+                  </div>
+                }
+                <button type="button" class="btn btn--sm btn--secondary" (click)="addKeyValue(block)">
+                  {{ 'WEBSITE.LEGAL_ADD_KV' | translate }}
+                </button>
+              }
+              @case ('hr') {
+                <hr class="legal-block__hr">
+              }
+            }
+          </div>
+        }
+
+        <div class="legal-block-add">
+          <select class="field__input field__input--sm" #blockKind>
+            @for (kind of blockKinds; track kind) {
+              <option [value]="kind">{{ ('WEBSITE.LEGAL_BLOCK_' + kind.toUpperCase()) | translate }}</option>
+            }
+          </select>
+          <button type="button" class="btn btn--sm btn--secondary" (click)="addBlock(section, blockKind.value)">
+            {{ 'WEBSITE.LEGAL_ADD_BLOCK' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (doc.sections.length === 0) {
+      <p class="field__hint">{{ 'WEBSITE.LEGAL_NO_SECTIONS' | translate }}</p>
+    }
+  </div>
+</div>

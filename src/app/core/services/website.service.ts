@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -13,6 +13,47 @@ export interface LandingStatPreview {
 export interface WebsiteSettings {
   statsSectionEnabled: boolean;
   testimonialsSectionEnabled: boolean;
+  heroBadgeEnabled: boolean;
+  faqSectionEnabled: boolean;
+  statsPreview: LandingStatPreview[];
+}
+
+export type FaqLocale = 'fr' | 'en' | 'de' | 'it';
+
+export type PageLocale = FaqLocale;
+
+export type LegalDocument = Record<string, unknown>;
+
+export type WebsitePageLocaleContent = {
+  document: LegalDocument;
+  lastUpdate: string;
+};
+
+export type WebsitePageTranslations = Record<PageLocale, WebsitePageLocaleContent>;
+
+export interface WebsitePage {
+  id: string;
+  slug: 'cgu' | 'cgv' | 'privacy' | 'mentions';
+  translations: WebsitePageTranslations;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FaqItemTranslation = {
+  question: string;
+  answer: string;
+};
+
+export type FaqItemTranslations = Record<FaqLocale, FaqItemTranslation>;
+
+export interface FaqItem {
+  id: string;
+  translations: FaqItemTranslations;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
   statsPreview: LandingStatPreview[];
 }
 
@@ -34,6 +75,8 @@ export interface Testimonial {
 export interface UpdateVisibilityDto {
   statsSectionEnabled?: boolean;
   testimonialsSectionEnabled?: boolean;
+  heroBadgeEnabled?: boolean;
+  faqSectionEnabled?: boolean;
 }
 
 export interface UpdateStatsDto {
@@ -79,5 +122,42 @@ export class WebsiteService {
 
   remove(id: string): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(`${this.url}/testimonials/${id}`);
+  }
+
+  findAllFaqItems(): Observable<{ status: number; faqItems: FaqItem[] }> {
+    return this.http.get<{ status: number; faqItems: FaqItem[] }>(`${this.url}/faq`);
+  }
+
+  createFaqItem(body: {
+    translations: FaqItemTranslations;
+    isActive?: boolean;
+  }): Observable<{ status: number; faqItem: FaqItem }> {
+    return this.http.post<{ status: number; faqItem: FaqItem }>(`${this.url}/faq`, body);
+  }
+
+  updateFaqItem(
+    id: string,
+    body: Partial<{ translations: FaqItemTranslations; sortOrder: number; isActive: boolean }>,
+  ): Observable<{ status: number; faqItem: FaqItem }> {
+    return this.http.patch<{ status: number; faqItem: FaqItem }>(`${this.url}/faq/${id}`, body);
+  }
+
+  removeFaqItem(id: string): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${this.url}/faq/${id}`);
+  }
+
+  findAllPages(): Observable<{ status: number; pages: WebsitePage[] }> {
+    return this.http.get<{ status: number; pages: WebsitePage[] }>(`${this.url}/pages`);
+  }
+
+  findPageBySlug(slug: string): Observable<{ status: number; page: WebsitePage }> {
+    return this.http.get<{ status: number; page: WebsitePage }>(`${this.url}/pages/admin/${slug}`);
+  }
+
+  updatePage(
+    slug: string,
+    body: Partial<{ translations: Partial<WebsitePageTranslations>; isPublished: boolean }>,
+  ): Observable<{ status: number; page: WebsitePage }> {
+    return this.http.patch<{ status: number; page: WebsitePage }>(`${this.url}/pages/${slug}`, body);
   }
 }

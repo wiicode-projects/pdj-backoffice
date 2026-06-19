@@ -10,6 +10,7 @@ import {
   CreateSubscriptionDto,
   TargetType,
   SubscriptionFeature,
+  SubscriptionStatusFilter,
 } from '../../core/services/subscription.service';
 
 @Component({
@@ -26,14 +27,27 @@ export class Subscriptions implements OnInit {
   createError = '';
   showCreateDialog = false;
   currentStep = 1;
+  togglingId: string | null = null;
+  toggleError = '';
 
   targetTypes = Object.values(TargetType);
   allFeatures = Object.values(SubscriptionFeature);
   targetFilter: string = '';
+  statusFilter: SubscriptionStatusFilter = 'all';
+  statusFilters: SubscriptionStatusFilter[] = ['all', 'active', 'inactive'];
 
   newSub: CreateSubscriptionDto = this.getEmptySubscription();
 
   get filteredSubscriptions(): Subscription[] {
+    return this.subscriptions.filter((s) => {
+      if (this.targetFilter && s.targetType !== this.targetFilter) return false;
+      if (this.statusFilter === 'active') return s.isActive;
+      if (this.statusFilter === 'inactive') return !s.isActive;
+      return true;
+    });
+  }
+
+  private baseForCounts(): Subscription[] {
     if (!this.targetFilter) return this.subscriptions;
     return this.subscriptions.filter(s => s.targetType === this.targetFilter);
   }
@@ -50,7 +64,8 @@ export class Subscriptions implements OnInit {
 
   loadSubscriptions(): void {
     this.loading = true;
-    this.subscriptionService.findAll()
+    this.toggleError = '';
+    this.subscriptionService.findAllAdmin('all')
       .pipe(finalize(() => {
         this.loading = false;
         this.cdr.detectChanges();
@@ -64,6 +79,40 @@ export class Subscriptions implements OnInit {
           console.error('Failed to load subscriptions:', err);
         },
       });
+  }
+
+  setStatusFilter(status: SubscriptionStatusFilter): void {
+    this.statusFilter = status;
+  }
+
+  setTargetFilter(target: string): void {
+    this.targetFilter = target;
+  }
+
+  toggleActive(sub: Subscription, event: Event): void {
+    event.stopPropagation();
+    this.togglingId = sub.id;
+    this.toggleError = '';
+    this.subscriptionService.setActive(sub.id, !sub.isActive)
+      .pipe(finalize(() => {
+        this.togglingId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => this.loadSubscriptions(),
+        error: (err) => {
+          console.error('Failed to toggle subscription:', err);
+          this.toggleError = err.error?.message || 'Impossible de modifier le statut.';
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  getCountByStatus(status: SubscriptionStatusFilter): number {
+    const base = this.baseForCounts();
+    if (status === 'all') return base.length;
+    if (status === 'active') return base.filter(s => s.isActive).length;
+    return base.filter(s => !s.isActive).length;
   }
 
   createSubscription(): void {

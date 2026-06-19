@@ -29,7 +29,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss",
+              "node_modules/quill/dist/quill.snow.css"
+            ]
           },
           "configurations": {
             "production": {

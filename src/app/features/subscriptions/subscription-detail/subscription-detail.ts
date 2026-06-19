@@ -50,6 +50,9 @@ export class SubscriptionDetail implements OnInit {
   deleting = false;
   deleteError = '';
 
+  togglingActive = false;
+  toggleError = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -240,6 +243,28 @@ export class SubscriptionDetail implements OnInit {
         error: (err) => {
           console.error('Failed to delete subscription:', err);
           this.deleteError = err.error?.message || 'Une erreur est survenue lors de la suppression.';
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  toggleActive(): void {
+    if (!this.subscription) return;
+    this.togglingActive = true;
+    this.toggleError = '';
+    this.subscriptionService.setActive(this.subscriptionId, !this.subscription.isActive)
+      .pipe(finalize(() => {
+        this.togglingActive = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (response) => {
+          this.subscription = response.subscription;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to toggle subscription:', err);
+          this.toggleError = err.error?.message || 'Impossible de modifier le statut.';
           this.cdr.detectChanges();
         },
       });

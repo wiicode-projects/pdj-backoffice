@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { websitePageEditCanDeactivate } from './core/guards/website-page-edit.guard';
 
 export const routes: Routes = [
   {
@@ -145,6 +146,13 @@ export const routes: Routes = [
           import('./features/website/website').then((m) => m.Website),
       },
       {
+        path: 'website/pages/:slug/edit',
+        canActivate: [roleGuard('ADMIN')],
+        canDeactivate: [websitePageEditCanDeactivate],
+        loadComponent: () =>
+          import('./features/website/pages/website-page-edit').then((m) => m.WebsitePageEdit),
+      },
+      {
         path: 'frites-packs',
         canActivate: [roleGuard('ADMIN')],
         loadComponent: () =>
@@ -284,7 +292,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        canActivate: [roleGuard('RESTAURANT')],
+        canActivate: [roleGuard('ADMIN', 'RESTAURANT')],
         loadComponent: () =>
           import('./features/profile/profile').then((m) => m.Profile),
       },

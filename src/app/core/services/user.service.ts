@@ -122,4 +122,28 @@ export class UserService {
       confirmPassword,
     });
   }
+
+  findAllAdmins(): Observable<{ status: number; admins: AdminUser[] }> {
+    return this.http.get<{ status: number; admins: AdminUser[] }>(`${this.apiUrl}/admins`);
+  }
+
+  createAdmin(payload: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    sendResetEmail?: boolean;
+  }): Observable<{ status: number; user: AdminUser; resetEmailSent: boolean }> {
+    return this.http.post<{ status: number; user: AdminUser; resetEmailSent: boolean }>(
+      `${this.apiUrl}/admins`,
+      payload,
+    );
+  }
+
+  sendAdminPasswordReset(adminId: string): Observable<{ status: number; message: string }> {
+    return this.http.post<{ status: number; message: string }>(
+      `${this.apiUrl}/admins/${adminId}/send-password-reset`,
+      {},
+    );
+  }
 }

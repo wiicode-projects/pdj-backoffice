@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import {
@@ -10,13 +11,14 @@ import {
   FaqLocale,
   FaqItemTranslations,
   LandingStatPreview,
+  WebsitePage,
 } from '../../core/services/website.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'pdj-website',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterLink],
   templateUrl: './website.html',
   styleUrl: './website.scss',
 })
@@ -32,6 +34,7 @@ export class Website implements OnInit {
 
   statsSectionEnabled = false;
   testimonialsSectionEnabled = false;
+  heroBadgeEnabled = true;
   faqSectionEnabled = false;
   statsPreview: LandingStatPreview[] = [];
 
@@ -76,6 +79,10 @@ export class Website implements OnInit {
   faqForm: FaqItemTranslations = this.emptyFaqTranslations();
   faqIsActive = true;
 
+  pages: WebsitePage[] = [];
+  loadingPages = true;
+  togglingPageSlug: string | null = null;
+
   readonly apiBase = environment.apiUrl.replace('/api/v1', '');
 
   constructor(
@@ -87,6 +94,7 @@ export class Website implements OnInit {
     this.loadSettings();
     this.loadTestimonials();
     this.loadFaqItems();
+    this.loadPages();
   }
 
   private emptyFaqTranslations(): FaqItemTranslations {
@@ -106,6 +114,7 @@ export class Website implements OnInit {
         next: (settings) => {
           this.statsSectionEnabled = settings.statsSectionEnabled;
           this.testimonialsSectionEnabled = settings.testimonialsSectionEnabled;
+          this.heroBadgeEnabled = settings.heroBadgeEnabled;
           this.faqSectionEnabled = settings.faqSectionEnabled;
           this.statsPreview = settings.statsPreview ?? [];
           this.cdr.detectChanges();
@@ -150,6 +159,7 @@ export class Website implements OnInit {
     this.websiteService.updateVisibility({
       statsSectionEnabled: this.statsSectionEnabled,
       testimonialsSectionEnabled: this.testimonialsSectionEnabled,
+      heroBadgeEnabled: this.heroBadgeEnabled,
       faqSectionEnabled: this.faqSectionEnabled,
     }).pipe(finalize(() => {
       this.savingVisibility = false;
@@ -158,6 +168,7 @@ export class Website implements OnInit {
       next: (settings) => {
         this.statsSectionEnabled = settings.statsSectionEnabled;
         this.testimonialsSectionEnabled = settings.testimonialsSectionEnabled;
+        this.heroBadgeEnabled = settings.heroBadgeEnabled;
         this.faqSectionEnabled = settings.faqSectionEnabled;
         this.visibilitySuccess = true;
         this.cdr.detectChanges();
@@ -492,5 +503,36 @@ export class Website implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  loadPages(): void {
+    this.loadingPages = true;
+    this.websiteService.findAllPages()
+      .pipe(finalize(() => {
+        this.loadingPages = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          this.pages = res.pages ?? [];
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  togglePagePublished(page: WebsitePage): void {
+    this.togglingPageSlug = page.slug;
+    this.websiteService.updatePage(page.slug, { isPublished: !page.isPublished })
+      .pipe(finalize(() => {
+        this.togglingPageSlug = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => this.loadPages(),
+        error: () => this.cdr.detectChanges(),
+      });
   }
 }

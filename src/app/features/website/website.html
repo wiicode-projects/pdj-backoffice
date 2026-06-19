@@ -45,6 +45,17 @@
 
         <div class="visibility-row">
           <div>
+            <strong>{{ 'WEBSITE.HERO_BADGE_SECTION' | translate }}</strong>
+            <p>{{ 'WEBSITE.HERO_BADGE_SECTION_DESC' | translate }}</p>
+          </div>
+          <label class="toggle" for="toggle-hero-badge">
+            <input type="checkbox" id="toggle-hero-badge" [(ngModel)]="heroBadgeEnabled" class="toggle__input"/>
+            <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          </label>
+        </div>
+
+        <div class="visibility-row">
+          <div>
             <strong>{{ 'WEBSITE.FAQ_SECTION' | translate }}</strong>
             <p>{{ 'WEBSITE.FAQ_SECTION_DESC' | translate }}</p>
           </div>
@@ -250,6 +261,70 @@
                         <button class="btn btn--sm btn--secondary" (click)="cancelDeleteFaq()">{{ 'WEBSITE.CANCEL' | translate }}</button>
                       </div>
                     }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="panel">
+      <div class="panel__header">
+        <div>
+          <h2>{{ 'WEBSITE.PAGES_TITLE' | translate }}</h2>
+          <p>{{ 'WEBSITE.PAGES_DESC' | translate }}</p>
+        </div>
+      </div>
+
+      @if (loadingPages) {
+        <div class="loading-state">
+          <div class="loading-state__spinner"></div>
+        </div>
+      }
+
+      @if (!loadingPages && pages.length > 0) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>{{ 'WEBSITE.COL_PAGE' | translate }}</th>
+                <th>{{ 'WEBSITE.COL_PAGE_STATUS' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (page of pages; track page.id) {
+                <tr>
+                  <td>
+                    <strong>{{ 'WEBSITE.PAGE_SLUGS.' + page.slug | translate }}</strong>
+                    <div class="table-sub">{{ page.slug }}</div>
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge--success]="page.isPublished" [class.badge--muted]="!page.isPublished">
+                      {{ (page.isPublished ? 'WEBSITE.PAGE_PUBLISHED' : 'WEBSITE.PAGE_DRAFT') | translate }}
+                    </span>
+                  </td>
+                  <td class="table-actions">
+                    <button
+                      type="button"
+                      class="btn btn--sm"
+                      [class.btn--primary]="!page.isPublished"
+                      [class.btn--secondary]="page.isPublished"
+                      [disabled]="togglingPageSlug === page.slug"
+                      (click)="togglePagePublished(page)">
+                      @if (togglingPageSlug === page.slug) {
+                        <div class="btn__spinner"></div>
+                      }
+                      {{ (page.isPublished ? 'WEBSITE.PAGE_UNPUBLISH' : 'WEBSITE.PAGE_PUBLISH') | translate }}
+                    </button>
+                    <a
+                      class="btn btn--sm btn--secondary"
+                      [routerLink]="['/app/website/pages', page.slug, 'edit']"
+                    >
+                      {{ 'WEBSITE.EDIT_PAGE' | translate }}
+                    </a>
                   </td>
                 </tr>
               }

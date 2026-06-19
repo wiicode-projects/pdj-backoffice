@@ -39,6 +39,9 @@
           @if (subscription.isDefault) {
             <span class="detail-hero__badge detail-hero__badge--default">{{ 'SUBSCRIPTIONS.DEFAULT' | translate }}</span>
           }
+          @if (!subscription.isActive) {
+            <span class="detail-hero__badge detail-hero__badge--inactive">{{ 'SUBSCRIPTIONS.STATUS.inactive' | translate }}</span>
+          }
           <h1 class="detail-hero__title">{{ subscription.name }}</h1>
           @if (subscription.description) {
             <p class="detail-hero__desc">{{ subscription.description }}</p>
@@ -55,6 +58,17 @@
           </div>
         </div>
         <div class="detail-hero__btns">
+          <button
+            type="button"
+            class="btn btn--outline btn--sm"
+            [class.btn--primary]="!subscription.isActive"
+            [disabled]="togglingActive"
+            (click)="toggleActive()">
+            @if (togglingActive) {
+              <div class="btn__spinner"></div>
+            }
+            {{ (subscription.isActive ? 'SUBSCRIPTIONS.DEACTIVATE' : 'SUBSCRIPTIONS.ACTIVATE') | translate }}
+          </button>
           <button class="btn btn--outline btn--sm" id="btn-edit-subscription" (click)="openEditDialog()">
             <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
               <path d="M14.5 3.5L16.5 5.5L6 16H4V14L14.5 3.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -71,6 +85,10 @@
         </div>
       </div>
     </div>
+
+    @if (toggleError) {
+      <div class="detail-page__error">{{ toggleError }}</div>
+    }
 
     <!-- Content grid -->
     <div class="detail-grid">

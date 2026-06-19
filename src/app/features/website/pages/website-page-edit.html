@@ -1,0 +1,170 @@
+<div class="page-edit">
+  <header class="page-edit__header">
+    <div class="page-edit__header-top">
+      <a class="page-edit__back" routerLink="/app/website">
+        ← {{ 'WEBSITE.BACK_TO_PAGES' | translate }}
+      </a>
+      @if (publicSitePath) {
+        <a class="page-edit__view-site" [href]="publicSitePath" target="_blank" rel="noopener noreferrer">
+          {{ 'WEBSITE.VIEW_ON_SITE' | translate }} →
+        </a>
+      }
+    </div>
+
+    <div class="page-edit__header-main">
+      <div>
+        <h1 class="page-edit__title">
+          {{ 'WEBSITE.EDIT_PAGE' | translate }}
+          @if (slug) {
+            — {{ 'WEBSITE.PAGE_SLUGS.' + slug | translate }}
+          }
+        </h1>
+        @if (dirty) {
+          <span class="page-edit__unsaved">{{ 'WEBSITE.UNSAVED_CHANGES' | translate }}</span>
+        }
+      </div>
+      <span
+        class="badge"
+        [class.badge--success]="isPublished"
+        [class.badge--muted]="!isPublished"
+      >
+        {{ (isPublished ? 'WEBSITE.PAGE_PUBLISHED' : 'WEBSITE.PAGE_DRAFT') | translate }}
+      </span>
+    </div>
+  </header>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-state__spinner"></div>
+    </div>
+  }
+
+  @if (!loading && loadError) {
+    <div class="panel panel--error">
+      <p>{{ loadError }}</p>
+      <a routerLink="/app/website" class="btn btn--secondary">{{ 'WEBSITE.BACK_TO_PAGES' | translate }}</a>
+    </div>
+  }
+
+  @if (!loading && !loadError && slug) {
+    <div class="page-edit__toolbar">
+      <div class="lang-tabs">
+        @for (locale of locales; track locale.code) {
+          <button
+            type="button"
+            class="lang-tabs__btn"
+            [class.lang-tabs__btn--active]="activeLocale === locale.code"
+            (click)="setActiveLocale(locale.code)"
+          >
+            {{ locale.label }}
+          </button>
+        }
+      </div>
+
+      <div class="view-mode-tabs">
+        @for (mode of viewModes; track mode) {
+          <button
+            type="button"
+            class="view-mode-tabs__btn"
+            [class.view-mode-tabs__btn--active]="viewMode === mode"
+            (click)="setViewMode(mode)"
+          >
+            {{ 'WEBSITE.VIEW_MODE_' + mode.toUpperCase() | translate }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div
+      class="page-edit__workspace"
+      [class.page-edit__workspace--split]="viewMode === 'split'"
+      [class.page-edit__workspace--preview]="viewMode === 'preview'"
+      [class.page-edit__workspace--edit]="viewMode === 'edit'"
+    >
+      @if (viewMode !== 'preview') {
+        <div class="page-edit__editor-col">
+          <section class="card">
+            <h2 class="card__title">{{ 'WEBSITE.PAGE_EDIT_INFO' | translate }}</h2>
+            <div class="card__body">
+              <div class="field">
+                <label class="field__label">{{ 'WEBSITE.FIELD_PAGE_LAST_UPDATE' | translate }}</label>
+                <input
+                  class="field__input"
+                  type="text"
+                  [(ngModel)]="lastUpdate[activeLocale]"
+                  (ngModelChange)="onMetaChange()"
+                >
+              </div>
+              <div class="field">
+                <label class="field__label">{{ 'WEBSITE.COL_PAGE_STATUS' | translate }}</label>
+                <div class="publish-row">
+                  <button
+                    type="button"
+                    class="btn btn--sm"
+                    [class.btn--primary]="!isPublished"
+                    [class.btn--secondary]="isPublished"
+                    (click)="togglePublished()"
+                  >
+                    {{ (isPublished ? 'WEBSITE.PAGE_UNPUBLISH' : 'WEBSITE.PAGE_PUBLISH') | translate }}
+                  </button>
+                  <p class="field__hint">{{ 'WEBSITE.PAGE_PUBLISH_HINT' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card card--content">
+            <h2 class="card__title">{{ 'WEBSITE.FIELD_PAGE_DOCUMENT' | translate }}</h2>
+            <div class="card__body">
+              @for (locale of locales; track locale.code) {
+                @if (activeLocale === locale.code) {
+                  <pdj-legal-document-editor
+                    #pageEditor
+                    [document]="documents[locale.code]"
+                    (documentChange)="onEditorChange()"
+                  />
+                }
+              }
+            </div>
+          </section>
+        </div>
+      }
+
+      @if (viewMode !== 'edit') {
+        <div class="page-edit__preview-col">
+          <section class="card card--preview">
+            <div class="card__title-row">
+              <h2 class="card__title">{{ 'WEBSITE.PREVIEW_TITLE' | translate }}</h2>
+              <span class="card__locale">{{ activeLocale | uppercase }}</span>
+            </div>
+            <div class="card__body card__body--preview">
+              <pdj-legal-document-preview
+                [document]="previewDocument"
+                [lastUpdate]="lastUpdate[activeLocale]"
+              />
+            </div>
+          </section>
+        </div>
+      }
+    </div>
+
+    <footer class="page-edit__footer">
+      <div class="page-edit__footer-left">
+        @if (saveSuccess) {
+          <span class="save-msg save-msg--success">{{ 'WEBSITE.SAVED' | translate }}</span>
+        }
+        @if (saveError) {
+          <span class="save-msg save-msg--error">{{ saveError }}</span>
+        }
+        <span class="page-edit__shortcut-hint">{{ 'WEBSITE.SAVE_SHORTCUT' | translate }}</span>
+      </div>
+      <div class="page-edit__footer-actions">
+        <a routerLink="/app/website" class="btn btn--secondary">{{ 'WEBSITE.CANCEL' | translate }}</a>
+        <button type="button" class="btn btn--primary" [disabled]="saving" (click)="save()">
+          @if (saving) { <div class="btn__spinner"></div> }
+          {{ 'WEBSITE.SAVE' | translate }}
+        </button>
+      </div>
+    </footer>
+  }
+</div>

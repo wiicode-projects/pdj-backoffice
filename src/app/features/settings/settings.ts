@@ -9,8 +9,10 @@ import {
   UpdateGeneralSettingsDto,
   UpdateEmailSettingsDto,
 } from '../../core/services/settings.service';
+import { UserService, AdminUser } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
 
-type Tab = 'general' | 'payment' | 'email' | 'notifications';
+type Tab = 'general' | 'payment' | 'email' | 'notifications' | 'admins';
 
 @Component({
   selector: 'pdj-settings',
@@ -75,6 +77,22 @@ export class Settings implements OnInit {
   emailInvoiceEnabled = true;
   emailSubscriptionEnabled = true;
 
+  // ── Admins ───────────────────────────────────────────────────────────
+  adminsLoading = false;
+  adminsSaving = false;
+  admins: AdminUser[] = [];
+  adminsError = '';
+  adminsSuccess = '';
+  showCreateAdminForm = false;
+  resetSendingId: string | null = null;
+  adminForm = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    sendResetEmail: true,
+  };
+
   /** Visual badge: shows a warning dot on the email tab if Brevo key is missing */
   get emailMissingConfig(): boolean {
     return this.emailEnabled && !this.brevoApiKey;
@@ -85,6 +103,7 @@ export class Settings implements OnInit {
     { id: 'payment',       label: 'Paiements',     icon: 'payment'  },
     { id: 'email',         label: 'E-mails',       icon: 'email'    },
     { id: 'notifications', label: 'Notifications', icon: 'bell'     },
+    { id: 'admins',        label: 'Administrateurs', icon: 'admins' },
   ];
 
   readonly emailToggleRows: { key: keyof Settings; label: string; desc: string; type: string }[] = [
@@ -97,6 +116,8 @@ export class Settings implements OnInit {
 
   constructor(
     private settingsService: SettingsService,
+    private userService: UserService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -157,6 +178,89 @@ export class Settings implements OnInit {
     this.activeTab = tab;
     this.saveSuccess = false;
     this.saveError = '';
+    this.adminsError = '';
+    this.adminsSuccess = '';
+    if (tab === 'admins') {
+      this.loadAdmins();
+    }
+  }
+
+  loadAdmins(): void {
+    this.adminsLoading = true;
+    this.adminsError = '';
+    this.userService.findAllAdmins()
+      .pipe(finalize(() => { this.adminsLoading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (res) => { this.admins = res.admins ?? []; },
+        error: (err) => { this.adminsError = err?.error?.message ?? 'Impossible de charger les administrateurs.'; },
+      });
+  }
+
+  toggleCreateAdminForm(): void {
+    this.showCreateAdminForm = !this.showCreateAdminForm;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+  }
+
+  createAdmin(): void {
+    if (!this.adminForm.firstName.trim() || !this.adminForm.lastName.trim() || !this.adminForm.email.trim()) {
+      this.adminsError = 'Veuillez remplir le prénom, le nom et l\'e-mail.';
+      return;
+    }
+
+    this.adminsSaving = true;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+
+    this.userService.createAdmin({
+      firstName: this.adminForm.firstName.trim(),
+      lastName: this.adminForm.lastName.trim(),
+      email: this.adminForm.email.trim(),
+      phone: this.adminForm.phone.trim() || undefined,
+      sendResetEmail: this.adminForm.sendResetEmail,
+    })
+      .pipe(finalize(() => { this.adminsSaving = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (res) => {
+          this.adminsSuccess = res.resetEmailSent
+            ? 'Administrateur créé. Un e-mail de réinitialisation a été envoyé.'
+            : 'Administrateur créé avec succès.';
+          this.adminForm = { firstName: '', lastName: '', email: '', phone: '', sendResetEmail: true };
+          this.showCreateAdminForm = false;
+          this.loadAdmins();
+          setTimeout(() => { this.adminsSuccess = ''; this.cdr.detectChanges(); }, 4000);
+        },
+        error: (err) => {
+          this.adminsError = err?.error?.message ?? 'Impossible de créer l\'administrateur.';
+        },
+      });
+  }
+
+  sendPasswordReset(admin: AdminUser): void {
+    this.resetSendingId = admin.id;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+
+    this.userService.sendAdminPasswordReset(admin.id)
+      .pipe(finalize(() => { this.resetSendingId = null; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: () => {
+          this.adminsSuccess = `E-mail de réinitialisation envoyé à ${admin.email}.`;
+          setTimeout(() => { this.adminsSuccess = ''; this.cdr.detectChanges(); }, 4000);
+        },
+        error: (err) => {
+          this.adminsError = err?.error?.message ?? 'Impossible d\'envoyer l\'e-mail.';
+        },
+      });
+  }
+
+  isCurrentAdmin(admin: AdminUser): boolean {
+    return admin.id === this.authService.user()?.id;
+  }
+
+  adminDisplayName(admin: AdminUser): string {
+    const name = [admin.firstName, admin.lastName].filter(Boolean).join(' ').trim();
+    return name || admin.email;
   }
 
   saveGeneral(): void {

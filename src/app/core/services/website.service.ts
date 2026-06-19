@@ -13,11 +13,32 @@ export interface LandingStatPreview {
 export interface WebsiteSettings {
   statsSectionEnabled: boolean;
   testimonialsSectionEnabled: boolean;
+  heroBadgeEnabled: boolean;
   faqSectionEnabled: boolean;
   statsPreview: LandingStatPreview[];
 }
 
 export type FaqLocale = 'fr' | 'en' | 'de' | 'it';
+
+export type PageLocale = FaqLocale;
+
+export type LegalDocument = Record<string, unknown>;
+
+export type WebsitePageLocaleContent = {
+  document: LegalDocument;
+  lastUpdate: string;
+};
+
+export type WebsitePageTranslations = Record<PageLocale, WebsitePageLocaleContent>;
+
+export interface WebsitePage {
+  id: string;
+  slug: 'cgu' | 'cgv' | 'privacy' | 'mentions';
+  translations: WebsitePageTranslations;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type FaqItemTranslation = {
   question: string;
@@ -53,6 +74,7 @@ export interface Testimonial {
 export interface UpdateVisibilityDto {
   statsSectionEnabled?: boolean;
   testimonialsSectionEnabled?: boolean;
+  heroBadgeEnabled?: boolean;
   faqSectionEnabled?: boolean;
 }
 
@@ -121,5 +143,20 @@ export class WebsiteService {
 
   removeFaqItem(id: string): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(`${this.url}/faq/${id}`);
+  }
+
+  findAllPages(): Observable<{ status: number; pages: WebsitePage[] }> {
+    return this.http.get<{ status: number; pages: WebsitePage[] }>(`${this.url}/pages`);
+  }
+
+  findPageBySlug(slug: string): Observable<{ status: number; page: WebsitePage }> {
+    return this.http.get<{ status: number; page: WebsitePage }>(`${this.url}/pages/admin/${slug}`);
+  }
+
+  updatePage(
+    slug: string,
+    body: Partial<{ translations: Partial<WebsitePageTranslations>; isPublished: boolean }>,
+  ): Observable<{ status: number; page: WebsitePage }> {
+    return this.http.patch<{ status: number; page: WebsitePage }>(`${this.url}/pages/${slug}`, body);
   }
 }

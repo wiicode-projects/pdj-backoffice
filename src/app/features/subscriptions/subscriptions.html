@@ -42,21 +42,34 @@
   <!-- Cards grid -->
   @if (!loading && subscriptions.length > 0) {
     <div class="filter-tabs">
-      <button class="filter-tab" [class.filter-tab--active]="targetFilter === ''" (click)="targetFilter = ''">
+      @for (status of statusFilters; track status) {
+        <button class="filter-tab" [class.filter-tab--active]="statusFilter === status" (click)="setStatusFilter(status)">
+          {{ 'SUBSCRIPTIONS.STATUS.' + status | translate }}
+          <span class="filter-tab__count">{{ getCountByStatus(status) }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="filter-tabs filter-tabs--secondary">
+      <button class="filter-tab" [class.filter-tab--active]="targetFilter === ''" (click)="setTargetFilter('')">
         {{ 'COMMON.TOTAL' | translate }}
         <span class="filter-tab__count">{{ subscriptions.length }}</span>
       </button>
       @for (t of targetTypes; track t) {
-        <button class="filter-tab" [class.filter-tab--active]="targetFilter === t" (click)="targetFilter = t">
+        <button class="filter-tab" [class.filter-tab--active]="targetFilter === t" (click)="setTargetFilter(t)">
           {{ 'SUBSCRIPTIONS.TARGET_TYPES.' + t | translate }}
           <span class="filter-tab__count">{{ getCountByTarget(t) }}</span>
         </button>
       }
     </div>
 
+    @if (toggleError) {
+      <div class="page__error">{{ toggleError }}</div>
+    }
+
     <div class="cards-grid">
       @for (sub of filteredSubscriptions; track sub.id) {
-        <div class="sub-card" [class.sub-card--restaurant]="sub.targetType === 'RESTAURANT'" (click)="navigateToDetail(sub)">
+        <div class="sub-card" [class.sub-card--restaurant]="sub.targetType === 'RESTAURANT'" [class.sub-card--inactive]="!sub.isActive" (click)="navigateToDetail(sub)">
           <!-- Card header -->
           <div class="sub-card__header">
             <div class="sub-card__icon">
@@ -76,6 +89,9 @@
             <span class="sub-card__target">{{ 'SUBSCRIPTIONS.TARGET_TYPES.' + sub.targetType | translate }}</span>
             @if (sub.isDefault) {
               <span class="sub-card__default-badge">Par défaut</span>
+            }
+            @if (!sub.isActive) {
+              <span class="sub-card__inactive-badge">{{ 'SUBSCRIPTIONS.STATUS.inactive' | translate }}</span>
             }
           </div>
 
@@ -169,6 +185,21 @@
               }
             </div>
           }
+
+          <div class="sub-card__actions">
+            <button
+              type="button"
+              class="btn btn--sm"
+              [class.btn--secondary]="sub.isActive"
+              [class.btn--primary]="!sub.isActive"
+              [disabled]="togglingId === sub.id"
+              (click)="toggleActive(sub, $event)">
+              @if (togglingId === sub.id) {
+                <div class="btn__spinner"></div>
+              }
+              {{ (sub.isActive ? 'SUBSCRIPTIONS.DEACTIVATE' : 'SUBSCRIPTIONS.ACTIVATE') | translate }}
+            </button>
+          </div>
         </div>
       }
     </div>

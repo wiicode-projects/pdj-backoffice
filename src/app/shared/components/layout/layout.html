@@ -324,7 +324,7 @@
 
               <!-- Menu items -->
               <div class="profile-panel__menu">
-                @if (authService.isRestaurant()) {
+                @if (authService.isAdmin() || authService.isRestaurant()) {
                   <button class="profile-panel__item" (click)="goToProfile()">
                     <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="6" r="3.5" stroke="currentColor" stroke-width="1.4"/>
@@ -332,6 +332,8 @@
                     </svg>
                     {{ 'NAV.PROFILE' | translate }}
                   </button>
+                }
+                @if (authService.isRestaurant()) {
                   <button class="profile-panel__item" (click)="goToAccountSettings()">
                     <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/>

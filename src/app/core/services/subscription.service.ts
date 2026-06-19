@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -41,8 +41,10 @@ export interface Subscription {
   description: string;
   price: number;
   isDeleted: boolean;
+  isActive: boolean;
   isDefault: boolean;
   targetType: TargetType;
+  catalogKey?: string | null;
   color: string | null;
   features: SubscriptionFeature[] | null;
   maxMenusPerDay: number;
@@ -99,6 +101,7 @@ export interface CreateSubscriptionDto {
   canHaveGift?: boolean;
   isMultiRestaurant?: boolean;
   isDefault?: boolean;
+  isActive?: boolean;
 }
 
 export interface CreatePlanDto {
@@ -107,6 +110,8 @@ export interface CreatePlanDto {
   currency: Currency;
   type?: PlanType;
 }
+
+export type SubscriptionStatusFilter = 'active' | 'inactive' | 'all';
 
 @Injectable({
   providedIn: 'root',
@@ -118,6 +123,24 @@ export class SubscriptionService {
 
   findAll(): Observable<{ status: number; subscriptions: Subscription[] }> {
     return this.http.get<{ status: number; subscriptions: Subscription[] }>(this.apiUrl);
+  }
+
+  findAllAdmin(
+    status: SubscriptionStatusFilter = 'all',
+    targetType?: TargetType,
+  ): Observable<{ status: number; subscriptions: Subscription[] }> {
+    let params = new HttpParams().set('status', status);
+    if (targetType) {
+      params = params.set('targetType', targetType);
+    }
+    return this.http.get<{ status: number; subscriptions: Subscription[] }>(
+      `${this.apiUrl}/admin`,
+      { params },
+    );
+  }
+
+  setActive(id: string, isActive: boolean): Observable<{ status: number; subscription: Subscription }> {
+    return this.update(id, { isActive });
   }
 
   findOne(id: string): Observable<{ status: number; subscription: Subscription }> {

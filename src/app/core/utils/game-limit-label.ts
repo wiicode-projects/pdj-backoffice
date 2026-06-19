@@ -3,15 +3,14 @@ import { GameSetting } from '../services/game-setting.service';
 const UNIT_BY_SLUG: Record<string, { one: string; many: string }> = {
   spin_win: { one: 'lancer', many: 'lancers' },
   mystery_box: { one: 'ouverture', many: 'ouvertures' },
-  quiz_flash: { one: 'question', many: 'questions' },
+  quiz_flash: { one: 'partie', many: 'parties' },
 };
 
 const DEFAULT_UNIT = { one: 'partie', many: 'parties' };
 
-/** Human-readable limit line for list cards and detail hero. */
-export function formatGameLimitDescription(game: GameSetting): string {
+function formatStandardLimit(game: GameSetting): string | null {
   if (!game.limitEnabled || game.maxPlaysPerPeriod == null) {
-    return game.description ?? 'Illimité';
+    return null;
   }
 
   const max = game.maxPlaysPerPeriod;
@@ -20,6 +19,36 @@ export function formatGameLimitDescription(game: GameSetting): string {
   const unit = max > 1 ? units.many : units.one;
 
   return `${max} ${unit} par ${periodLabel}`;
+}
+
+function formatQuizQuestionsPerSession(count: number | null | undefined): string | null {
+  if (count == null || count < 1) return null;
+  const unit = count > 1 ? 'questions' : 'question';
+  return `${count} ${unit} par partie`;
+}
+
+/** Human-readable limit line for list cards and detail hero. */
+export function formatGameLimitDescription(game: GameSetting): string {
+  if (game.description?.trim()) {
+    return game.description.trim();
+  }
+
+  if (game.slug === 'quiz_flash') {
+    const parts = [
+      formatStandardLimit(game),
+      formatQuizQuestionsPerSession(game.quizQuestionsPerSession),
+    ].filter((part): part is string => Boolean(part));
+
+    if (parts.length > 0) return parts.join(' · ');
+    return 'Illimité';
+  }
+
+  if (!game.limitEnabled || game.maxPlaysPerPeriod == null) {
+    return 'Illimité';
+  }
+
+  const standard = formatStandardLimit(game);
+  return standard ?? 'Illimité';
 }
 
 /** Compact badge: "2 / jour" */

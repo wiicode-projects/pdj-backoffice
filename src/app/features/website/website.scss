@@ -338,7 +338,7 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   flex-direction: column;
 
-  &--wide { width: 640px; }
+  &--wide { width: 960px; }
 
   &__header {
     display: flex;
@@ -454,6 +454,57 @@ $font: 'PolySans Trial', -apple-system, BlinkMacSystemFont, sans-serif;
     width: 100%;
     height: 100%;
   }
+}
+
+.field__input--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.field__error {
+  color: #DC2626;
+  font-size: 0.82rem;
+  margin-top: 8px;
+}
+
+.table-sub {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  margin-top: 2px;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &--success {
+    background: rgba(5, 150, 105, 0.12);
+    color: #059669;
+  }
+
+  &--muted {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
+}
+
+.publish-callout {
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  background: rgba(5, 150, 105, 0.06);
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

@@ -1087,7 +1087,7 @@
     "FIELD_FAQ_ANSWER": "Answer",
     "FAQ_ALL_LANGS_HINT": "Fill in the question and answer in all 4 languages before saving.",
     "PAGES_TITLE": "Legal pages",
-    "PAGES_DESC": "Edit CGU, GTS, privacy and legal notice content. Until a page is published, the site shows the existing static content.",
+    "PAGES_DESC": "Each legal page has its own URL on the website (CGU → /cgu, CGV → /cgv, etc.). Until a page is published, the site shows the existing static content.",
     "COL_PAGE": "Page",
     "COL_PAGE_STATUS": "Status",
     "PAGE_PUBLISHED": "Published",

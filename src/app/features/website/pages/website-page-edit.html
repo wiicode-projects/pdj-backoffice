@@ -4,9 +4,9 @@
       <a class="page-edit__back" routerLink="/app/website">
         ← {{ 'WEBSITE.BACK_TO_PAGES' | translate }}
       </a>
-      @if (publicSitePath) {
+          @if (publicSitePath) {
         <a class="page-edit__view-site" [href]="publicSitePath" target="_blank" rel="noopener noreferrer">
-          {{ 'WEBSITE.VIEW_ON_SITE' | translate }} →
+          {{ 'WEBSITE.VIEW_ON_SITE' | translate }} ({{ publicSitePath }}) →
         </a>
       }
     </div>

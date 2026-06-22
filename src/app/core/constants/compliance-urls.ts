@@ -4,5 +4,5 @@ export const FALLBACK_LEGAL_URLS = {
   cgu: 'https://leplatdujour.ch/cgu',
   cgv: 'https://leplatdujour.ch/cgv',
   privacy: 'https://leplatdujour.ch/politique-de-confidentialite',
-  pricing: 'https://leplatdujour.ch/#tarifs',
+  pricing: 'https://leplatdujour.ch/tarifs',
 } as const;

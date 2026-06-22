@@ -87,6 +87,51 @@ export interface UpdateEmailSettingsDto {
   emailSubscriptionEnabled?: boolean;
 }
 
+export type ComplianceUrlCategory =
+  | 'website'
+  | 'legal'
+  | 'registration'
+  | 'pricing'
+  | 'ipc';
+
+export interface ComplianceUrlItem {
+  key: string;
+  label: string;
+  description: string;
+  url: string;
+  category: ComplianceUrlCategory;
+}
+
+export interface ComplianceUrlHealthItem extends ComplianceUrlItem {
+  ok: boolean;
+  statusCode: number | null;
+  error?: string;
+}
+
+export interface ComplianceUrlsResponse {
+  websitePublicUrl: string;
+  backofficePublicUrl: string;
+  apiPublicUrl: string;
+  ipc: ComplianceUrlItem[];
+  compliance: ComplianceUrlItem[];
+  all: ComplianceUrlItem[];
+  submissionText: string;
+}
+
+export interface ComplianceUrlsHealthResponse {
+  checkedAt: string;
+  items: ComplianceUrlHealthItem[];
+  allOk: boolean;
+}
+
+export interface PublicLegalUrls {
+  website: string;
+  cgu: string;
+  cgv: string;
+  privacy: string;
+  pricing: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly url = `${environment.apiUrl}/settings`;
@@ -107,6 +152,18 @@ export class SettingsService {
 
   updateEmail(dto: UpdateEmailSettingsDto): Observable<PlatformSettings> {
     return this.http.patch<PlatformSettings>(`${this.url}/email`, dto);
+  }
+
+  getComplianceUrls(): Observable<ComplianceUrlsResponse> {
+    return this.http.get<ComplianceUrlsResponse>(`${this.url}/compliance-urls`);
+  }
+
+  getComplianceUrlsHealth(): Observable<ComplianceUrlsHealthResponse> {
+    return this.http.get<ComplianceUrlsHealthResponse>(`${this.url}/compliance-urls/health`);
+  }
+
+  getPublicLegalUrls(): Observable<PublicLegalUrls> {
+    return this.http.get<PublicLegalUrls>(`${this.url}/public/legal-urls`);
   }
 }
 

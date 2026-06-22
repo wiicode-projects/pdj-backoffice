@@ -8,6 +8,8 @@ import {
   UpdatePaymentSettingsDto,
   UpdateGeneralSettingsDto,
   UpdateEmailSettingsDto,
+  ComplianceUrlHealthItem,
+  ComplianceUrlsResponse,
 } from '../../core/services/settings.service';
 import { UserService, AdminUser } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -37,16 +39,28 @@ export class Settings implements OnInit {
     supportPhone: '',
   };
 
-  // ── Payment: MyPos / TWINT (combined) ───────────────────────────────
-  myposTwintEnabled = false;
-  twintWebhookUrl = '';
-  twintMerchantId = '';
-  twintApiKey = '';
-  showTwintKey = false;
-  myposWebhookUrl = '';
-  myposMerchantId = '';
-  myposApiKey = '';
-  showMyposKey = false;
+  // ── Payment: myPOS (Cartes + TWINT via même intégration) ─────────────
+  myposEnabled = false;
+  myposStoreId = '';
+  myposConfigurationPack = '';
+  showMyposSecrets = false;
+
+  // ── myPOS compliance URLs (from API) ───────────────────────────────
+  complianceUrls: ComplianceUrlsResponse | null = null;
+  complianceUrlsLoading = false;
+  complianceUrlsError = '';
+  complianceHealth: ComplianceUrlHealthItem[] = [];
+  complianceHealthLoading = false;
+  complianceHealthCheckedAt = '';
+  complianceCopySuccess = false;
+
+  get myposIpcUrls() {
+    return this.complianceUrls?.ipc ?? [];
+  }
+
+  get myposComplianceUrls() {
+    return this.complianceUrls?.compliance ?? [];
+  }
 
   // ── Payment: PayPal ────────────────────────────────────────────────
   paypalEnabled = false;
@@ -123,6 +137,7 @@ export class Settings implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadComplianceUrls();
   }
 
   load(): void {
@@ -141,14 +156,10 @@ export class Settings implements OnInit {
       supportEmail: data?.supportEmail ?? '',
       supportPhone: data?.supportPhone ?? '',
     };
-    // Payment: MyPos / TWINT (combined — both enabled together)
-    this.myposTwintEnabled = (data?.twintEnabled ?? false) || (data?.myposEnabled ?? false);
-    this.twintWebhookUrl   = data?.twintWebhookUrl ?? '';
-    this.twintMerchantId   = data?.twintMerchantId ?? '';
-    this.twintApiKey       = data?.twintApiKey     ?? '';
-    this.myposWebhookUrl   = data?.myposWebhookUrl ?? '';
-    this.myposMerchantId   = data?.myposMerchantId ?? '';
-    this.myposApiKey       = data?.myposApiKey     ?? '';
+    // myPOS — single gateway (TWINT included via myPOS contract, not a separate integration)
+    this.myposEnabled = (data?.myposEnabled ?? false) || (data?.twintEnabled ?? false);
+    this.myposStoreId = data?.myposMerchantId ?? '';
+    this.myposConfigurationPack = data?.myposApiKey ?? '';
     // Payment: PayPal
     this.paypalEnabled     = data?.paypalEnabled   ?? false;
     this.paypalClientId    = data?.paypalClientId   ?? '';
@@ -180,9 +191,52 @@ export class Settings implements OnInit {
     this.saveError = '';
     this.adminsError = '';
     this.adminsSuccess = '';
+    if (tab === 'payment' && !this.complianceUrls && !this.complianceUrlsLoading) {
+      this.loadComplianceUrls();
+    }
     if (tab === 'admins') {
       this.loadAdmins();
     }
+  }
+
+  loadComplianceUrls(): void {
+    this.complianceUrlsLoading = true;
+    this.complianceUrlsError = '';
+    this.settingsService.getComplianceUrls()
+      .pipe(finalize(() => { this.complianceUrlsLoading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (data) => { this.complianceUrls = data; },
+        error: (err) => {
+          this.complianceUrlsError = err?.error?.message ?? 'Impossible de charger les URLs de conformité.';
+        },
+      });
+  }
+
+  checkComplianceHealth(): void {
+    this.complianceHealthLoading = true;
+    this.settingsService.getComplianceUrlsHealth()
+      .pipe(finalize(() => { this.complianceHealthLoading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (data) => {
+          this.complianceHealth = data.items;
+          this.complianceHealthCheckedAt = data.checkedAt;
+        },
+        error: (err) => {
+          this.complianceUrlsError = err?.error?.message ?? 'Impossible de vérifier les URLs.';
+        },
+      });
+  }
+
+  getUrlHealth(url: string): ComplianceUrlHealthItem | undefined {
+    return this.complianceHealth.find((item) => item.url === url);
+  }
+
+  copyComplianceSubmission(): void {
+    const text = this.complianceUrls?.submissionText;
+    if (!text) return;
+    this.copyToClipboard(text);
+    this.complianceCopySuccess = true;
+    setTimeout(() => { this.complianceCopySuccess = false; this.cdr.detectChanges(); }, 2500);
   }
 
   loadAdmins(): void {
@@ -269,11 +323,15 @@ export class Settings implements OnInit {
 
   savePayment(): void {
     const dto: UpdatePaymentSettingsDto = {
-      // MyPos / TWINT (combined)
-      twintEnabled: this.myposTwintEnabled, twintWebhookUrl: this.twintWebhookUrl,
-      twintMerchantId: this.twintMerchantId, twintApiKey: this.twintApiKey,
-      myposEnabled: this.myposTwintEnabled, myposWebhookUrl: this.myposWebhookUrl,
-      myposMerchantId: this.myposMerchantId, myposApiKey: this.myposApiKey,
+      // myPOS — TWINT is enabled through the same myPOS checkout (no separate credentials)
+      myposEnabled: this.myposEnabled,
+      myposMerchantId: this.myposStoreId.trim() || undefined,
+      myposApiKey: this.myposConfigurationPack.trim() || undefined,
+      myposWebhookUrl: this.complianceUrls?.ipc[0]?.url ?? this.myposIpcUrls[0]?.url,
+      twintEnabled: this.myposEnabled,
+      twintWebhookUrl: '',
+      twintMerchantId: '',
+      twintApiKey: '',
       // PayPal
       paypalEnabled: this.paypalEnabled, paypalClientId: this.paypalClientId,
       paypalSecretKey: this.paypalSecretKey, paypalWebhookUrl: this.paypalWebhookUrl,
@@ -320,6 +378,7 @@ export class Settings implements OnInit {
   }
 
   copyToClipboard(value: string): void {
+    if (!value) return;
     navigator.clipboard.writeText(value).catch(() => {});
   }
 

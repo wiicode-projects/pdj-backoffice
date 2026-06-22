@@ -143,98 +143,149 @@
           <div class="settings-section" id="panel-payment">
             <div class="settings-section__header">
               <h2 class="settings-section__title">Fournisseurs de paiement</h2>
-              <p class="settings-section__desc">Configurez vos intégrations de paiement : MyPos/TWINT, PayPal et virement bancaire</p>
+              <p class="settings-section__desc">Configurez vos moyens de paiement. Cartes bancaires et TWINT passent par une seule intégration myPOS.</p>
             </div>
 
-            <!-- MYPOS / TWINT Combined Card -->
-            <div class="provider-card" [class.provider-card--active]="myposTwintEnabled" id="mypos-twint-card">
+            <!-- myPOS — Cartes & TWINT (single integration) -->
+            <div class="provider-card" [class.provider-card--active]="myposEnabled" id="mypos-card">
               <div class="provider-card__header">
                 <div class="provider-logo provider-logo--twint">
                   <svg width="28" height="28" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#0C1B33"/><text x="50%" y="40%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="10" fill="white">myPOS</text><text x="50%" y="68%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="#4FC3F7">TWINT</text></svg>
                 </div>
                 <div class="provider-card__title-group">
-                  <h3 class="provider-card__name">MyPos / TWINT</h3>
-                  <p class="provider-card__desc">Terminal de paiement, carte, QR Code &amp; NFC</p>
+                  <h3 class="provider-card__name">Cartes &amp; TWINT (myPOS)</h3>
+                  <p class="provider-card__desc">Visa, Mastercard et TWINT via la page de paiement hébergée myPOS</p>
                 </div>
                 <div class="provider-toggle">
-                  <label class="toggle" for="toggle-mypos-twint">
-                    <input type="checkbox" id="toggle-mypos-twint" [(ngModel)]="myposTwintEnabled" class="toggle__input"/>
+                  <label class="toggle" for="toggle-mypos">
+                    <input type="checkbox" id="toggle-mypos" [(ngModel)]="myposEnabled" class="toggle__input"/>
                     <span class="toggle__track"><span class="toggle__thumb"></span></span>
                   </label>
-                  <span class="provider-status" [class.provider-status--on]="myposTwintEnabled">{{ myposTwintEnabled ? 'Activé' : 'Désactivé' }}</span>
+                  <span class="provider-status" [class.provider-status--on]="myposEnabled">{{ myposEnabled ? 'Activé' : 'Désactivé' }}</span>
                 </div>
               </div>
 
-              @if (myposTwintEnabled) {
+              @if (myposEnabled) {
                 <div class="provider-card__fields">
-                  <h4 class="provider-card__sub">Configuration TWINT</h4>
-                  <div class="form-field">
-                    <label class="form-label" for="twint-webhook">URL Webhook TWINT</label>
-                    <div class="input-with-copy">
-                      <input id="twint-webhook" class="form-input" type="url" [(ngModel)]="twintWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/twint"/>
-                      <button class="copy-btn" (click)="copyToClipboard(twintWebhookUrl)" title="Copier" type="button">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="form-field">
-                    <label class="form-label" for="twint-merchant-id">Merchant ID TWINT</label>
-                    <input id="twint-merchant-id" class="form-input" type="text" [(ngModel)]="twintMerchantId" placeholder="TWINT-MERCHANT-XXXXX"/>
-                  </div>
-                  <div class="form-field">
-                    <label class="form-label" for="twint-api-key">Clé API TWINT</label>
-                    <div class="input-with-copy">
-                      <input id="twint-api-key" class="form-input form-input--secret" [type]="showTwintKey ? 'text' : 'password'" [(ngModel)]="twintApiKey" placeholder="sk_live_••••••••••••••••" autocomplete="new-password"/>
-                      <button class="copy-btn" (click)="showTwintKey = !showTwintKey" title="Afficher/masquer" type="button">
-                        @if (!showTwintKey) {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-                        } @else {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
-                        }
-                      </button>
-                    </div>
-                    <span class="form-hint form-hint--warn">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
-                      Ne partagez jamais votre clé API secrète
-                    </span>
+                  <div class="provider-info-banner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    <p>
+                      <strong>TWINT n’est pas une intégration séparée.</strong>
+                      Les paiements TWINT et par carte utilisent le même contrat marchand myPOS.
+                      TWINT doit être activé sur votre compte myPOS ; aucune clé API TWINT n’est requise ici.
+                    </p>
                   </div>
 
-                  <h4 class="provider-card__sub" style="margin-top:20px;">Configuration MyPos</h4>
-                  <div class="form-field">
-                    <label class="form-label" for="mypos-webhook">URL Webhook MyPos</label>
-                    <div class="input-with-copy">
-                      <input id="mypos-webhook" class="form-input" type="url" [(ngModel)]="myposWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/mypos"/>
-                      <button class="copy-btn" (click)="copyToClipboard(myposWebhookUrl)" title="Copier" type="button">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
-                      </button>
-                    </div>
+                  <h4 class="provider-card__sub">Identifiants myPOS</h4>
+
+                  <div class="form-field form-field--full">
+                    <label class="form-label" for="mypos-config-pack">Configuration Pack (base64) — recommandé</label>
+                    <textarea
+                      id="mypos-config-pack"
+                      class="form-input form-input--textarea"
+                      [class.form-input--masked]="!showMyposSecrets"
+                      rows="4"
+                      [(ngModel)]="myposConfigurationPack"
+                      placeholder="Collez le Configuration Pack fourni par myPOS…"
+                      autocomplete="off"
+                    ></textarea>
+                    <span class="form-hint">Contient SID, Wallet, clés RSA et certificat API. Alternative : saisie manuelle du Store ID ci-dessous.</span>
                   </div>
+
                   <div class="form-field">
-                    <label class="form-label" for="mypos-merchant-id">Merchant ID MyPos</label>
-                    <input id="mypos-merchant-id" class="form-input" type="text" [(ngModel)]="myposMerchantId" placeholder="MYPOS-XXXXXXXXXX"/>
+                    <label class="form-label" for="mypos-store-id">Store ID (SID)</label>
+                    <input id="mypos-store-id" class="form-input" type="text" [(ngModel)]="myposStoreId" placeholder="000000000000010"/>
+                    <span class="form-hint">Client Number, Key Index et clés RSA si pas de Configuration Pack.</span>
                   </div>
-                  <div class="form-field">
-                    <label class="form-label" for="mypos-api-key">Clé API MyPos</label>
-                    <div class="input-with-copy">
-                      <input id="mypos-api-key" class="form-input form-input--secret" [type]="showMyposKey ? 'text' : 'password'" [(ngModel)]="myposApiKey" placeholder="mp_live_••••••••••••••••" autocomplete="new-password"/>
-                      <button class="copy-btn" (click)="showMyposKey = !showMyposKey" title="Afficher/masquer" type="button">
-                        @if (!showMyposKey) {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-                        } @else {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
-                        }
-                      </button>
-                    </div>
-                    <span class="form-hint form-hint--warn">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
-                      Ne partagez jamais votre clé API secrète
-                    </span>
+
+                  <div class="form-field form-field--actions">
+                    <button class="copy-btn copy-btn--inline" type="button" (click)="showMyposSecrets = !showMyposSecrets">
+                      {{ showMyposSecrets ? 'Masquer les secrets' : 'Afficher les secrets' }}
+                    </button>
                   </div>
                 </div>
               } @else {
                 <div class="provider-card__disabled-hint">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                  Activez MyPos/TWINT pour configurer les paramètres d'intégration
+                  Activez myPOS pour accepter les cartes bancaires et TWINT
+                </div>
+              }
+            </div>
+
+            <!-- myPOS compliance URLs -->
+            <div class="provider-card provider-card--compliance" id="mypos-compliance-card">
+              <div class="provider-card__header">
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">URLs myPOS — conformité</h3>
+                  <p class="provider-card__desc">URLs techniques et pages légales à soumettre au portail myPOS</p>
+                </div>
+                <div class="compliance-actions">
+                  <button type="button" class="copy-btn copy-btn--inline" (click)="copyComplianceSubmission()" [disabled]="!complianceUrls">
+                    Copier tout
+                  </button>
+                  <button type="button" class="copy-btn copy-btn--inline" (click)="checkComplianceHealth()" [disabled]="complianceHealthLoading || !complianceUrls">
+                    {{ complianceHealthLoading ? 'Vérification…' : 'Vérifier les URLs' }}
+                  </button>
+                </div>
+              </div>
+
+              @if (complianceCopySuccess) {
+                <p class="compliance-flash compliance-flash--ok">Liste copiée dans le presse-papiers.</p>
+              }
+              @if (complianceUrlsError) {
+                <p class="compliance-flash compliance-flash--error">{{ complianceUrlsError }}</p>
+              }
+              @if (complianceUrlsLoading) {
+                <div class="provider-card__disabled-hint">Chargement des URLs…</div>
+              } @else if (complianceUrls) {
+                <div class="provider-card__fields">
+                  @if (complianceHealthCheckedAt) {
+                    <p class="provider-card__note">
+                      Dernière vérification : {{ complianceHealthCheckedAt | date:'short' }}
+                      — {{ complianceHealth.every(h => h.ok) ? 'Toutes les URLs répondent.' : 'Certaines URLs sont inaccessibles.' }}
+                    </p>
+                  }
+
+                  <h4 class="provider-card__sub">URLs techniques (IPC)</h4>
+                  @for (item of myposIpcUrls; track item.url) {
+                    <div class="form-field form-field--full">
+                      <label class="form-label">
+                        {{ item.label }}
+                        @if (getUrlHealth(item.url); as health) {
+                          <span class="url-health" [class.url-health--ok]="health.ok" [class.url-health--fail]="!health.ok">
+                            {{ health.ok ? 'OK' : (health.error || 'Erreur') }}
+                          </span>
+                        }
+                      </label>
+                      <div class="input-with-copy">
+                        <input class="form-input form-input--readonly" type="text" [value]="item.url" readonly tabindex="-1"/>
+                        <button class="copy-btn" (click)="copyToClipboard(item.url)" title="Copier" type="button">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+
+                  <h4 class="provider-card__sub">Pages légales &amp; parcours client</h4>
+                  @for (item of myposComplianceUrls; track item.url) {
+                    <div class="form-field form-field--full">
+                      <label class="form-label">
+                        {{ item.label }}
+                        @if (getUrlHealth(item.url); as health) {
+                          <span class="url-health" [class.url-health--ok]="health.ok" [class.url-health--fail]="!health.ok">
+                            {{ health.ok ? 'OK' : (health.error || 'Erreur') }}
+                          </span>
+                        }
+                      </label>
+                      <span class="form-hint form-hint--inline">{{ item.description }}</span>
+                      <div class="input-with-copy">
+                        <input class="form-input form-input--readonly" type="url" [value]="item.url" readonly tabindex="-1"/>
+                        <button class="copy-btn" (click)="copyToClipboard(item.url)" title="Copier" type="button">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
                 </div>
               }
             </div>

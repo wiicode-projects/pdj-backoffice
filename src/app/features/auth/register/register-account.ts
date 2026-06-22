@@ -5,8 +5,10 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignupService } from '../../../core/services/signup.service';
+import { SettingsService, PublicLegalUrls } from '../../../core/services/settings.service';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
 import { PdjPhoneInput } from '../../../shared/components/phone-input/phone-input';
+import { FALLBACK_LEGAL_URLS } from '../../../core/constants/compliance-urls';
 
 @Component({
   selector: 'pdj-register-account',
@@ -28,10 +30,12 @@ export class RegisterAccount implements OnInit {
   errorMessage = signal('');
   isSubmitting = signal(false);
   restaurantRoleId = '';
+  legalUrls: PublicLegalUrls = { ...FALLBACK_LEGAL_URLS };
 
   constructor(
     private authService: AuthService,
     private signupService: SignupService,
+    private settingsService: SettingsService,
     private router: Router,
   ) {}
 
@@ -54,6 +58,10 @@ export class RegisterAccount implements OnInit {
         const role = res.roles.find((r) => r.name === 'RESTAURANT');
         this.restaurantRoleId = role?.id || '';
       },
+    });
+
+    this.settingsService.getPublicLegalUrls().subscribe({
+      next: (urls) => { this.legalUrls = urls; },
     });
   }
 

@@ -10,7 +10,7 @@ export function isWebsitePageSlug(slug: string): slug is WebsitePageSlug {
 /** Public website paths (for “view on site” links). */
 export const WEBSITE_PAGE_PUBLIC_PATHS: Record<WebsitePageSlug, string> = {
   cgu: '/cgu',
-  cgv: '/cgu',
+  cgv: '/cgv',
   privacy: '/politique-de-confidentialite',
   mentions: '/mentions-legales',
 };

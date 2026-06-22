@@ -14,6 +14,10 @@ import {
   WebsitePage,
 } from '../../core/services/website.service';
 import { environment } from '../../../environments/environment';
+import {
+  WEBSITE_PAGE_PUBLIC_PATHS,
+  WebsitePageSlug,
+} from '../../core/utils/website-page-paths';
 
 @Component({
   selector: 'pdj-website',
@@ -521,6 +525,10 @@ export class Website implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  pagePublicPath(slug: WebsitePageSlug): string {
+    return WEBSITE_PAGE_PUBLIC_PATHS[slug];
   }
 
   togglePagePublished(page: WebsitePage): void {

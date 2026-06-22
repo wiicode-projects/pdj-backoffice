@@ -1087,7 +1087,7 @@
     "FIELD_FAQ_ANSWER": "Réponse",
     "FAQ_ALL_LANGS_HINT": "Remplissez la question et la réponse dans les 4 langues avant d'enregistrer.",
     "PAGES_TITLE": "Pages légales",
-    "PAGES_DESC": "Éditez le contenu des pages CGU, CGV, confidentialité et mentions légales. Tant qu'une page n'est pas publiée, le site affiche le contenu statique existant.",
+    "PAGES_DESC": "Chaque page légale a sa propre URL sur le site (CGU → /cgu, CGV → /cgv, etc.). Tant qu'une page n'est pas publiée, le site affiche le contenu statique existant.",
     "COL_PAGE": "Page",
     "COL_PAGE_STATUS": "Publication",
     "PAGE_PUBLISHED": "Publiée",

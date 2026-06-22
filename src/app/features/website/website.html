@@ -299,7 +299,7 @@
                 <tr>
                   <td>
                     <strong>{{ 'WEBSITE.PAGE_SLUGS.' + page.slug | translate }}</strong>
-                    <div class="table-sub">{{ page.slug }}</div>
+                    <div class="table-sub">{{ pagePublicPath(page.slug) }}</div>
                   </td>
                   <td>
                     <span class="badge" [class.badge--success]="page.isPublished" [class.badge--muted]="!page.isPublished">

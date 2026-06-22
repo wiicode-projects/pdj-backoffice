@@ -24,8 +24,8 @@ $teal: #0B7285;
   to { transform: rotate(360deg); }
 }
 @keyframes expandDown {
-  from { opacity: 0; max-height: 0; }
-  to   { opacity: 1; max-height: 800px; }
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 // ==========================================
@@ -506,10 +506,29 @@ $teal: #0B7285;
 }
 
 .provider-card--compliance {
+  overflow: visible;
+
   .provider-card__header {
     flex-wrap: wrap;
     gap: 12px;
   }
+
+  .provider-card__fields {
+    padding-bottom: 28px;
+  }
+}
+
+.deploy-env-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0b7285;
+  background: rgba(11, 114, 133, 0.12);
+  vertical-align: middle;
 }
 
 // Provider logo bubble

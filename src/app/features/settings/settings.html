@@ -217,7 +217,12 @@
               <div class="provider-card__header">
                 <div class="provider-card__title-group">
                   <h3 class="provider-card__name">URLs myPOS — conformité</h3>
-                  <p class="provider-card__desc">URLs techniques et pages légales à soumettre au portail myPOS</p>
+                  <p class="provider-card__desc">
+                    URLs techniques et pages légales à soumettre au portail myPOS
+                    @if (complianceUrls?.deployEnv; as deployEnv) {
+                      <span class="deploy-env-badge">{{ deployEnvLabel(deployEnv) }}</span>
+                    }
+                  </p>
                 </div>
                 <div class="compliance-actions">
                   <button type="button" class="copy-btn copy-btn--inline" (click)="copyComplianceSubmission()" [disabled]="!complianceUrls">

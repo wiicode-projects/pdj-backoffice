@@ -8,7 +8,7 @@ import { SignupService } from '../../../core/services/signup.service';
 import { SettingsService, PublicLegalUrls } from '../../../core/services/settings.service';
 import { LanguageSwitcher } from '../../../shared/components/language-switcher/language-switcher';
 import { PdjPhoneInput } from '../../../shared/components/phone-input/phone-input';
-import { FALLBACK_LEGAL_URLS } from '../../../core/constants/compliance-urls';
+import { resolveFallbackLegalUrls } from '../../../core/constants/compliance-urls';
 
 @Component({
   selector: 'pdj-register-account',
@@ -30,7 +30,7 @@ export class RegisterAccount implements OnInit {
   errorMessage = signal('');
   isSubmitting = signal(false);
   restaurantRoleId = '';
-  legalUrls: PublicLegalUrls = { ...FALLBACK_LEGAL_URLS };
+  legalUrls: PublicLegalUrls = { ...resolveFallbackLegalUrls() };
 
   constructor(
     private authService: AuthService,

@@ -13,6 +13,7 @@ import {
 } from '../../core/services/settings.service';
 import { UserService, AdminUser } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
+import { deployEnvLabel } from '../../core/constants/compliance-urls';
 
 type Tab = 'general' | 'payment' | 'email' | 'notifications' | 'admins';
 
@@ -60,6 +61,13 @@ export class Settings implements OnInit {
 
   get myposComplianceUrls() {
     return this.complianceUrls?.compliance ?? [];
+  }
+
+  deployEnvLabel(env: string | undefined): string {
+    if (env === 'development' || env === 'staging' || env === 'production') {
+      return deployEnvLabel(env);
+    }
+    return 'Inconnu';
   }
 
   // ── Payment: PayPal ────────────────────────────────────────────────

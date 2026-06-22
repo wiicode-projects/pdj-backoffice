@@ -108,7 +108,10 @@ export interface ComplianceUrlHealthItem extends ComplianceUrlItem {
   error?: string;
 }
 
+export type DeployEnv = 'development' | 'staging' | 'production';
+
 export interface ComplianceUrlsResponse {
+  deployEnv: DeployEnv;
   websitePublicUrl: string;
   backofficePublicUrl: string;
   apiPublicUrl: string;

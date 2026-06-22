@@ -32,6 +32,16 @@ $card-bg: #FFFFFF;
     cursor: pointer;
   }
 
+  &__legal-link {
+    color: $primary-red;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: darken($primary-red, 8%);
+    }
+  }
+
   &__back-link {
     display: block;
     text-align: center;

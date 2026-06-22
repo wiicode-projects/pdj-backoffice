@@ -382,6 +382,134 @@ $teal: #0B7285;
     border-bottom: 1px dashed rgba($border, 0.8);
     margin: 0;
   }
+
+  &__note {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    color: $text-mid;
+    margin: -8px 0 0;
+    line-height: 1.45;
+  }
+}
+
+.provider-info-banner {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba($amber, 0.08);
+  border: 1px solid rgba($amber, 0.25);
+  color: $text-dark;
+  font-size: 0.83rem;
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: $amber;
+  }
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
+.form-field--actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.form-hint--inline {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.form-input--textarea {
+  min-height: 96px;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.form-input--masked {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
+.form-input--readonly {
+  background: rgba($bg, 0.8);
+  color: $text-mid;
+  cursor: default;
+}
+
+.copy-btn--inline {
+  position: static;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  height: auto;
+  width: auto;
+}
+
+.compliance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.compliance-flash {
+  margin: 0 24px 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+
+  &--ok {
+    background: rgba(#16a34a, 0.08);
+    color: #166534;
+    border: 1px solid rgba(#16a34a, 0.2);
+  }
+
+  &--error {
+    background: rgba($red, 0.06);
+    color: darken($red, 8%);
+    border: 1px solid rgba($red, 0.2);
+  }
+}
+
+.url-health {
+  margin-left: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  &--ok {
+    color: #16a34a;
+  }
+
+  &--fail {
+    color: $red;
+  }
+}
+
+.provider-card--compliance {
+  .provider-card__header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 }
 
 // Provider logo bubble

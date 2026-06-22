@@ -160,7 +160,13 @@
         <label class="login-page__checkbox-label register-page__terms">
           <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" class="login-page__checkbox" />
           <span class="login-page__checkbox-custom"></span>
-          <span>{{ 'AUTH.SIGNUP_TERMS' | translate }}</span>
+          <span>
+            {{ 'AUTH.SIGNUP_TERMS_PREFIX' | translate }}
+            <a [href]="legalUrls.cgu" target="_blank" rel="noopener noreferrer" class="register-page__legal-link" (click)="$event.stopPropagation()">CGU</a>,
+            <a [href]="legalUrls.cgv" target="_blank" rel="noopener noreferrer" class="register-page__legal-link" (click)="$event.stopPropagation()">CGV</a>
+            {{ 'AUTH.SIGNUP_TERMS_AND' | translate }}
+            <a [href]="legalUrls.privacy" target="_blank" rel="noopener noreferrer" class="register-page__legal-link" (click)="$event.stopPropagation()">{{ 'AUTH.SIGNUP_TERMS_PRIVACY' | translate }}</a>
+          </span>
         </label>
 
         <button type="submit" class="login-page__submit" [disabled]="isSubmitting()">

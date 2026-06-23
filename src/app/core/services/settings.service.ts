@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type EmailProvider = 'brevo' | 'kreativmedia';
+
 export interface PlatformSettings {
   id: string;
   // MyPos / TWINT (combined)
@@ -32,8 +34,16 @@ export interface PlatformSettings {
   platformName: string | null;
   supportEmail: string | null;
   supportPhone: string | null;
-  // Email / Brevo
+  // Email providers
+  emailProvider: EmailProvider;
+  brevoEnabled: boolean;
   brevoApiKey: string | null;
+  kreativMediaEnabled: boolean;
+  kreativMediaSmtpHost: string | null;
+  kreativMediaSmtpPort: number;
+  kreativMediaSmtpUser: string | null;
+  kreativMediaSmtpPassword: string | null;
+  kreativMediaSmtpSecure: boolean;
   emailSenderName: string | null;
   emailSenderAddress: string | null;
   emailEnabled: boolean;
@@ -78,7 +88,15 @@ export interface UpdateGeneralSettingsDto {
 }
 
 export interface UpdateEmailSettingsDto {
+  emailProvider?: EmailProvider;
+  brevoEnabled?: boolean;
   brevoApiKey?: string;
+  kreativMediaEnabled?: boolean;
+  kreativMediaSmtpHost?: string;
+  kreativMediaSmtpPort?: number;
+  kreativMediaSmtpUser?: string;
+  kreativMediaSmtpPassword?: string;
+  kreativMediaSmtpSecure?: boolean;
   emailSenderName?: string;
   emailSenderAddress?: string;
   emailEnabled?: boolean;

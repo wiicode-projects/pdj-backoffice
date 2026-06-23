@@ -789,6 +789,39 @@ $teal: #0B7285;
   font-weight: 600;
   margin-left: auto;
   white-space: nowrap;
+
+  &--inline {
+    margin-left: 0;
+    margin-bottom: 12px;
+  }
+}
+
+.email-provider-card {
+  margin-bottom: 16px;
+
+  &--selected {
+    border-color: $teal;
+    box-shadow: 0 0 0 1px rgba($teal, 0.15);
+  }
+}
+
+.email-provider-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba($bg, 0.55);
+  border: 1px solid $border;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-dark;
+
+  input {
+    accent-color: $teal;
+  }
 }
 
 // ── Per-type toggle list ──────────────────

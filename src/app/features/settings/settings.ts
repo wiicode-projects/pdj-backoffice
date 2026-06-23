@@ -8,6 +8,7 @@ import {
   UpdatePaymentSettingsDto,
   UpdateGeneralSettingsDto,
   UpdateEmailSettingsDto,
+  EmailProvider,
   ComplianceUrlHealthItem,
   ComplianceUrlsResponse,
 } from '../../core/services/settings.service';
@@ -89,8 +90,17 @@ export class Settings implements OnInit {
 
   // ── Email ──────────────────────────────────────────────────────────
   emailEnabled = true;
+  emailProvider: EmailProvider = 'brevo';
+  brevoEnabled = true;
   brevoApiKey = '';
   showBrevoKey = false;
+  kreativMediaEnabled = false;
+  kreativMediaSmtpHost = '';
+  kreativMediaSmtpPort = 465;
+  kreativMediaSmtpUser = '';
+  kreativMediaSmtpPassword = '';
+  showKreativPassword = false;
+  kreativMediaSmtpSecure = true;
   emailSenderName = '';
   emailSenderAddress = '';
 
@@ -116,9 +126,18 @@ export class Settings implements OnInit {
     sendResetEmail: true,
   };
 
-  /** Visual badge: shows a warning dot on the email tab if Brevo key is missing */
+  /** Visual badge: shows a warning dot on the email tab if active provider is misconfigured */
   get emailMissingConfig(): boolean {
-    return this.emailEnabled && !this.brevoApiKey;
+    if (!this.emailEnabled) return false;
+    if (this.emailProvider === 'brevo') {
+      return this.brevoEnabled && !this.brevoApiKey.trim();
+    }
+    return (
+      this.kreativMediaEnabled &&
+      (!this.kreativMediaSmtpHost.trim() ||
+        !this.kreativMediaSmtpUser.trim() ||
+        !this.kreativMediaSmtpPassword.trim())
+    );
   }
 
   readonly tabs: { id: Tab; label: string; icon: string }[] = [
@@ -185,7 +204,15 @@ export class Settings implements OnInit {
     this.bankReference       = data?.bankReference       ?? '';
     // Email
     this.emailEnabled               = data?.emailEnabled               ?? true;
+    this.emailProvider              = data?.emailProvider              ?? 'brevo';
+    this.brevoEnabled               = data?.brevoEnabled               ?? true;
     this.brevoApiKey                = data?.brevoApiKey                ?? '';
+    this.kreativMediaEnabled        = data?.kreativMediaEnabled        ?? false;
+    this.kreativMediaSmtpHost       = data?.kreativMediaSmtpHost       ?? '';
+    this.kreativMediaSmtpPort       = data?.kreativMediaSmtpPort       ?? 465;
+    this.kreativMediaSmtpUser       = data?.kreativMediaSmtpUser       ?? '';
+    this.kreativMediaSmtpPassword   = data?.kreativMediaSmtpPassword   ?? '';
+    this.kreativMediaSmtpSecure     = data?.kreativMediaSmtpSecure     ?? true;
     this.emailSenderName            = data?.emailSenderName            ?? 'Plat du Jour';
     this.emailSenderAddress         = data?.emailSenderAddress         ?? 'contact@caytout.com';
     this.emailOtpEnabled            = data?.emailOtpEnabled            ?? true;
@@ -357,7 +384,15 @@ export class Settings implements OnInit {
 
   saveEmail(): void {
     const dto: UpdateEmailSettingsDto = {
+      emailProvider:             this.emailProvider,
+      brevoEnabled:              this.brevoEnabled,
       brevoApiKey:               this.brevoApiKey,
+      kreativMediaEnabled:       this.kreativMediaEnabled,
+      kreativMediaSmtpHost:      this.kreativMediaSmtpHost,
+      kreativMediaSmtpPort:      this.kreativMediaSmtpPort,
+      kreativMediaSmtpUser:      this.kreativMediaSmtpUser,
+      kreativMediaSmtpPassword:  this.kreativMediaSmtpPassword,
+      kreativMediaSmtpSecure:    this.kreativMediaSmtpSecure,
       emailSenderName:           this.emailSenderName,
       emailSenderAddress:        this.emailSenderAddress,
       emailEnabled:              this.emailEnabled,
@@ -368,6 +403,10 @@ export class Settings implements OnInit {
       emailSubscriptionEnabled:  this.emailSubscriptionEnabled,
     };
     this.doSave(this.settingsService.updateEmail(dto));
+  }
+
+  selectEmailProvider(provider: EmailProvider): void {
+    this.emailProvider = provider;
   }
 
   private doSave(obs: any): void {

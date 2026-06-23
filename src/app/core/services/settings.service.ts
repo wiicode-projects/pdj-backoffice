@@ -14,6 +14,7 @@ export interface PlatformSettings {
   myposMerchantId: string | null;
   myposApiKey: string | null;
   myposEnabled: boolean;
+  myposTestMode: boolean;
   // PayPal
   paypalEnabled: boolean;
   paypalClientId: string | null;
@@ -54,6 +55,7 @@ export interface UpdatePaymentSettingsDto {
   myposMerchantId?: string;
   myposApiKey?: string;
   myposEnabled?: boolean;
+  myposTestMode?: boolean;
   // PayPal
   paypalEnabled?: boolean;
   paypalClientId?: string;

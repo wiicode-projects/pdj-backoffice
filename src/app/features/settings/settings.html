@@ -198,6 +198,20 @@
                     <span class="form-hint">Client Number, Key Index et clés RSA si pas de Configuration Pack.</span>
                   </div>
 
+                  <div class="form-field">
+                    <label class="form-label">Mode myPOS</label>
+                    <div class="provider-toggle">
+                      <label class="toggle" for="toggle-mypos-test">
+                        <input type="checkbox" id="toggle-mypos-test" [(ngModel)]="myposTestMode" class="toggle__input"/>
+                        <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      </label>
+                      <span class="provider-status" [class.provider-status--on]="myposTestMode">
+                        {{ myposTestMode ? 'Sandbox (test)' : 'Production' }}
+                      </span>
+                    </div>
+                    <span class="form-hint">En sandbox, les paiements passent par checkout-test.mypos.com.</span>
+                  </div>
+
                   <div class="form-field form-field--actions">
                     <button class="copy-btn copy-btn--inline" type="button" (click)="showMyposSecrets = !showMyposSecrets">
                       {{ showMyposSecrets ? 'Masquer les secrets' : 'Afficher les secrets' }}

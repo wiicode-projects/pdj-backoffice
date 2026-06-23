@@ -9,6 +9,25 @@ $border-color: #E5E7EB;
   font-family: 'PolySans Trial', -apple-system, sans-serif;
 
   &__header { margin-bottom: 28px; animation: fadeSlideDown 0.5s ease both; }
+  &__alert {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    &--success {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    &--warning {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+    }
+  }
   &__title { font-size: 1.6rem; font-weight: 700; color: $text-dark; }
   &__subtitle { font-size: 0.88rem; color: $text-medium; margin-top: 2px; }
   &__loading { display: flex; justify-content: center; padding: 80px 0; }
@@ -222,6 +241,24 @@ $border-color: #E5E7EB;
     margin: 0 24px; padding: 10px 14px;
     background: rgba($primary-red, 0.06); border: 1px solid rgba($primary-red, 0.2);
     border-radius: 10px; color: $primary-red; font-size: 0.82rem;
+  }
+
+  &__cgv {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 24px 8px;
+    font-size: 0.84rem;
+    color: $text-medium;
+    line-height: 1.45;
+
+    input { margin-top: 3px; }
+
+    a {
+      color: $primary-red;
+      font-weight: 600;
+      text-decoration: underline;
+    }
   }
 
   &__footer {

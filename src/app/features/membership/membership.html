@@ -6,6 +6,18 @@
     </div>
   </div>
 
+  @if (subscribeSuccess && !selectedSubscription) {
+    <div class="membership-page__alert membership-page__alert--success">
+      {{ 'MEMBERSHIP.SUBSCRIBE_SUCCESS' | translate }}
+    </div>
+  }
+
+  @if (paymentUnavailable) {
+    <div class="membership-page__alert membership-page__alert--warning">
+      {{ 'MEMBERSHIP.PAYMENT_UNAVAILABLE' | translate }}
+    </div>
+  }
+
   @if (loading) {
     <div class="membership-page__loading"><div class="spinner"></div></div>
   }
@@ -196,15 +208,27 @@
               <div class="modal__error">{{ subscribeError }}</div>
             }
 
+            @if (selectedPlanRequiresPayment) {
+              <label class="modal__cgv">
+                <input type="checkbox" [(ngModel)]="acceptCgv" />
+                <span>
+                  {{ 'MEMBERSHIP.ACCEPT_CGV_PREFIX' | translate }}
+                  <a [href]="legalUrls.cgv" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                    {{ 'MEMBERSHIP.ACCEPT_CGV_LINK' | translate }}
+                  </a>
+                </span>
+              </label>
+            }
+
             <div class="modal__footer">
               <button class="btn btn--secondary" (click)="closePlanModal()">{{ 'COMMON.CANCEL' | translate }}</button>
-              <button class="btn btn--primary" [disabled]="subscribing || !selectedPlanId"
+              <button class="btn btn--primary" [disabled]="modalSubscribeDisabled"
                 [style.background]="getSubColor(selectedSubscription)"
                 (click)="subscribe()">
                 @if (subscribing) {
                   <span class="btn__spinner"></span>
                 }
-                {{ 'MEMBERSHIP.SUBSCRIBE' | translate }}
+                {{ subscribeButtonKey | translate }}
               </button>
             </div>
           } @else {

@@ -44,6 +44,7 @@ export class Settings implements OnInit {
   myposEnabled = false;
   myposStoreId = '';
   myposConfigurationPack = '';
+  myposTestMode = true;
   showMyposSecrets = false;
 
   // ── myPOS compliance URLs (from API) ───────────────────────────────
@@ -168,6 +169,7 @@ export class Settings implements OnInit {
     this.myposEnabled = (data?.myposEnabled ?? false) || (data?.twintEnabled ?? false);
     this.myposStoreId = data?.myposMerchantId ?? '';
     this.myposConfigurationPack = data?.myposApiKey ?? '';
+    this.myposTestMode = data?.myposTestMode ?? true;
     // Payment: PayPal
     this.paypalEnabled     = data?.paypalEnabled   ?? false;
     this.paypalClientId    = data?.paypalClientId   ?? '';
@@ -335,6 +337,7 @@ export class Settings implements OnInit {
       myposEnabled: this.myposEnabled,
       myposMerchantId: this.myposStoreId.trim() || undefined,
       myposApiKey: this.myposConfigurationPack.trim() || undefined,
+      myposTestMode: this.myposTestMode,
       myposWebhookUrl: this.complianceUrls?.ipc[0]?.url ?? this.myposIpcUrls[0]?.url,
       twintEnabled: this.myposEnabled,
       twintWebhookUrl: '',

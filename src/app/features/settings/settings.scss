@@ -1036,6 +1036,22 @@ $teal: #0B7285;
     }
   }
 
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__confirm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: $text-mid;
+  }
+
   &__action {
     padding: 7px 12px;
     border: 1px solid $border;
@@ -1054,6 +1070,15 @@ $teal: #0B7285;
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+
+    &--danger {
+      color: $red;
+      border-color: rgba($red, 0.25);
+
+      &:hover:not(:disabled) {
+        background: rgba($red, 0.06);
+      }
     }
   }
 

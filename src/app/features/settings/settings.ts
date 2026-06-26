@@ -101,8 +101,6 @@ export class Settings implements OnInit {
   kreativMediaSmtpPassword = '';
   showKreativPassword = false;
   kreativMediaSmtpSecure = true;
-  emailSenderName = '';
-  emailSenderAddress = '';
 
   emailOtpEnabled = true;
   emailWelcomeEnabled = true;
@@ -118,6 +116,8 @@ export class Settings implements OnInit {
   adminsSuccess = '';
   showCreateAdminForm = false;
   resetSendingId: string | null = null;
+  confirmDeleteAdminId: string | null = null;
+  deletingAdmin = false;
   adminForm = {
     firstName: '',
     lastName: '',
@@ -213,8 +213,6 @@ export class Settings implements OnInit {
     this.kreativMediaSmtpUser       = data?.kreativMediaSmtpUser       ?? '';
     this.kreativMediaSmtpPassword   = data?.kreativMediaSmtpPassword   ?? '';
     this.kreativMediaSmtpSecure     = data?.kreativMediaSmtpSecure     ?? true;
-    this.emailSenderName            = data?.emailSenderName            ?? 'Plat du Jour';
-    this.emailSenderAddress         = data?.emailSenderAddress         ?? 'contact@caytout.com';
     this.emailOtpEnabled            = data?.emailOtpEnabled            ?? true;
     this.emailWelcomeEnabled        = data?.emailWelcomeEnabled        ?? true;
     this.emailPasswordResetEnabled  = data?.emailPasswordResetEnabled  ?? true;
@@ -354,6 +352,39 @@ export class Settings implements OnInit {
     return name || admin.email;
   }
 
+  askDeleteAdmin(admin: AdminUser): void {
+    this.confirmDeleteAdminId = admin.id;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+  }
+
+  cancelDeleteAdmin(): void {
+    this.confirmDeleteAdminId = null;
+  }
+
+  confirmDeleteAdmin(id: string): void {
+    this.deletingAdmin = true;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+
+    this.userService.removeAdmin(id)
+      .pipe(finalize(() => {
+        this.deletingAdmin = false;
+        this.confirmDeleteAdminId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.admins = this.admins.filter((admin) => admin.id !== id);
+          this.adminsSuccess = 'Administrateur supprimé.';
+          setTimeout(() => { this.adminsSuccess = ''; this.cdr.detectChanges(); }, 4000);
+        },
+        error: (err) => {
+          this.adminsError = err?.error?.message ?? 'Impossible de supprimer l\'administrateur.';
+        },
+      });
+  }
+
   saveGeneral(): void {
     this.doSave(this.settingsService.updateGeneral(this.generalForm));
   }
@@ -393,8 +424,6 @@ export class Settings implements OnInit {
       kreativMediaSmtpUser:      this.kreativMediaSmtpUser,
       kreativMediaSmtpPassword:  this.kreativMediaSmtpPassword,
       kreativMediaSmtpSecure:    this.kreativMediaSmtpSecure,
-      emailSenderName:           this.emailSenderName,
-      emailSenderAddress:        this.emailSenderAddress,
       emailEnabled:              this.emailEnabled,
       emailOtpEnabled:           this.emailOtpEnabled,
       emailWelcomeEnabled:       this.emailWelcomeEnabled,

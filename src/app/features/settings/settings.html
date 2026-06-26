@@ -482,41 +482,6 @@
               </div>
             </div>
 
-            <!-- Shared sender -->
-            <div class="email-config-block" [class.email-config-block--disabled]="!emailEnabled">
-              <div class="email-config-block__title">
-                <div>
-                  <strong>Expéditeur commun</strong>
-                  <span>Utilisé par les deux fournisseurs</span>
-                </div>
-              </div>
-              <div class="form-grid" style="margin-top:20px;">
-                <div class="form-field">
-                  <label class="form-label" for="email-sender-name">Nom de l'expéditeur</label>
-                  <input
-                    id="email-sender-name"
-                    class="form-input"
-                    type="text"
-                    [(ngModel)]="emailSenderName"
-                    placeholder="Plat du Jour"
-                    [disabled]="!emailEnabled"
-                  />
-                </div>
-                <div class="form-field">
-                  <label class="form-label" for="email-sender-address">Adresse expéditeur</label>
-                  <input
-                    id="email-sender-address"
-                    class="form-input"
-                    type="email"
-                    [(ngModel)]="emailSenderAddress"
-                    placeholder="contact@caytout.com"
-                    [disabled]="!emailEnabled"
-                  />
-                  <span class="form-hint">Doit correspondre à une adresse vérifiée (Brevo) ou à la boîte mail SMTP (Kreativ Media)</span>
-                </div>
-              </div>
-            </div>
-
             <!-- BREVO Card -->
             <div
               class="provider-card email-provider-card"
@@ -585,7 +550,8 @@
                       </button>
                     </div>
                     <span class="form-hint form-hint--warn">
-                      Récupérez votre clé sur <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener" style="color:#DC2626">app.brevo.com</a>
+                      Récupérez votre clé sur <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener" style="color:#DC2626">app.brevo.com</a>.
+                      L'expéditeur utilise le nom de la plateforme et l'e-mail de support (onglet Général).
                     </span>
                   </div>
                 </div>
@@ -674,7 +640,7 @@
                       [(ngModel)]="kreativMediaSmtpUser"
                       placeholder="contact@votredomaine.ch"
                     />
-                    <span class="form-hint">Adresse e-mail complète (Plesk / Kreativ Media)</span>
+                    <span class="form-hint">Adresse e-mail complète — utilisée aussi comme expéditeur des envois</span>
                   </div>
                   <div class="form-field">
                     <label class="form-label" for="kreativ-smtp-password">Mot de passe SMTP</label>
@@ -793,7 +759,7 @@
             <div class="settings-section__header settings-section__header--row">
               <div>
                 <h2 class="settings-section__title">Comptes administrateurs</h2>
-                <p class="settings-section__desc">Créez des comptes admin et envoyez des e-mails de réinitialisation de mot de passe</p>
+                <p class="settings-section__desc">Créez, supprimez des comptes admin et envoyez des e-mails de réinitialisation de mot de passe</p>
               </div>
               <button type="button" class="btn-save btn-save--secondary" (click)="toggleCreateAdminForm()">
                 {{ showCreateAdminForm ? 'Annuler' : 'Nouvel administrateur' }}
@@ -873,18 +839,51 @@
                           </span>
                         </td>
                         <td>
-                          <button
-                            type="button"
-                            class="admin-table__action"
-                            (click)="sendPasswordReset(admin)"
-                            [disabled]="resetSendingId === admin.id"
-                          >
-                            @if (resetSendingId === admin.id) {
-                              Envoi...
-                            } @else {
-                              Envoyer reset mot de passe
+                          <div class="admin-table__actions">
+                            <button
+                              type="button"
+                              class="admin-table__action"
+                              (click)="sendPasswordReset(admin)"
+                              [disabled]="resetSendingId === admin.id"
+                            >
+                              @if (resetSendingId === admin.id) {
+                                Envoi...
+                              } @else {
+                                Envoyer reset mot de passe
+                              }
+                            </button>
+                            @if (!isCurrentAdmin(admin)) {
+                              @if (confirmDeleteAdminId !== admin.id) {
+                                <button
+                                  type="button"
+                                  class="admin-table__action admin-table__action--danger"
+                                  (click)="askDeleteAdmin(admin)"
+                                >
+                                  Supprimer
+                                </button>
+                              } @else {
+                                <div class="admin-table__confirm">
+                                  <span>Confirmer ?</span>
+                                  <button
+                                    type="button"
+                                    class="admin-table__action admin-table__action--danger"
+                                    [disabled]="deletingAdmin"
+                                    (click)="confirmDeleteAdmin(admin.id)"
+                                  >
+                                    {{ deletingAdmin ? 'Suppression...' : 'Oui' }}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class="admin-table__action"
+                                    [disabled]="deletingAdmin"
+                                    (click)="cancelDeleteAdmin()"
+                                  >
+                                    Non
+                                  </button>
+                                </div>
+                              }
                             }
-                          </button>
+                          </div>
                         </td>
                       </tr>
                     } @empty {

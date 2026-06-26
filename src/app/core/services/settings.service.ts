@@ -97,8 +97,6 @@ export interface UpdateEmailSettingsDto {
   kreativMediaSmtpUser?: string;
   kreativMediaSmtpPassword?: string;
   kreativMediaSmtpSecure?: boolean;
-  emailSenderName?: string;
-  emailSenderAddress?: string;
   emailEnabled?: boolean;
   emailOtpEnabled?: boolean;
   emailWelcomeEnabled?: boolean;

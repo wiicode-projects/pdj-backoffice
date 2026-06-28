@@ -290,22 +290,47 @@
             <thead>
               <tr>
                 <th>{{ 'MEMBERSHIP.INVOICE_DATE' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_TYPE' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_AMOUNT' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_STATUS' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_DUE' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_ACTIONS' | translate }}</th>
               </tr>
             </thead>
             <tbody>
               @for (invoice of invoices; track invoice.id) {
                 <tr>
-                  <td>{{ formatDate(invoice.createdAt) }}</td>
+                  <td>{{ formatDateTime(invoice.createdAt) }}</td>
+                  <td>{{ invoice.label }}</td>
                   <td class="invoices-table__amount">{{ formatPrice(invoice.amount) }}</td>
                   <td>
                     <span class="invoice-status" [ngClass]="getInvoiceStatusClass(invoice.status)">
                       {{ invoice.status }}
                     </span>
                   </td>
-                  <td>{{ formatDate(invoice.dueDate) }}</td>
+                  <td>{{ formatDate(invoice.endingAt) }}</td>
+                  <td class="invoices-table__actions">
+                    @if (invoice.status === 'PENDING' && invoice.invoicePdfPath) {
+                      <button type="button" class="btn btn--ghost btn--sm" (click)="openInvoiceDocument(invoice.invoicePdfPath)">
+                        {{ 'MEMBERSHIP.VIEW_INVOICE_PDF' | translate }}
+                      </button>
+                    }
+                    @if (invoice.status === 'PAID' && invoice.receiptPdfPath) {
+                      <button type="button" class="btn btn--ghost btn--sm" (click)="openInvoiceDocument(invoice.receiptPdfPath)">
+                        {{ 'MEMBERSHIP.VIEW_RECEIPT_PDF' | translate }}
+                      </button>
+                    }
+                    @if (canPayInvoice(invoice)) {
+                      <button
+                        type="button"
+                        class="btn btn--primary btn--sm"
+                        [disabled]="payingRenewalId === invoice.paymentId"
+                        (click)="payRenewal(invoice)"
+                      >
+                        {{ payingRenewalId === invoice.paymentId ? '…' : ('MEMBERSHIP.PAY_NOW' | translate) }}
+                      </button>
+                    }
+                  </td>
                 </tr>
               }
             </tbody>

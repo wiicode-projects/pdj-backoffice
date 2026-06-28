@@ -37,11 +37,20 @@ interface MembershipData {
 
 interface Invoice {
   id: string;
+  source?: 'invoice' | 'payment';
   amount: number;
   status: string;
-  dueDate: string;
-  paidAt: string | null;
+  endingAt: string | null;
   createdAt: string;
+  purpose: string;
+  label: string;
+  description: string;
+  paymentId: string | null;
+  paymentStatus: string | null;
+  invoicePath: string | null;
+  receiptPath: string | null;
+  invoicePdfPath: string | null;
+  receiptPdfPath: string | null;
 }
 
 interface Plan {
@@ -105,6 +114,7 @@ export class Membership implements OnInit {
   paymentMethods: PaymentMethodInfo[] = [];
   selectedGateway: PaymentGatewaySlug = 'mypos';
   legalUrls: PublicLegalUrls = { ...resolveFallbackLegalUrls() };
+  payingRenewalId: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -383,6 +393,15 @@ export class Membership implements OnInit {
           checkoutMode: res.checkoutMode ?? 'form_post',
           gateway: res.payment.paymentGateway,
         });
+        if (res.checkoutMode === 'redirect') {
+          this.router.navigate(['/app/membership/payment-return'], {
+            queryParams: {
+              paymentId: res.payment.id,
+              token: res.returnToken,
+            },
+          });
+          return;
+        }
         this.router.navigate(['/app/membership/checkout']);
       },
       error: (err) => {
@@ -421,6 +440,17 @@ export class Membership implements OnInit {
     });
   }
 
+  formatDateTime(date: string | null): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleString('fr-CH', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
   formatPrice(amount: number): string {
     return new Intl.NumberFormat('fr-CH', { style: 'currency', currency: 'CHF' }).format(amount);
   }
@@ -452,6 +482,81 @@ export class Membership implements OnInit {
       case 'OVERDUE': return 'status--overdue';
       default: return '';
     }
+  }
+
+  openInvoiceDocument(path: string | null): void {
+    if (!path) return;
+    const url = path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
+
+    if (path.endsWith('.pdf')) {
+      this.http.get(url, { responseType: 'blob' }).subscribe({
+        next: (blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          window.open(blobUrl, '_blank');
+        },
+        error: (err) => console.error('Failed to open document:', err),
+      });
+      return;
+    }
+
+    this.http.get(url, { responseType: 'text' }).subscribe({
+      next: (html) => {
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => console.error('Failed to open document:', err),
+    });
+  }
+
+  canPayInvoice(invoice: Invoice): boolean {
+    return invoice.status === 'PENDING' && !!invoice.paymentId;
+  }
+
+  payRenewal(invoice: Invoice): void {
+    if (!invoice.paymentId) return;
+
+    this.payingRenewalId = invoice.paymentId;
+    this.paymentService.createRenewalCheckout({
+      paymentId: invoice.paymentId,
+      gateway: this.selectedGateway,
+    })
+    .pipe(finalize(() => {
+      this.payingRenewalId = null;
+      this.cdr.detectChanges();
+    }))
+    .subscribe({
+      next: (res) => {
+        if (res.checkoutMode === 'bank_transfer') {
+          storeMembershipBankTransfer({
+            paymentId: res.payment.id,
+            returnToken: res.returnToken,
+            qrBill: res.qrBill,
+          });
+          this.router.navigate(['/app/membership/bank-transfer']);
+          return;
+        }
+        storeMembershipCheckout({
+          paymentId: res.payment.id,
+          returnToken: res.returnToken,
+          checkoutUrl: res.checkoutUrl,
+          fields: res.fields,
+          checkoutMode: res.checkoutMode ?? 'form_post',
+          gateway: res.payment.paymentGateway,
+        });
+        if (res.checkoutMode === 'redirect') {
+          this.router.navigate(['/app/membership/payment-return'], {
+            queryParams: {
+              paymentId: res.payment.id,
+              token: res.returnToken,
+            },
+          });
+          return;
+        }
+        this.router.navigate(['/app/membership/checkout']);
+      },
+      error: (err) => console.error('Renewal checkout error:', err),
+    });
   }
 
   get membershipPrice(): number {

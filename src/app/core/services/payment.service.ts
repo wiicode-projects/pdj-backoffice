@@ -101,6 +101,11 @@ export interface RestaurantCheckoutPayload {
   gateway: PaymentGatewaySlug;
 }
 
+export interface RenewalCheckoutPayload {
+  paymentId: string;
+  gateway: PaymentGatewaySlug;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private readonly url = `${environment.apiUrl}/payments`;
@@ -110,6 +115,14 @@ export class PaymentService {
   createRestaurantCheckout(payload: RestaurantCheckoutPayload): Observable<CheckoutResponse> {
     return this.http.post<CheckoutResponse>(`${this.url}/checkout`, {
       purpose: 'restaurant_subscription',
+      returnChannel: 'backoffice',
+      ...payload,
+    });
+  }
+
+  createRenewalCheckout(payload: RenewalCheckoutPayload): Observable<CheckoutResponse> {
+    return this.http.post<CheckoutResponse>(`${this.url}/checkout`, {
+      purpose: 'subscription_renewal',
       returnChannel: 'backoffice',
       ...payload,
     });

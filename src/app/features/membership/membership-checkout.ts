@@ -64,7 +64,11 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
     if (this.error || !this.checkoutUrl) return;
 
     queueMicrotask(() => {
-      if (this.checkoutMode === 'redirect' || this.fieldEntries.length === 0) {
+      if (this.checkoutMode === 'redirect') {
+        this.router.navigate(['/app/membership']);
+        return;
+      }
+      if (this.fieldEntries.length === 0) {
         window.location.href = this.checkoutUrl;
         return;
       }
@@ -90,14 +94,18 @@ export function clearMembershipCheckout(): void {
   sessionStorage.removeItem(CHECKOUT_STORAGE_KEY);
 }
 
-export function readStoredCheckoutGateway(): string {
+export function readStoredCheckout(): StoredCheckoutPayload | null {
   const raw = sessionStorage.getItem(CHECKOUT_STORAGE_KEY);
-  if (!raw) return '';
+  if (!raw) return null;
   try {
-    return (JSON.parse(raw) as StoredCheckoutPayload).gateway ?? '';
+    return JSON.parse(raw) as StoredCheckoutPayload;
   } catch {
-    return '';
+    return null;
   }
+}
+
+export function readStoredCheckoutGateway(): string {
+  return readStoredCheckout()?.gateway ?? '';
 }
 
 export function resolvePaymentProviderLabel(gateway: string): string {

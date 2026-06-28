@@ -382,6 +382,10 @@ $border-color: #E5E7EB;
   tr:hover td { background: #FAFBFC; }
 
   &__amount { font-weight: 700; color: $text-dark; }
+
+  &__actions {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
 }
 
 .invoice-status {
@@ -428,6 +432,7 @@ $border-color: #E5E7EB;
 }
 
 .modal__payment-methods {
+  padding: 0 24px;
   margin-bottom: 16px;
 }
 

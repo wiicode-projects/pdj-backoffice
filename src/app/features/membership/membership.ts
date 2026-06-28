@@ -381,6 +381,7 @@ export class Membership implements OnInit {
           checkoutUrl: res.checkoutUrl,
           fields: res.fields,
           checkoutMode: res.checkoutMode ?? 'form_post',
+          gateway: res.payment.paymentGateway,
         });
         this.router.navigate(['/app/membership/checkout']);
       },

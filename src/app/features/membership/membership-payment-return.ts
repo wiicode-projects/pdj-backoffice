@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EMPTY, Subscription, timer } from 'rxjs';
 import { catchError, switchMap, take, takeWhile, tap } from 'rxjs/operators';
 import { PaymentService, PaymentStatus } from '../../core/services/payment.service';
-import { clearMembershipCheckout } from './membership-checkout';
+import { clearMembershipCheckout, readStoredCheckoutGateway, resolvePaymentProviderLabel } from './membership-checkout';
 
 type Outcome = 'loading' | 'confirmed' | 'failed' | 'cancelled' | 'timeout';
 
@@ -19,6 +19,7 @@ type Outcome = 'loading' | 'confirmed' | 'failed' | 'cancelled' | 'timeout';
 export class MembershipPaymentReturn implements OnInit, OnDestroy {
   paymentId = '';
   returnToken = '';
+  paymentGateway = '';
   outcome: Outcome = 'loading';
   private pollSub?: Subscription;
 
@@ -29,6 +30,7 @@ export class MembershipPaymentReturn implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.paymentGateway = readStoredCheckoutGateway();
     clearMembershipCheckout();
 
     this.paymentId = this.route.snapshot.queryParamMap.get('paymentId') ?? '';
@@ -62,6 +64,10 @@ export class MembershipPaymentReturn implements OnInit, OnDestroy {
     this.router.navigate(['/app/membership']);
   }
 
+  get providerLabel(): string {
+    return resolvePaymentProviderLabel(this.paymentGateway);
+  }
+
   private pollPaymentStatus(): void {
     this.pollSub = timer(0, 2000)
       .pipe(
@@ -82,6 +88,9 @@ export class MembershipPaymentReturn implements OnInit, OnDestroy {
           );
         }),
         tap((res) => {
+          if (res.payment.paymentGateway) {
+            this.paymentGateway = res.payment.paymentGateway;
+          }
           const status = res.payment.status as PaymentStatus;
           if (status === 'confirmed') {
             this.outcome = 'confirmed';

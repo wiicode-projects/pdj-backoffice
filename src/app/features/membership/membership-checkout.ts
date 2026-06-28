@@ -12,6 +12,7 @@ export interface StoredCheckoutPayload {
   checkoutUrl: string;
   fields: Record<string, string>;
   checkoutMode?: CheckoutMode;
+  gateway?: string;
 }
 
 @Component({
@@ -27,6 +28,7 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
   checkoutUrl = '';
   fieldEntries: { key: string; value: string }[] = [];
   checkoutMode: CheckoutMode = 'form_post';
+  paymentGateway = 'mypos';
   loading = true;
   error = '';
 
@@ -46,6 +48,7 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
       }
       this.checkoutUrl = data.checkoutUrl;
       this.checkoutMode = data.checkoutMode ?? 'form_post';
+      this.paymentGateway = data.gateway ?? 'mypos';
       this.fieldEntries = Object.entries(data.fields ?? {}).map(([key, value]) => ({
         key,
         value: String(value),
@@ -61,7 +64,7 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
     if (this.error || !this.checkoutUrl) return;
 
     queueMicrotask(() => {
-      if (this.checkoutMode === 'redirect' || (this.fieldEntries.length === 0 && this.checkoutMode !== 'bank_transfer')) {
+      if (this.checkoutMode === 'redirect' || this.fieldEntries.length === 0) {
         window.location.href = this.checkoutUrl;
         return;
       }
@@ -73,6 +76,10 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
     sessionStorage.removeItem(CHECKOUT_STORAGE_KEY);
     this.router.navigate(['/app/membership']);
   }
+
+  get providerLabel(): string {
+    return resolvePaymentProviderLabel(this.paymentGateway);
+  }
 }
 
 export function storeMembershipCheckout(payload: StoredCheckoutPayload): void {
@@ -81,4 +88,25 @@ export function storeMembershipCheckout(payload: StoredCheckoutPayload): void {
 
 export function clearMembershipCheckout(): void {
   sessionStorage.removeItem(CHECKOUT_STORAGE_KEY);
+}
+
+export function readStoredCheckoutGateway(): string {
+  const raw = sessionStorage.getItem(CHECKOUT_STORAGE_KEY);
+  if (!raw) return '';
+  try {
+    return (JSON.parse(raw) as StoredCheckoutPayload).gateway ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export function resolvePaymentProviderLabel(gateway: string): string {
+  switch (gateway) {
+    case 'paypal':
+      return 'PayPal';
+    case 'mypos':
+      return 'myPOS';
+    default:
+      return gateway || 'PayPal / myPOS';
+  }
 }

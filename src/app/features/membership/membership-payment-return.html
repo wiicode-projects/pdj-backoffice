@@ -4,7 +4,7 @@
       @case ('loading') {
         <div class="spinner"></div>
         <h1>{{ 'MEMBERSHIP.PAYMENT_PROCESSING' | translate }}</h1>
-        <p>{{ 'MEMBERSHIP.PAYMENT_PROCESSING_DESC' | translate }}</p>
+        <p>{{ 'MEMBERSHIP.PAYMENT_PROCESSING_DESC' | translate:{ provider: providerLabel } }}</p>
       }
       @case ('confirmed') {
         <div class="payment-return__icon payment-return__icon--success">

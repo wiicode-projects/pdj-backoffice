@@ -21,6 +21,7 @@ export interface PlatformSettings {
   paypalEnabled: boolean;
   paypalClientId: string | null;
   paypalSecretKey: string | null;
+  paypalWebhookId: string | null;
   paypalWebhookUrl: string | null;
   paypalSandbox: boolean;
   // Virement bancaire
@@ -30,6 +31,13 @@ export interface PlatformSettings {
   bankBic: string | null;
   bankAccountHolder: string | null;
   bankReference: string | null;
+  bankStreet: string | null;
+  bankPostalCode: string | null;
+  bankCity: string | null;
+  bankCountry: string | null;
+  bankReferencePrefix: string | null;
+  bankInstructionsFr: string | null;
+  bankInstructionsEn: string | null;
   // General
   platformName: string | null;
   supportEmail: string | null;
@@ -70,6 +78,7 @@ export interface UpdatePaymentSettingsDto {
   paypalEnabled?: boolean;
   paypalClientId?: string;
   paypalSecretKey?: string;
+  paypalWebhookId?: string;
   paypalWebhookUrl?: string;
   paypalSandbox?: boolean;
   // Virement bancaire
@@ -79,6 +88,13 @@ export interface UpdatePaymentSettingsDto {
   bankBic?: string;
   bankAccountHolder?: string;
   bankReference?: string;
+  bankStreet?: string;
+  bankPostalCode?: string;
+  bankCity?: string;
+  bankCountry?: string;
+  bankReferencePrefix?: string;
+  bankInstructionsFr?: string;
+  bankInstructionsEn?: string;
 }
 
 export interface UpdateGeneralSettingsDto {
@@ -110,7 +126,8 @@ export type ComplianceUrlCategory =
   | 'legal'
   | 'registration'
   | 'pricing'
-  | 'ipc';
+  | 'ipc'
+  | 'paypal';
 
 export interface ComplianceUrlItem {
   key: string;
@@ -134,6 +151,7 @@ export interface ComplianceUrlsResponse {
   backofficePublicUrl: string;
   apiPublicUrl: string;
   ipc: ComplianceUrlItem[];
+  paypal: ComplianceUrlItem[];
   compliance: ComplianceUrlItem[];
   all: ComplianceUrlItem[];
   submissionText: string;

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import type { CheckoutMode } from '../../core/services/payment.service';
 
 const CHECKOUT_STORAGE_KEY = 'pdj_membership_checkout';
 
@@ -10,6 +11,7 @@ export interface StoredCheckoutPayload {
   returnToken: string;
   checkoutUrl: string;
   fields: Record<string, string>;
+  checkoutMode?: CheckoutMode;
 }
 
 @Component({
@@ -24,6 +26,7 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
 
   checkoutUrl = '';
   fieldEntries: { key: string; value: string }[] = [];
+  checkoutMode: CheckoutMode = 'form_post';
   loading = true;
   error = '';
 
@@ -38,11 +41,12 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
 
     try {
       const data = JSON.parse(raw) as StoredCheckoutPayload;
-      if (!data.checkoutUrl || !data.fields) {
+      if (!data.checkoutUrl) {
         throw new Error('Invalid checkout payload');
       }
       this.checkoutUrl = data.checkoutUrl;
-      this.fieldEntries = Object.entries(data.fields).map(([key, value]) => ({
+      this.checkoutMode = data.checkoutMode ?? 'form_post';
+      this.fieldEntries = Object.entries(data.fields ?? {}).map(([key, value]) => ({
         key,
         value: String(value),
       }));
@@ -57,6 +61,10 @@ export class MembershipCheckout implements OnInit, AfterViewInit {
     if (this.error || !this.checkoutUrl) return;
 
     queueMicrotask(() => {
+      if (this.checkoutMode === 'redirect' || (this.fieldEntries.length === 0 && this.checkoutMode !== 'bank_transfer')) {
+        window.location.href = this.checkoutUrl;
+        return;
+      }
       this.checkoutForm?.nativeElement?.submit();
     });
   }

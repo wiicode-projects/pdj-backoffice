@@ -5,11 +5,11 @@
 
 ## Implementation checklist
 
-- [ ] **backend-settings** — Add bank transfer columns (incl. creditor address) to PlatformSetting + migration + DTO/service + sync to payment_gateways
-- [ ] **backend-qr-service** — Port SwissQrBillService to TypeScript (SPC payload, QR SVG, Swiss cross) using qrcode npm package
-- [ ] **backend-checkout-confirm** — Extend PaymentsService for bank_transfer checkout, instructions endpoint, admin confirm/cancel, email template
-- [ ] **backoffice-flow** — Wire settings address fields, gateway picker, bank-transfer instructions page, admin pending-payments reconciliation
-- [ ] **mobile-flow** — Build mobile payment API layer, gateway selection, bank-transfer instructions screen, wire subscribe/frites checkout
+- [x] **backend-settings** — Add bank transfer columns (incl. creditor address) to PlatformSetting + migration + DTO/service + sync to payment_gateways
+- [x] **backend-qr-service** — Port SwissQrBillService to TypeScript (SPC payload, QR SVG, Swiss cross) using qrcode npm package
+- [x] **backend-checkout-confirm** — Extend PaymentsService for bank_transfer checkout, instructions endpoint, admin confirm/cancel, email template
+- [x] **backoffice-flow** — Wire settings address fields, gateway picker, bank-transfer instructions page, admin pending-payments reconciliation
+- [x] **mobile-flow** — Build mobile payment API layer, gateway selection, bank-transfer instructions screen, wire subscribe/frites checkout
 - [ ] **testing-rollout** — End-to-end tests with SIX test IBAN across all purposes/clients; production credential checklist
 
 ---

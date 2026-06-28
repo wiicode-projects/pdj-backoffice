@@ -427,6 +427,80 @@ $border-color: #E5E7EB;
   to { opacity: 1; transform: scale(1); }
 }
 
+.modal__payment-methods {
+  margin-bottom: 16px;
+}
+
+.modal__payment-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-medium;
+  margin-bottom: 10px;
+}
+
+.modal__payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-payment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &--selected {
+    border-color: $primary-red;
+    box-shadow: 0 0 0 1px rgba($primary-red, 0.15);
+  }
+}
+
+.modal-payment-option__radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  position: relative;
+
+  .modal-payment-option--selected & {
+    border-color: $primary-red;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: $primary-red;
+    }
+  }
+}
+
+.modal-payment-option__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-payment-option__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.modal-payment-option__desc {
+  font-size: 0.78rem;
+  color: $text-light;
+}
+
 // ── Responsive ─────────────────────────────────────────────────────────
 @media (max-width: 700px) {
   .subscription-card__details { grid-template-columns: 1fr; }

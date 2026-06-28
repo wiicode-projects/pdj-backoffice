@@ -6,10 +6,11 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { PaymentService } from '../../core/services/payment.service';
+import { PaymentService, PaymentGatewaySlug, PaymentMethodInfo } from '../../core/services/payment.service';
 import { SettingsService, PublicLegalUrls } from '../../core/services/settings.service';
 import { resolveFallbackLegalUrls } from '../../core/constants/compliance-urls';
 import { storeMembershipCheckout } from './membership-checkout';
+import { storeMembershipBankTransfer } from './membership-bank-transfer';
 import { environment } from '../../../environments/environment';
 
 interface MembershipData {
@@ -101,6 +102,8 @@ export class Membership implements OnInit {
   acceptCgv = false;
   paymentAvailable = true;
   paymentAvailabilityLoading = true;
+  paymentMethods: PaymentMethodInfo[] = [];
+  selectedGateway: PaymentGatewaySlug = 'mypos';
   legalUrls: PublicLegalUrls = { ...resolveFallbackLegalUrls() };
 
   constructor(
@@ -148,12 +151,19 @@ export class Membership implements OnInit {
       }))
       .subscribe({
         next: (res) => {
-          this.paymentAvailable = res.mypos.enabled && res.mypos.configured;
+          this.paymentMethods = res.methods ?? [];
+          this.paymentAvailable = this.paymentMethods.length > 0;
+          this.selectedGateway = this.paymentMethods[0]?.slug ?? 'mypos';
         },
         error: () => {
           this.paymentAvailable = false;
+          this.paymentMethods = [];
         },
       });
+  }
+
+  selectGateway(slug: PaymentGatewaySlug): void {
+    this.selectedGateway = slug;
   }
 
   get restaurantId(): string | null {
@@ -347,6 +357,7 @@ export class Membership implements OnInit {
       subscriptionId: this.selectedSubscription.id,
       subscriptionPlanId: this.selectedPlanId,
       restaurantId,
+      gateway: this.selectedGateway,
     })
     .pipe(finalize(() => {
       this.subscribing = false;
@@ -354,13 +365,23 @@ export class Membership implements OnInit {
     }))
     .subscribe({
       next: (res) => {
+        this.closePlanModal();
+        if (res.checkoutMode === 'bank_transfer') {
+          storeMembershipBankTransfer({
+            paymentId: res.payment.id,
+            returnToken: res.returnToken,
+            qrBill: res.qrBill,
+          });
+          this.router.navigate(['/app/membership/bank-transfer']);
+          return;
+        }
         storeMembershipCheckout({
           paymentId: res.payment.id,
           returnToken: res.returnToken,
           checkoutUrl: res.checkoutUrl,
           fields: res.fields,
+          checkoutMode: res.checkoutMode ?? 'form_post',
         });
-        this.closePlanModal();
         this.router.navigate(['/app/membership/checkout']);
       },
       error: (err) => {

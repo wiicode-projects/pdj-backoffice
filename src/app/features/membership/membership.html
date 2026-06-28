@@ -209,6 +209,28 @@
             }
 
             @if (selectedPlanRequiresPayment) {
+              @if (paymentMethods.length > 0) {
+                <div class="modal__payment-methods">
+                  <p class="modal__payment-label">{{ 'MEMBERSHIP.PAYMENT_METHOD' | translate }}</p>
+                  <div class="modal__payment-options">
+                    @for (method of paymentMethods; track method.slug) {
+                      <button
+                        type="button"
+                        class="modal-payment-option"
+                        [class.modal-payment-option--selected]="selectedGateway === method.slug"
+                        (click)="selectGateway(method.slug)"
+                      >
+                        <span class="modal-payment-option__radio"></span>
+                        <span class="modal-payment-option__info">
+                          <span class="modal-payment-option__name">{{ method.label }}</span>
+                          <span class="modal-payment-option__desc">{{ method.description }}</span>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
               <label class="modal__cgv">
                 <input type="checkbox" [(ngModel)]="acceptCgv" />
                 <span>

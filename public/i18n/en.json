@@ -738,6 +738,7 @@
     "SELECT_PLAN": "Select a billing period",
     "SUBSCRIBE": "Subscribe",
     "PROCEED_TO_PAYMENT": "Proceed to payment",
+    "PAYMENT_METHOD": "Payment method",
     "SUBSCRIBE_SUCCESS": "Subscription activated successfully!",
     "CHECKOUT_TITLE": "Redirecting to payment",
     "CHECKOUT_REDIRECT": "You will be redirected to the secure myPOS payment page…",

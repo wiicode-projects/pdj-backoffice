@@ -738,6 +738,7 @@
     "SELECT_PLAN": "Choisissez la période de facturation",
     "SUBSCRIBE": "S'abonner",
     "PROCEED_TO_PAYMENT": "Procéder au paiement",
+    "PAYMENT_METHOD": "Mode de paiement",
     "SUBSCRIBE_SUCCESS": "Abonnement activé avec succès !",
     "CHECKOUT_TITLE": "Redirection vers le paiement",
     "CHECKOUT_REDIRECT": "Vous allez être redirigé vers la page de paiement sécurisée myPOS…",

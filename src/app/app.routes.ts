@@ -237,6 +237,12 @@ export const routes: Routes = [
           import('./features/membership/membership').then((m) => m.Membership),
       },
       {
+        path: 'membership/bank-transfer',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/membership/membership-bank-transfer').then((m) => m.MembershipBankTransfer),
+      },
+      {
         path: 'membership/checkout',
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>

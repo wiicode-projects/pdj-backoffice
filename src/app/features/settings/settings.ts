@@ -12,6 +12,7 @@ import {
   ComplianceUrlHealthItem,
   ComplianceUrlsResponse,
 } from '../../core/services/settings.service';
+import { PaymentService, PaymentRecord } from '../../core/services/payment.service';
 import { UserService, AdminUser } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { deployEnvLabel } from '../../core/constants/compliance-urls';
@@ -65,6 +66,14 @@ export class Settings implements OnInit {
     return this.complianceUrls?.compliance ?? [];
   }
 
+  get paypalComplianceUrls() {
+    return this.complianceUrls?.paypal ?? [];
+  }
+
+  get defaultPaypalWebhookUrl(): string {
+    return this.paypalComplianceUrls.find((item) => item.key === 'paypal_webhook')?.url ?? '';
+  }
+
   deployEnvLabel(env: string | undefined): string {
     if (env === 'development' || env === 'staging' || env === 'production') {
       return deployEnvLabel(env);
@@ -76,6 +85,7 @@ export class Settings implements OnInit {
   paypalEnabled = false;
   paypalClientId = '';
   paypalSecretKey = '';
+  paypalWebhookId = '';
   paypalWebhookUrl = '';
   paypalSandbox = true;
   showPaypalKey = false;
@@ -87,6 +97,15 @@ export class Settings implements OnInit {
   bankBic = '';
   bankAccountHolder = '';
   bankReference = '';
+  bankStreet = '';
+  bankPostalCode = '';
+  bankCity = '';
+  bankCountry = 'CH';
+  bankInstructionsFr = '';
+
+  pendingBankTransfers: PaymentRecord[] = [];
+  pendingLoading = false;
+  confirmingId: string | null = null;
 
   // ── Email ──────────────────────────────────────────────────────────
   emailEnabled = true;
@@ -158,6 +177,7 @@ export class Settings implements OnInit {
 
   constructor(
     private settingsService: SettingsService,
+    private paymentService: PaymentService,
     private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
@@ -166,6 +186,27 @@ export class Settings implements OnInit {
   ngOnInit(): void {
     this.load();
     this.loadComplianceUrls();
+    this.loadPendingBankTransfers();
+  }
+
+  loadPendingBankTransfers(): void {
+    this.pendingLoading = true;
+    this.paymentService.getPendingBankTransfers()
+      .pipe(finalize(() => { this.pendingLoading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (res) => { this.pendingBankTransfers = res.payments ?? []; },
+        error: () => { this.pendingBankTransfers = []; },
+      });
+  }
+
+  confirmBankTransfer(paymentId: string): void {
+    this.confirmingId = paymentId;
+    this.paymentService.confirmPayment(paymentId)
+      .pipe(finalize(() => { this.confirmingId = null; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: () => this.loadPendingBankTransfers(),
+        error: () => { this.saveError = 'Impossible de confirmer le virement'; },
+      });
   }
 
   load(): void {
@@ -193,6 +234,7 @@ export class Settings implements OnInit {
     this.paypalEnabled     = data?.paypalEnabled   ?? false;
     this.paypalClientId    = data?.paypalClientId   ?? '';
     this.paypalSecretKey   = data?.paypalSecretKey   ?? '';
+    this.paypalWebhookId   = data?.paypalWebhookId   ?? '';
     this.paypalWebhookUrl  = data?.paypalWebhookUrl  ?? '';
     this.paypalSandbox     = data?.paypalSandbox     ?? true;
     // Payment: Bank transfer
@@ -201,7 +243,12 @@ export class Settings implements OnInit {
     this.bankIban            = data?.bankIban            ?? '';
     this.bankBic             = data?.bankBic             ?? '';
     this.bankAccountHolder   = data?.bankAccountHolder   ?? '';
-    this.bankReference       = data?.bankReference       ?? '';
+    this.bankReference       = data?.bankReferencePrefix ?? data?.bankReference ?? 'INV';
+    this.bankStreet          = data?.bankStreet          ?? '';
+    this.bankPostalCode      = data?.bankPostalCode      ?? '';
+    this.bankCity            = data?.bankCity            ?? '';
+    this.bankCountry         = data?.bankCountry         ?? 'CH';
+    this.bankInstructionsFr  = data?.bankInstructionsFr  ?? '';
     // Email
     this.emailEnabled               = data?.emailEnabled               ?? true;
     this.emailProvider              = data?.emailProvider              ?? 'brevo';
@@ -240,7 +287,13 @@ export class Settings implements OnInit {
     this.settingsService.getComplianceUrls()
       .pipe(finalize(() => { this.complianceUrlsLoading = false; this.cdr.detectChanges(); }))
       .subscribe({
-        next: (data) => { this.complianceUrls = data; },
+        next: (data) => {
+          this.complianceUrls = data;
+          if (!this.paypalWebhookUrl.trim()) {
+            const webhook = data.paypal?.find((item) => item.key === 'paypal_webhook')?.url;
+            if (webhook) this.paypalWebhookUrl = webhook;
+          }
+        },
         error: (err) => {
           this.complianceUrlsError = err?.error?.message ?? 'Impossible de charger les URLs de conformité.';
         },
@@ -403,12 +456,19 @@ export class Settings implements OnInit {
       twintApiKey: '',
       // PayPal
       paypalEnabled: this.paypalEnabled, paypalClientId: this.paypalClientId,
-      paypalSecretKey: this.paypalSecretKey, paypalWebhookUrl: this.paypalWebhookUrl,
+      paypalSecretKey: this.paypalSecretKey, paypalWebhookId: this.paypalWebhookId,
+      paypalWebhookUrl: this.paypalWebhookUrl.trim() || this.defaultPaypalWebhookUrl || undefined,
       paypalSandbox: this.paypalSandbox,
       // Bank transfer
       bankTransferEnabled: this.bankTransferEnabled, bankName: this.bankName,
       bankIban: this.bankIban, bankBic: this.bankBic,
-      bankAccountHolder: this.bankAccountHolder, bankReference: this.bankReference,
+      bankAccountHolder: this.bankAccountHolder,
+      bankReferencePrefix: this.bankReference,
+      bankStreet: this.bankStreet,
+      bankPostalCode: this.bankPostalCode,
+      bankCity: this.bankCity,
+      bankCountry: this.bankCountry,
+      bankInstructionsFr: this.bankInstructionsFr,
     };
     this.doSave(this.settingsService.updatePayment(dto));
   }

@@ -354,12 +354,33 @@
                   <div class="form-field">
                     <label class="form-label" for="paypal-webhook">URL Webhook</label>
                     <div class="input-with-copy">
-                      <input id="paypal-webhook" class="form-input" type="url" [(ngModel)]="paypalWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/paypal"/>
-                      <button class="copy-btn" (click)="copyToClipboard(paypalWebhookUrl)" title="Copier" type="button">
+                      <input id="paypal-webhook" class="form-input" type="url" [(ngModel)]="paypalWebhookUrl" [placeholder]="defaultPaypalWebhookUrl || 'https://api.leplatdujour.ch/api/v1/payments/paypal/webhook'"/>
+                      <button class="copy-btn" (click)="copyToClipboard(paypalWebhookUrl || defaultPaypalWebhookUrl)" title="Copier" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
                       </button>
                     </div>
+                    <span class="form-hint">URL à enregistrer dans PayPal Developer → Webhooks</span>
                   </div>
+                  <div class="form-field">
+                    <label class="form-label" for="paypal-webhook-id">Webhook ID</label>
+                    <input id="paypal-webhook-id" class="form-input" type="text" [(ngModel)]="paypalWebhookId" placeholder="WH-XXXXXXXX"/>
+                    <span class="form-hint">Identifiant du webhook PayPal (requis pour la vérification des signatures en production)</span>
+                  </div>
+                  @if (paypalComplianceUrls.length > 0) {
+                    <h4 class="provider-card__sub">URLs PayPal (API)</h4>
+                    @for (item of paypalComplianceUrls; track item.url) {
+                      <div class="form-field form-field--full">
+                        <label class="form-label">{{ item.label }}</label>
+                        <span class="form-hint form-hint--inline">{{ item.description }}</span>
+                        <div class="input-with-copy">
+                          <input class="form-input form-input--readonly" type="text" [value]="item.url" readonly tabindex="-1"/>
+                          <button class="copy-btn" (click)="copyToClipboard(item.url)" title="Copier" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  }
                   <div class="form-field">
                     <label class="form-label">Mode Sandbox</label>
                     <div class="provider-toggle" style="margin-top:6px;">
@@ -388,7 +409,7 @@
                 </div>
                 <div class="provider-card__title-group">
                   <h3 class="provider-card__name">Virement bancaire</h3>
-                  <p class="provider-card__desc">Transfert direct vers votre compte — IBAN &amp; BIC</p>
+                  <p class="provider-card__desc">QR-facture suisse — IBAN, adresse créancier &amp; BIC</p>
                 </div>
                 <div class="provider-toggle">
                   <label class="toggle" for="toggle-bank">
@@ -423,9 +444,29 @@
                     <input id="bank-bic" class="form-input" type="text" [(ngModel)]="bankBic" placeholder="UBSWCHZH80A"/>
                   </div>
                   <div class="form-field">
-                    <label class="form-label" for="bank-reference">Référence de paiement</label>
-                    <input id="bank-reference" class="form-input" type="text" [(ngModel)]="bankReference" placeholder="PDJ-XXXXXX"/>
-                    <span class="form-hint">Référence ajoutée automatiquement aux instructions de virement</span>
+                    <label class="form-label" for="bank-street">Rue</label>
+                    <input id="bank-street" class="form-input" type="text" [(ngModel)]="bankStreet" placeholder="Rue Example 1"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-postal">NPA</label>
+                    <input id="bank-postal" class="form-input" type="text" [(ngModel)]="bankPostalCode" placeholder="1000"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-city">Ville</label>
+                    <input id="bank-city" class="form-input" type="text" [(ngModel)]="bankCity" placeholder="Lausanne"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-country">Pays</label>
+                    <input id="bank-country" class="form-input" type="text" [(ngModel)]="bankCountry" placeholder="CH"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-reference">Préfixe de référence</label>
+                    <input id="bank-reference" class="form-input" type="text" [(ngModel)]="bankReference" placeholder="INV"/>
+                    <span class="form-hint">Préfixe des références de paiement (ex. INV-20260626-ABC123)</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-instructions">Instructions (FR)</label>
+                    <input id="bank-instructions" class="form-input" type="text" [(ngModel)]="bankInstructionsFr" placeholder="Merci d'indiquer la référence dans le motif du virement."/>
                   </div>
                 </div>
               } @else {
@@ -435,6 +476,43 @@
                 </div>
               }
             </div>
+
+            @if (bankTransferEnabled) {
+              <div class="provider-card" id="bank-transfer-pending">
+                <div class="provider-card__header">
+                  <div class="provider-card__title-group">
+                    <h3 class="provider-card__name">Virements en attente</h3>
+                    <p class="provider-card__desc">Confirmez manuellement après réception sur le compte bancaire</p>
+                  </div>
+                  <button type="button" class="copy-btn" (click)="loadPendingBankTransfers()">Actualiser</button>
+                </div>
+                @if (pendingLoading) {
+                  <p class="form-hint">Chargement…</p>
+                } @else if (pendingBankTransfers.length === 0) {
+                  <p class="form-hint">Aucun virement en attente.</p>
+                } @else {
+                  <div class="pending-list">
+                    @for (p of pendingBankTransfers; track p.id) {
+                      <div class="pending-item">
+                        <div>
+                          <strong>{{ p.reference }}</strong>
+                          <span class="form-hint"> — {{ p.amount }} {{ p.currency }}</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn-save"
+                          style="width:auto;padding:0.5rem 1rem;"
+                          [disabled]="confirmingId === p.id"
+                          (click)="confirmBankTransfer(p.id)"
+                        >
+                          {{ confirmingId === p.id ? '…' : 'Confirmer' }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
 
             <!-- Save bar -->
             <div class="settings-actions">

@@ -28,4 +28,5 @@ Restaurant:
 
 Suivi feature par feature avec checkboxes :
 
-→ **[restaurant-backoffice-parity-plan.md](../plan-implementation/restaurant-backoffice-parity-plan.md)**
+→ **[restaurant-backoffice-parity-plan.md](../plan-implementation/restaurant-backoffice-parity-plan.md)**  
+→ **[swiss-qr-virement-plan.md](../plan-implementation/swiss-qr-virement-plan.md)**

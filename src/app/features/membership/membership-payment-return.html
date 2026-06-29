@@ -1,0 +1,59 @@
+<div class="payment-return">
+  <div class="payment-return__card">
+    @switch (outcome) {
+      @case ('loading') {
+        <div class="spinner"></div>
+        <h1>{{ 'MEMBERSHIP.PAYMENT_PROCESSING' | translate }}</h1>
+        <p>{{ 'MEMBERSHIP.PAYMENT_PROCESSING_DESC' | translate:{ provider: providerLabel } }}</p>
+      }
+      @case ('confirmed') {
+        <div class="payment-return__icon payment-return__icon--success">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="24" stroke="#10B981" stroke-width="2.5"/>
+            <path d="M18 28l7 7 13-15" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1>{{ 'MEMBERSHIP.SUBSCRIBE_SUCCESS' | translate }}</h1>
+        <button type="button" class="btn btn--primary" (click)="goToMembership()">
+          {{ 'MEMBERSHIP.BACK_TO_MEMBERSHIP' | translate }}
+        </button>
+      }
+      @case ('failed') {
+        <div class="payment-return__icon payment-return__icon--error">×</div>
+        <h1>{{ 'MEMBERSHIP.PAYMENT_FAILED' | translate }}</h1>
+        <p>{{ 'MEMBERSHIP.PAYMENT_FAILED_DESC' | translate }}</p>
+        <div class="payment-return__actions">
+          <button type="button" class="btn btn--primary" (click)="retryPayment()">
+            {{ 'MEMBERSHIP.PAYMENT_RETRY' | translate }}
+          </button>
+          <button type="button" class="btn btn--secondary" (click)="goToMembership()">
+            {{ 'MEMBERSHIP.BACK_TO_MEMBERSHIP' | translate }}
+          </button>
+        </div>
+      }
+      @case ('cancelled') {
+        <div class="payment-return__icon payment-return__icon--warning">!</div>
+        <h1>{{ 'MEMBERSHIP.PAYMENT_CANCELLED' | translate }}</h1>
+        <p>{{ 'MEMBERSHIP.PAYMENT_CANCELLED_DESC' | translate }}</p>
+        <div class="payment-return__actions">
+          <button type="button" class="btn btn--primary" (click)="retryPayment()">
+            {{ 'MEMBERSHIP.PAYMENT_RETRY' | translate }}
+          </button>
+          <button type="button" class="btn btn--secondary" (click)="goToMembership()">
+            {{ 'MEMBERSHIP.BACK_TO_MEMBERSHIP' | translate }}
+          </button>
+        </div>
+      }
+      @case ('timeout') {
+        <div class="payment-return__icon payment-return__icon--warning">…</div>
+        <h1>{{ 'MEMBERSHIP.PAYMENT_TIMEOUT' | translate }}</h1>
+        <p>{{ 'MEMBERSHIP.PAYMENT_TIMEOUT_DESC' | translate }}</p>
+        <div class="payment-return__actions">
+          <button type="button" class="btn btn--primary" (click)="goToMembership()">
+            {{ 'MEMBERSHIP.BACK_TO_MEMBERSHIP' | translate }}
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

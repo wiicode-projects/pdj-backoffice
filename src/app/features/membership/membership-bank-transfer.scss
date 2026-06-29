@@ -1,0 +1,134 @@
+.bt-page {
+  max-width: 760px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.bt-loading, .bt-error {
+  text-align: center;
+  padding: 2rem;
+}
+
+.bt-banner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(45, 106, 79, 0.1);
+  border: 1px solid #2d6a4f;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.bt-banner__title { font-weight: 600; color: #2d6a4f; }
+.bt-banner__sub { font-size: 0.875rem; color: #6c757d; margin-top: 0.25rem; }
+
+.bt-card {
+  background: #fff;
+  border: 1px solid #e0d8cc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.bt-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0;
+}
+
+.bt-grid dd { margin: 0; font-weight: 600; font-family: monospace; word-break: break-all; }
+.bt-grid dt { color: #6c757d; font-size: 0.875rem; }
+
+.bt-reference {
+  text-align: center;
+  border: 2px solid #b8860b;
+  background: rgba(184, 134, 11, 0.08);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.bt-reference__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.bt-reference__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #b8860b;
+  font-family: monospace;
+  margin: 0.5rem 0;
+}
+
+.bt-copy {
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+}
+
+.bt-qr {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  background: rgba(200, 164, 94, 0.06);
+  border-radius: 8px;
+}
+
+.bt-qr__wrap {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.bt-qr__code {
+  width: 200px;
+  height: 200px;
+  background: #fff;
+  border: 1px solid #e0d8cc;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.bt-qr__code :global(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.bt-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.bt-warning {
+  margin-top: 1rem;
+  padding: 0.875rem;
+  background: rgba(224, 122, 47, 0.1);
+  border: 1px solid #e07a2f;
+  border-radius: 6px;
+  color: #e07a2f;
+  font-size: 0.875rem;
+}
+
+.bt-back {
+  margin-top: 1rem;
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .bt-grid { grid-template-columns: 1fr; }
+}

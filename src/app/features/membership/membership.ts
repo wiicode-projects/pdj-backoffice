@@ -1,9 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { PaymentService, PaymentGatewaySlug, PaymentMethodInfo } from '../../core/services/payment.service';
+import { SettingsService, PublicLegalUrls } from '../../core/services/settings.service';
+import { resolveFallbackLegalUrls } from '../../core/constants/compliance-urls';
+import { storeMembershipCheckout } from './membership-checkout';
+import { storeMembershipBankTransfer } from './membership-bank-transfer';
 import { environment } from '../../../environments/environment';
 
 interface MembershipData {
@@ -30,11 +37,20 @@ interface MembershipData {
 
 interface Invoice {
   id: string;
+  source?: 'invoice' | 'payment';
   amount: number;
   status: string;
-  dueDate: string;
-  paidAt: string | null;
+  endingAt: string | null;
   createdAt: string;
+  purpose: string;
+  label: string;
+  description: string;
+  paymentId: string | null;
+  paymentStatus: string | null;
+  invoicePath: string | null;
+  receiptPath: string | null;
+  invoicePdfPath: string | null;
+  receiptPdfPath: string | null;
 }
 
 interface Plan {
@@ -74,7 +90,7 @@ interface AvailableSubscription {
 @Component({
   selector: 'pdj-membership',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './membership.html',
   styleUrl: './membership.scss',
 })
@@ -92,18 +108,72 @@ export class Membership implements OnInit {
   subscribing = false;
   subscribeSuccess = false;
   subscribeError = '';
+  acceptCgv = false;
+  paymentAvailable = true;
+  paymentAvailabilityLoading = true;
+  paymentMethods: PaymentMethodInfo[] = [];
+  selectedGateway: PaymentGatewaySlug = 'mypos';
+  legalUrls: PublicLegalUrls = { ...resolveFallbackLegalUrls() };
+  payingRenewalId: string | null = null;
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private translate: TranslateService,
     private cdr: ChangeDetectorRef,
+    private paymentService: PaymentService,
+    private settingsService: SettingsService,
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('subscribed') === '1') {
+      this.subscribeSuccess = true;
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {},
+        replaceUrl: true,
+      });
+    }
     this.loadMembership();
     this.loadInvoices();
     this.loadSubscriptions();
+    this.loadPaymentAvailability();
+    this.settingsService.getPublicLegalUrls().subscribe({
+      next: (urls) => {
+        this.legalUrls = urls;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  get paymentUnavailable(): boolean {
+    return !this.paymentAvailabilityLoading && !this.paymentAvailable;
+  }
+
+  private loadPaymentAvailability(): void {
+    this.paymentAvailabilityLoading = true;
+    this.paymentService.getAvailability()
+      .pipe(finalize(() => {
+        this.paymentAvailabilityLoading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          this.paymentMethods = res.methods ?? [];
+          this.paymentAvailable = this.paymentMethods.length > 0;
+          this.selectedGateway = this.paymentMethods[0]?.slug ?? 'mypos';
+        },
+        error: () => {
+          this.paymentAvailable = false;
+          this.paymentMethods = [];
+        },
+      });
+  }
+
+  selectGateway(slug: PaymentGatewaySlug): void {
+    this.selectedGateway = slug;
   }
 
   get restaurantId(): string | null {
@@ -185,6 +255,7 @@ export class Membership implements OnInit {
     this.selectedPlanId = sub.plans?.[0]?.id || null;
     this.subscribeError = '';
     this.subscribeSuccess = false;
+    this.acceptCgv = false;
   }
 
   closePlanModal(): void {
@@ -192,6 +263,7 @@ export class Membership implements OnInit {
     this.selectedPlanId = null;
     this.subscribeError = '';
     this.subscribeSuccess = false;
+    this.acceptCgv = false;
   }
 
   selectPlan(planId: string): void {
@@ -200,17 +272,65 @@ export class Membership implements OnInit {
 
   subscribe(): void {
     const id = this.restaurantId;
-    if (!id || !this.selectedSubscription || !this.selectedPlanId) return;
+    if (!id || !this.selectedSubscription) return;
+
+    if (this.requiresPayment(this.selectedSubscription, this.selectedPlanId)) {
+      if (!this.selectedPlanId) return;
+      if (!this.acceptCgv) {
+        this.subscribeError = this.translate.instant('MEMBERSHIP.CGV_REQUIRED');
+        return;
+      }
+      if (!this.paymentAvailable) {
+        this.subscribeError = this.translate.instant('MEMBERSHIP.PAYMENT_UNAVAILABLE');
+        return;
+      }
+      this.startPaidCheckout(id);
+      return;
+    }
+
+    this.subscribeDirect(id);
+  }
+
+  get modalSubscribeDisabled(): boolean {
+    if (this.subscribing) return true;
+    if (!this.selectedPlanId && !this.selectedSubscription?.isDefault) return true;
+    if (
+      this.selectedSubscription &&
+      this.requiresPayment(this.selectedSubscription, this.selectedPlanId) &&
+      !this.acceptCgv
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  get selectedPlanRequiresPayment(): boolean {
+    if (!this.selectedSubscription) return false;
+    return this.requiresPayment(this.selectedSubscription, this.selectedPlanId);
+  }
+
+  private requiresPayment(sub: AvailableSubscription, planId: string | null): boolean {
+    if (sub.isDefault) return false;
+    if (!planId) return false;
+    const plan = sub.plans?.find((p) => p.id === planId);
+    if (!plan) return false;
+    return this.getPlanPrice(plan, sub) > 0;
+  }
+
+  private subscribeDirect(restaurantId: string): void {
+    const body: { subscriptionId: string; subscriptionPlanId?: string } = {
+      subscriptionId: this.selectedSubscription!.id,
+    };
+    if (this.selectedPlanId) {
+      body.subscriptionPlanId = this.selectedPlanId;
+    }
 
     this.subscribing = true;
     this.subscribeError = '';
 
     this.http.post(
-      `${environment.apiUrl}/restaurants/${id}/subscriptions`,
-      {
-        subscriptionId: this.selectedSubscription.id,
-        subscriptionPlanId: this.selectedPlanId,
-      }
+      `${environment.apiUrl}/restaurants/${restaurantId}/subscriptions`,
+      body,
     )
     .pipe(finalize(() => {
       this.subscribing = false;
@@ -220,17 +340,89 @@ export class Membership implements OnInit {
       next: () => {
         this.subscribeSuccess = true;
         this.cdr.detectChanges();
-        // Reload membership after short delay
         setTimeout(() => {
           this.closePlanModal();
           this.loadMembership();
+          this.loadInvoices();
         }, 1500);
       },
       error: (err) => {
-        this.subscribeError = err?.error?.message || 'An error occurred';
+        if (err?.status === 402) {
+          this.startPaidCheckout(restaurantId);
+          return;
+        }
+        this.subscribeError = this.extractErrorMessage(err);
         console.error('Subscribe error:', err);
       },
     });
+  }
+
+  private startPaidCheckout(restaurantId: string): void {
+    if (!this.selectedSubscription || !this.selectedPlanId) return;
+
+    this.subscribing = true;
+    this.subscribeError = '';
+
+    this.paymentService.createRestaurantCheckout({
+      subscriptionId: this.selectedSubscription.id,
+      subscriptionPlanId: this.selectedPlanId,
+      restaurantId,
+      gateway: this.selectedGateway,
+    })
+    .pipe(finalize(() => {
+      this.subscribing = false;
+      this.cdr.detectChanges();
+    }))
+    .subscribe({
+      next: (res) => {
+        this.closePlanModal();
+        if (res.checkoutMode === 'bank_transfer') {
+          storeMembershipBankTransfer({
+            paymentId: res.payment.id,
+            returnToken: res.returnToken,
+            qrBill: res.qrBill,
+          });
+          this.router.navigate(['/app/membership/bank-transfer']);
+          return;
+        }
+        storeMembershipCheckout({
+          paymentId: res.payment.id,
+          returnToken: res.returnToken,
+          checkoutUrl: res.checkoutUrl,
+          fields: res.fields,
+          checkoutMode: res.checkoutMode ?? 'form_post',
+          gateway: res.payment.paymentGateway,
+        });
+        if (res.checkoutMode === 'redirect') {
+          this.router.navigate(['/app/membership/payment-return'], {
+            queryParams: {
+              paymentId: res.payment.id,
+              token: res.returnToken,
+            },
+          });
+          return;
+        }
+        this.router.navigate(['/app/membership/checkout']);
+      },
+      error: (err) => {
+        this.subscribeError = this.extractErrorMessage(err);
+        console.error('Checkout error:', err);
+      },
+    });
+  }
+
+  private extractErrorMessage(err: { error?: { message?: string | { message?: string } }; message?: string }): string {
+    const msg = err?.error?.message;
+    if (typeof msg === 'string') return msg;
+    if (msg && typeof msg === 'object' && typeof msg.message === 'string') return msg.message;
+    return err?.message || 'An error occurred';
+  }
+
+  get subscribeButtonKey(): string {
+    if (!this.selectedSubscription) return 'MEMBERSHIP.SUBSCRIBE';
+    return this.requiresPayment(this.selectedSubscription, this.selectedPlanId)
+      ? 'MEMBERSHIP.PROCEED_TO_PAYMENT'
+      : 'MEMBERSHIP.SUBSCRIBE';
   }
 
   isCurrentSubscription(subId: string): boolean {
@@ -245,6 +437,17 @@ export class Membership implements OnInit {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
+    });
+  }
+
+  formatDateTime(date: string | null): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleString('fr-CH', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   }
 
@@ -279,6 +482,81 @@ export class Membership implements OnInit {
       case 'OVERDUE': return 'status--overdue';
       default: return '';
     }
+  }
+
+  openInvoiceDocument(path: string | null): void {
+    if (!path) return;
+    const url = path.startsWith('http') ? path : `${environment.apiUrl}${path}`;
+
+    if (path.endsWith('.pdf')) {
+      this.http.get(url, { responseType: 'blob' }).subscribe({
+        next: (blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          window.open(blobUrl, '_blank');
+        },
+        error: (err) => console.error('Failed to open document:', err),
+      });
+      return;
+    }
+
+    this.http.get(url, { responseType: 'text' }).subscribe({
+      next: (html) => {
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+      },
+      error: (err) => console.error('Failed to open document:', err),
+    });
+  }
+
+  canPayInvoice(invoice: Invoice): boolean {
+    return invoice.status === 'PENDING' && !!invoice.paymentId;
+  }
+
+  payRenewal(invoice: Invoice): void {
+    if (!invoice.paymentId) return;
+
+    this.payingRenewalId = invoice.paymentId;
+    this.paymentService.createRenewalCheckout({
+      paymentId: invoice.paymentId,
+      gateway: this.selectedGateway,
+    })
+    .pipe(finalize(() => {
+      this.payingRenewalId = null;
+      this.cdr.detectChanges();
+    }))
+    .subscribe({
+      next: (res) => {
+        if (res.checkoutMode === 'bank_transfer') {
+          storeMembershipBankTransfer({
+            paymentId: res.payment.id,
+            returnToken: res.returnToken,
+            qrBill: res.qrBill,
+          });
+          this.router.navigate(['/app/membership/bank-transfer']);
+          return;
+        }
+        storeMembershipCheckout({
+          paymentId: res.payment.id,
+          returnToken: res.returnToken,
+          checkoutUrl: res.checkoutUrl,
+          fields: res.fields,
+          checkoutMode: res.checkoutMode ?? 'form_post',
+          gateway: res.payment.paymentGateway,
+        });
+        if (res.checkoutMode === 'redirect') {
+          this.router.navigate(['/app/membership/payment-return'], {
+            queryParams: {
+              paymentId: res.payment.id,
+              token: res.returnToken,
+            },
+          });
+          return;
+        }
+        this.router.navigate(['/app/membership/checkout']);
+      },
+      error: (err) => console.error('Renewal checkout error:', err),
+    });
   }
 
   get membershipPrice(): number {

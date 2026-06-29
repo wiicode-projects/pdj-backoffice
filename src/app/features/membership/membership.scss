@@ -9,6 +9,25 @@ $border-color: #E5E7EB;
   font-family: 'PolySans Trial', -apple-system, sans-serif;
 
   &__header { margin-bottom: 28px; animation: fadeSlideDown 0.5s ease both; }
+  &__alert {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    &--success {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    &--warning {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+    }
+  }
   &__title { font-size: 1.6rem; font-weight: 700; color: $text-dark; }
   &__subtitle { font-size: 0.88rem; color: $text-medium; margin-top: 2px; }
   &__loading { display: flex; justify-content: center; padding: 80px 0; }
@@ -224,6 +243,24 @@ $border-color: #E5E7EB;
     border-radius: 10px; color: $primary-red; font-size: 0.82rem;
   }
 
+  &__cgv {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 24px 8px;
+    font-size: 0.84rem;
+    color: $text-medium;
+    line-height: 1.45;
+
+    input { margin-top: 3px; }
+
+    a {
+      color: $primary-red;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  }
+
   &__footer {
     display: flex; gap: 10px; justify-content: flex-end;
     padding: 16px 24px 24px; border-top: 1px solid $border-color;
@@ -345,6 +382,10 @@ $border-color: #E5E7EB;
   tr:hover td { background: #FAFBFC; }
 
   &__amount { font-weight: 700; color: $text-dark; }
+
+  &__actions {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
 }
 
 .invoice-status {
@@ -388,6 +429,81 @@ $border-color: #E5E7EB;
 @keyframes successPop {
   from { opacity: 0; transform: scale(0.5); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.modal__payment-methods {
+  padding: 0 24px;
+  margin-bottom: 16px;
+}
+
+.modal__payment-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-medium;
+  margin-bottom: 10px;
+}
+
+.modal__payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-payment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &--selected {
+    border-color: $primary-red;
+    box-shadow: 0 0 0 1px rgba($primary-red, 0.15);
+  }
+}
+
+.modal-payment-option__radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  position: relative;
+
+  .modal-payment-option--selected & {
+    border-color: $primary-red;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: $primary-red;
+    }
+  }
+}
+
+.modal-payment-option__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-payment-option__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.modal-payment-option__desc {
+  font-size: 0.78rem;
+  color: $text-light;
 }
 
 // ── Responsive ─────────────────────────────────────────────────────────

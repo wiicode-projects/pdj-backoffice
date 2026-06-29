@@ -1,0 +1,28 @@
+<div class="checkout-page">
+  @if (error) {
+    <div class="checkout-page__card checkout-page__card--error">
+      <p>{{ error | translate }}</p>
+      <button type="button" class="btn btn--primary" (click)="goBack()">
+        {{ 'COMMON.BACK' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="checkout-page__card">
+      <div class="spinner"></div>
+      <h1>{{ 'MEMBERSHIP.CHECKOUT_TITLE' | translate }}</h1>
+      <p>{{ 'MEMBERSHIP.CHECKOUT_REDIRECT' | translate:{ provider: providerLabel } }}</p>
+    </div>
+
+    <form
+      #checkoutForm
+      class="checkout-page__form"
+      [attr.action]="checkoutUrl"
+      method="POST"
+      target="_self"
+    >
+      @for (field of fieldEntries; track field.key) {
+        <input type="hidden" [name]="field.key" [value]="field.value" />
+      }
+    </form>
+  }
+</div>

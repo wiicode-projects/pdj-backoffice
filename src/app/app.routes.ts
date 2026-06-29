@@ -237,6 +237,24 @@ export const routes: Routes = [
           import('./features/membership/membership').then((m) => m.Membership),
       },
       {
+        path: 'membership/bank-transfer',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/membership/membership-bank-transfer').then((m) => m.MembershipBankTransfer),
+      },
+      {
+        path: 'membership/checkout',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/membership/membership-checkout').then((m) => m.MembershipCheckout),
+      },
+      {
+        path: 'membership/payment-return',
+        canActivate: [roleGuard('RESTAURANT')],
+        loadComponent: () =>
+          import('./features/membership/membership-payment-return').then((m) => m.MembershipPaymentReturn),
+      },
+      {
         path: 'dishes/create',
         canActivate: [roleGuard('RESTAURANT')],
         loadComponent: () =>

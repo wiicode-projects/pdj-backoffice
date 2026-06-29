@@ -6,6 +6,18 @@
     </div>
   </div>
 
+  @if (subscribeSuccess && !selectedSubscription) {
+    <div class="membership-page__alert membership-page__alert--success">
+      {{ 'MEMBERSHIP.SUBSCRIBE_SUCCESS' | translate }}
+    </div>
+  }
+
+  @if (paymentUnavailable) {
+    <div class="membership-page__alert membership-page__alert--warning">
+      {{ 'MEMBERSHIP.PAYMENT_UNAVAILABLE' | translate }}
+    </div>
+  }
+
   @if (loading) {
     <div class="membership-page__loading"><div class="spinner"></div></div>
   }
@@ -196,15 +208,49 @@
               <div class="modal__error">{{ subscribeError }}</div>
             }
 
+            @if (selectedPlanRequiresPayment) {
+              @if (paymentMethods.length > 0) {
+                <div class="modal__payment-methods">
+                  <p class="modal__payment-label">{{ 'MEMBERSHIP.PAYMENT_METHOD' | translate }}</p>
+                  <div class="modal__payment-options">
+                    @for (method of paymentMethods; track method.slug) {
+                      <button
+                        type="button"
+                        class="modal-payment-option"
+                        [class.modal-payment-option--selected]="selectedGateway === method.slug"
+                        (click)="selectGateway(method.slug)"
+                      >
+                        <span class="modal-payment-option__radio"></span>
+                        <span class="modal-payment-option__info">
+                          <span class="modal-payment-option__name">{{ method.label }}</span>
+                          <span class="modal-payment-option__desc">{{ method.description }}</span>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              <label class="modal__cgv">
+                <input type="checkbox" [(ngModel)]="acceptCgv" />
+                <span>
+                  {{ 'MEMBERSHIP.ACCEPT_CGV_PREFIX' | translate }}
+                  <a [href]="legalUrls.cgv" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                    {{ 'MEMBERSHIP.ACCEPT_CGV_LINK' | translate }}
+                  </a>
+                </span>
+              </label>
+            }
+
             <div class="modal__footer">
               <button class="btn btn--secondary" (click)="closePlanModal()">{{ 'COMMON.CANCEL' | translate }}</button>
-              <button class="btn btn--primary" [disabled]="subscribing || !selectedPlanId"
+              <button class="btn btn--primary" [disabled]="modalSubscribeDisabled"
                 [style.background]="getSubColor(selectedSubscription)"
                 (click)="subscribe()">
                 @if (subscribing) {
                   <span class="btn__spinner"></span>
                 }
-                {{ 'MEMBERSHIP.SUBSCRIBE' | translate }}
+                {{ subscribeButtonKey | translate }}
               </button>
             </div>
           } @else {
@@ -244,22 +290,47 @@
             <thead>
               <tr>
                 <th>{{ 'MEMBERSHIP.INVOICE_DATE' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_TYPE' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_AMOUNT' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_STATUS' | translate }}</th>
                 <th>{{ 'MEMBERSHIP.INVOICE_DUE' | translate }}</th>
+                <th>{{ 'MEMBERSHIP.INVOICE_ACTIONS' | translate }}</th>
               </tr>
             </thead>
             <tbody>
               @for (invoice of invoices; track invoice.id) {
                 <tr>
-                  <td>{{ formatDate(invoice.createdAt) }}</td>
+                  <td>{{ formatDateTime(invoice.createdAt) }}</td>
+                  <td>{{ invoice.label }}</td>
                   <td class="invoices-table__amount">{{ formatPrice(invoice.amount) }}</td>
                   <td>
                     <span class="invoice-status" [ngClass]="getInvoiceStatusClass(invoice.status)">
                       {{ invoice.status }}
                     </span>
                   </td>
-                  <td>{{ formatDate(invoice.dueDate) }}</td>
+                  <td>{{ formatDate(invoice.endingAt) }}</td>
+                  <td class="invoices-table__actions">
+                    @if (invoice.status === 'PENDING' && invoice.invoicePdfPath) {
+                      <button type="button" class="btn btn--ghost btn--sm" (click)="openInvoiceDocument(invoice.invoicePdfPath)">
+                        {{ 'MEMBERSHIP.VIEW_INVOICE_PDF' | translate }}
+                      </button>
+                    }
+                    @if (invoice.status === 'PAID' && invoice.receiptPdfPath) {
+                      <button type="button" class="btn btn--ghost btn--sm" (click)="openInvoiceDocument(invoice.receiptPdfPath)">
+                        {{ 'MEMBERSHIP.VIEW_RECEIPT_PDF' | translate }}
+                      </button>
+                    }
+                    @if (canPayInvoice(invoice)) {
+                      <button
+                        type="button"
+                        class="btn btn--primary btn--sm"
+                        [disabled]="payingRenewalId === invoice.paymentId"
+                        (click)="payRenewal(invoice)"
+                      >
+                        {{ payingRenewalId === invoice.paymentId ? '…' : ('MEMBERSHIP.PAY_NOW' | translate) }}
+                      </button>
+                    }
+                  </td>
                 </tr>
               }
             </tbody>

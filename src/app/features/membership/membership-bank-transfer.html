@@ -1,0 +1,60 @@
+<div class="bt-page">
+  @if (loading) {
+    <p class="bt-loading">Chargement des instructions…</p>
+  } @else if (error) {
+    <div class="bt-error">{{ error }}</div>
+    <button type="button" class="bt-back" (click)="goBack()">Retour</button>
+  } @else if (qrBill) {
+    <div class="bt-banner">
+      <span class="bt-banner__icon">✅</span>
+      <div>
+        <div class="bt-banner__title">Commande enregistrée</div>
+        <div class="bt-banner__sub">Effectuez le virement ci-dessous. Votre abonnement sera activé après confirmation du paiement.</div>
+      </div>
+    </div>
+
+    <div class="bt-card">
+      <h2>Coordonnées de virement</h2>
+      <dl class="bt-grid">
+        <dt>Bénéficiaire</dt><dd>{{ qrBill.creditor.name }}</dd>
+        <dt>IBAN</dt><dd>{{ qrBill.iban }}</dd>
+        @if (qrBill.bic) {
+          <dt>BIC / SWIFT</dt><dd>{{ qrBill.bic }}</dd>
+        }
+        @if (qrBill.bankName) {
+          <dt>Banque</dt><dd>{{ qrBill.bankName }}</dd>
+        }
+      </dl>
+
+      <div class="bt-reference">
+        <div class="bt-reference__label">Référence à indiquer</div>
+        <div class="bt-reference__value">{{ qrBill.reference }}</div>
+        <button type="button" class="bt-copy" (click)="copyReference()">Copier</button>
+      </div>
+
+      @if (qrSvg) {
+        <div class="bt-qr">
+          <h3>Scanner pour payer</h3>
+          <p>Scannez ce QR avec votre application bancaire suisse.</p>
+          <div class="bt-qr__wrap">
+            <div class="bt-qr__code" [innerHTML]="qrSvg"></div>
+            <div class="bt-qr__meta">
+              <div><span>Montant</span><strong>{{ qrBill.amount | number:'1.2-2' }} CHF</strong></div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="bt-amount">
+        <span>Montant à virer</span>
+        <strong>{{ qrBill.amount | number:'1.2-2' }} CHF</strong>
+      </div>
+
+      <div class="bt-warning">
+        Indiquez impérativement la référence dans le motif du virement.
+      </div>
+    </div>
+
+    <button type="button" class="bt-back" (click)="goBack()">Retour à l'abonnement</button>
+  }
+</div>

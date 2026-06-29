@@ -146,4 +146,8 @@ export class UserService {
       {},
     );
   }
+
+  removeAdmin(adminId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/admins/${adminId}`);
+  }
 }

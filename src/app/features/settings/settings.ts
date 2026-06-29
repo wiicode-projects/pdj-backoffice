@@ -8,9 +8,11 @@ import {
   UpdatePaymentSettingsDto,
   UpdateGeneralSettingsDto,
   UpdateEmailSettingsDto,
+  EmailProvider,
   ComplianceUrlHealthItem,
   ComplianceUrlsResponse,
 } from '../../core/services/settings.service';
+import { PaymentService, PaymentRecord } from '../../core/services/payment.service';
 import { UserService, AdminUser } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { deployEnvLabel } from '../../core/constants/compliance-urls';
@@ -44,6 +46,7 @@ export class Settings implements OnInit {
   myposEnabled = false;
   myposStoreId = '';
   myposConfigurationPack = '';
+  myposTestMode = true;
   showMyposSecrets = false;
 
   // ── myPOS compliance URLs (from API) ───────────────────────────────
@@ -63,6 +66,14 @@ export class Settings implements OnInit {
     return this.complianceUrls?.compliance ?? [];
   }
 
+  get paypalComplianceUrls() {
+    return this.complianceUrls?.paypal ?? [];
+  }
+
+  get defaultPaypalWebhookUrl(): string {
+    return this.paypalComplianceUrls.find((item) => item.key === 'paypal_webhook')?.url ?? '';
+  }
+
   deployEnvLabel(env: string | undefined): string {
     if (env === 'development' || env === 'staging' || env === 'production') {
       return deployEnvLabel(env);
@@ -74,6 +85,7 @@ export class Settings implements OnInit {
   paypalEnabled = false;
   paypalClientId = '';
   paypalSecretKey = '';
+  paypalWebhookId = '';
   paypalWebhookUrl = '';
   paypalSandbox = true;
   showPaypalKey = false;
@@ -85,13 +97,29 @@ export class Settings implements OnInit {
   bankBic = '';
   bankAccountHolder = '';
   bankReference = '';
+  bankStreet = '';
+  bankPostalCode = '';
+  bankCity = '';
+  bankCountry = 'CH';
+  bankInstructionsFr = '';
+
+  pendingBankTransfers: PaymentRecord[] = [];
+  pendingLoading = false;
+  confirmingId: string | null = null;
 
   // ── Email ──────────────────────────────────────────────────────────
   emailEnabled = true;
+  emailProvider: EmailProvider = 'brevo';
+  brevoEnabled = true;
   brevoApiKey = '';
   showBrevoKey = false;
-  emailSenderName = '';
-  emailSenderAddress = '';
+  kreativMediaEnabled = false;
+  kreativMediaSmtpHost = '';
+  kreativMediaSmtpPort = 465;
+  kreativMediaSmtpUser = '';
+  kreativMediaSmtpPassword = '';
+  showKreativPassword = false;
+  kreativMediaSmtpSecure = true;
 
   emailOtpEnabled = true;
   emailWelcomeEnabled = true;
@@ -107,6 +135,8 @@ export class Settings implements OnInit {
   adminsSuccess = '';
   showCreateAdminForm = false;
   resetSendingId: string | null = null;
+  confirmDeleteAdminId: string | null = null;
+  deletingAdmin = false;
   adminForm = {
     firstName: '',
     lastName: '',
@@ -115,9 +145,18 @@ export class Settings implements OnInit {
     sendResetEmail: true,
   };
 
-  /** Visual badge: shows a warning dot on the email tab if Brevo key is missing */
+  /** Visual badge: shows a warning dot on the email tab if active provider is misconfigured */
   get emailMissingConfig(): boolean {
-    return this.emailEnabled && !this.brevoApiKey;
+    if (!this.emailEnabled) return false;
+    if (this.emailProvider === 'brevo') {
+      return this.brevoEnabled && !this.brevoApiKey.trim();
+    }
+    return (
+      this.kreativMediaEnabled &&
+      (!this.kreativMediaSmtpHost.trim() ||
+        !this.kreativMediaSmtpUser.trim() ||
+        !this.kreativMediaSmtpPassword.trim())
+    );
   }
 
   readonly tabs: { id: Tab; label: string; icon: string }[] = [
@@ -138,6 +177,7 @@ export class Settings implements OnInit {
 
   constructor(
     private settingsService: SettingsService,
+    private paymentService: PaymentService,
     private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
@@ -146,6 +186,27 @@ export class Settings implements OnInit {
   ngOnInit(): void {
     this.load();
     this.loadComplianceUrls();
+    this.loadPendingBankTransfers();
+  }
+
+  loadPendingBankTransfers(): void {
+    this.pendingLoading = true;
+    this.paymentService.getPendingBankTransfers()
+      .pipe(finalize(() => { this.pendingLoading = false; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: (res) => { this.pendingBankTransfers = res.payments ?? []; },
+        error: () => { this.pendingBankTransfers = []; },
+      });
+  }
+
+  confirmBankTransfer(paymentId: string): void {
+    this.confirmingId = paymentId;
+    this.paymentService.confirmPayment(paymentId)
+      .pipe(finalize(() => { this.confirmingId = null; this.cdr.detectChanges(); }))
+      .subscribe({
+        next: () => this.loadPendingBankTransfers(),
+        error: () => { this.saveError = 'Impossible de confirmer le virement'; },
+      });
   }
 
   load(): void {
@@ -168,10 +229,12 @@ export class Settings implements OnInit {
     this.myposEnabled = (data?.myposEnabled ?? false) || (data?.twintEnabled ?? false);
     this.myposStoreId = data?.myposMerchantId ?? '';
     this.myposConfigurationPack = data?.myposApiKey ?? '';
+    this.myposTestMode = data?.myposTestMode ?? true;
     // Payment: PayPal
     this.paypalEnabled     = data?.paypalEnabled   ?? false;
     this.paypalClientId    = data?.paypalClientId   ?? '';
     this.paypalSecretKey   = data?.paypalSecretKey   ?? '';
+    this.paypalWebhookId   = data?.paypalWebhookId   ?? '';
     this.paypalWebhookUrl  = data?.paypalWebhookUrl  ?? '';
     this.paypalSandbox     = data?.paypalSandbox     ?? true;
     // Payment: Bank transfer
@@ -180,12 +243,23 @@ export class Settings implements OnInit {
     this.bankIban            = data?.bankIban            ?? '';
     this.bankBic             = data?.bankBic             ?? '';
     this.bankAccountHolder   = data?.bankAccountHolder   ?? '';
-    this.bankReference       = data?.bankReference       ?? '';
+    this.bankReference       = data?.bankReferencePrefix ?? data?.bankReference ?? 'INV';
+    this.bankStreet          = data?.bankStreet          ?? '';
+    this.bankPostalCode      = data?.bankPostalCode      ?? '';
+    this.bankCity            = data?.bankCity            ?? '';
+    this.bankCountry         = data?.bankCountry         ?? 'CH';
+    this.bankInstructionsFr  = data?.bankInstructionsFr  ?? '';
     // Email
     this.emailEnabled               = data?.emailEnabled               ?? true;
+    this.emailProvider              = data?.emailProvider              ?? 'brevo';
+    this.brevoEnabled               = data?.brevoEnabled               ?? true;
     this.brevoApiKey                = data?.brevoApiKey                ?? '';
-    this.emailSenderName            = data?.emailSenderName            ?? 'Plat du Jour';
-    this.emailSenderAddress         = data?.emailSenderAddress         ?? 'contact@caytout.com';
+    this.kreativMediaEnabled        = data?.kreativMediaEnabled        ?? false;
+    this.kreativMediaSmtpHost       = data?.kreativMediaSmtpHost       ?? '';
+    this.kreativMediaSmtpPort       = data?.kreativMediaSmtpPort       ?? 465;
+    this.kreativMediaSmtpUser       = data?.kreativMediaSmtpUser       ?? '';
+    this.kreativMediaSmtpPassword   = data?.kreativMediaSmtpPassword   ?? '';
+    this.kreativMediaSmtpSecure     = data?.kreativMediaSmtpSecure     ?? true;
     this.emailOtpEnabled            = data?.emailOtpEnabled            ?? true;
     this.emailWelcomeEnabled        = data?.emailWelcomeEnabled        ?? true;
     this.emailPasswordResetEnabled  = data?.emailPasswordResetEnabled  ?? true;
@@ -213,7 +287,13 @@ export class Settings implements OnInit {
     this.settingsService.getComplianceUrls()
       .pipe(finalize(() => { this.complianceUrlsLoading = false; this.cdr.detectChanges(); }))
       .subscribe({
-        next: (data) => { this.complianceUrls = data; },
+        next: (data) => {
+          this.complianceUrls = data;
+          if (!this.paypalWebhookUrl.trim()) {
+            const webhook = data.paypal?.find((item) => item.key === 'paypal_webhook')?.url;
+            if (webhook) this.paypalWebhookUrl = webhook;
+          }
+        },
         error: (err) => {
           this.complianceUrlsError = err?.error?.message ?? 'Impossible de charger les URLs de conformité.';
         },
@@ -325,6 +405,39 @@ export class Settings implements OnInit {
     return name || admin.email;
   }
 
+  askDeleteAdmin(admin: AdminUser): void {
+    this.confirmDeleteAdminId = admin.id;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+  }
+
+  cancelDeleteAdmin(): void {
+    this.confirmDeleteAdminId = null;
+  }
+
+  confirmDeleteAdmin(id: string): void {
+    this.deletingAdmin = true;
+    this.adminsError = '';
+    this.adminsSuccess = '';
+
+    this.userService.removeAdmin(id)
+      .pipe(finalize(() => {
+        this.deletingAdmin = false;
+        this.confirmDeleteAdminId = null;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.admins = this.admins.filter((admin) => admin.id !== id);
+          this.adminsSuccess = 'Administrateur supprimé.';
+          setTimeout(() => { this.adminsSuccess = ''; this.cdr.detectChanges(); }, 4000);
+        },
+        error: (err) => {
+          this.adminsError = err?.error?.message ?? 'Impossible de supprimer l\'administrateur.';
+        },
+      });
+  }
+
   saveGeneral(): void {
     this.doSave(this.settingsService.updateGeneral(this.generalForm));
   }
@@ -335,6 +448,7 @@ export class Settings implements OnInit {
       myposEnabled: this.myposEnabled,
       myposMerchantId: this.myposStoreId.trim() || undefined,
       myposApiKey: this.myposConfigurationPack.trim() || undefined,
+      myposTestMode: this.myposTestMode,
       myposWebhookUrl: this.complianceUrls?.ipc[0]?.url ?? this.myposIpcUrls[0]?.url,
       twintEnabled: this.myposEnabled,
       twintWebhookUrl: '',
@@ -342,21 +456,34 @@ export class Settings implements OnInit {
       twintApiKey: '',
       // PayPal
       paypalEnabled: this.paypalEnabled, paypalClientId: this.paypalClientId,
-      paypalSecretKey: this.paypalSecretKey, paypalWebhookUrl: this.paypalWebhookUrl,
+      paypalSecretKey: this.paypalSecretKey, paypalWebhookId: this.paypalWebhookId,
+      paypalWebhookUrl: this.paypalWebhookUrl.trim() || this.defaultPaypalWebhookUrl || undefined,
       paypalSandbox: this.paypalSandbox,
       // Bank transfer
       bankTransferEnabled: this.bankTransferEnabled, bankName: this.bankName,
       bankIban: this.bankIban, bankBic: this.bankBic,
-      bankAccountHolder: this.bankAccountHolder, bankReference: this.bankReference,
+      bankAccountHolder: this.bankAccountHolder,
+      bankReferencePrefix: this.bankReference,
+      bankStreet: this.bankStreet,
+      bankPostalCode: this.bankPostalCode,
+      bankCity: this.bankCity,
+      bankCountry: this.bankCountry,
+      bankInstructionsFr: this.bankInstructionsFr,
     };
     this.doSave(this.settingsService.updatePayment(dto));
   }
 
   saveEmail(): void {
     const dto: UpdateEmailSettingsDto = {
+      emailProvider:             this.emailProvider,
+      brevoEnabled:              this.brevoEnabled,
       brevoApiKey:               this.brevoApiKey,
-      emailSenderName:           this.emailSenderName,
-      emailSenderAddress:        this.emailSenderAddress,
+      kreativMediaEnabled:       this.kreativMediaEnabled,
+      kreativMediaSmtpHost:      this.kreativMediaSmtpHost,
+      kreativMediaSmtpPort:      this.kreativMediaSmtpPort,
+      kreativMediaSmtpUser:      this.kreativMediaSmtpUser,
+      kreativMediaSmtpPassword:  this.kreativMediaSmtpPassword,
+      kreativMediaSmtpSecure:    this.kreativMediaSmtpSecure,
       emailEnabled:              this.emailEnabled,
       emailOtpEnabled:           this.emailOtpEnabled,
       emailWelcomeEnabled:       this.emailWelcomeEnabled,
@@ -365,6 +492,10 @@ export class Settings implements OnInit {
       emailSubscriptionEnabled:  this.emailSubscriptionEnabled,
     };
     this.doSave(this.settingsService.updateEmail(dto));
+  }
+
+  selectEmailProvider(provider: EmailProvider): void {
+    this.emailProvider = provider;
   }
 
   private doSave(obs: any): void {

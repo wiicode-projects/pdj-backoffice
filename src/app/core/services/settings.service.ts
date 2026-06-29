@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export type EmailProvider = 'brevo' | 'kreativmedia';
+
 export interface PlatformSettings {
   id: string;
   // MyPos / TWINT (combined)
@@ -14,10 +16,12 @@ export interface PlatformSettings {
   myposMerchantId: string | null;
   myposApiKey: string | null;
   myposEnabled: boolean;
+  myposTestMode: boolean;
   // PayPal
   paypalEnabled: boolean;
   paypalClientId: string | null;
   paypalSecretKey: string | null;
+  paypalWebhookId: string | null;
   paypalWebhookUrl: string | null;
   paypalSandbox: boolean;
   // Virement bancaire
@@ -27,12 +31,27 @@ export interface PlatformSettings {
   bankBic: string | null;
   bankAccountHolder: string | null;
   bankReference: string | null;
+  bankStreet: string | null;
+  bankPostalCode: string | null;
+  bankCity: string | null;
+  bankCountry: string | null;
+  bankReferencePrefix: string | null;
+  bankInstructionsFr: string | null;
+  bankInstructionsEn: string | null;
   // General
   platformName: string | null;
   supportEmail: string | null;
   supportPhone: string | null;
-  // Email / Brevo
+  // Email providers
+  emailProvider: EmailProvider;
+  brevoEnabled: boolean;
   brevoApiKey: string | null;
+  kreativMediaEnabled: boolean;
+  kreativMediaSmtpHost: string | null;
+  kreativMediaSmtpPort: number;
+  kreativMediaSmtpUser: string | null;
+  kreativMediaSmtpPassword: string | null;
+  kreativMediaSmtpSecure: boolean;
   emailSenderName: string | null;
   emailSenderAddress: string | null;
   emailEnabled: boolean;
@@ -54,10 +73,12 @@ export interface UpdatePaymentSettingsDto {
   myposMerchantId?: string;
   myposApiKey?: string;
   myposEnabled?: boolean;
+  myposTestMode?: boolean;
   // PayPal
   paypalEnabled?: boolean;
   paypalClientId?: string;
   paypalSecretKey?: string;
+  paypalWebhookId?: string;
   paypalWebhookUrl?: string;
   paypalSandbox?: boolean;
   // Virement bancaire
@@ -67,6 +88,13 @@ export interface UpdatePaymentSettingsDto {
   bankBic?: string;
   bankAccountHolder?: string;
   bankReference?: string;
+  bankStreet?: string;
+  bankPostalCode?: string;
+  bankCity?: string;
+  bankCountry?: string;
+  bankReferencePrefix?: string;
+  bankInstructionsFr?: string;
+  bankInstructionsEn?: string;
 }
 
 export interface UpdateGeneralSettingsDto {
@@ -76,9 +104,15 @@ export interface UpdateGeneralSettingsDto {
 }
 
 export interface UpdateEmailSettingsDto {
+  emailProvider?: EmailProvider;
+  brevoEnabled?: boolean;
   brevoApiKey?: string;
-  emailSenderName?: string;
-  emailSenderAddress?: string;
+  kreativMediaEnabled?: boolean;
+  kreativMediaSmtpHost?: string;
+  kreativMediaSmtpPort?: number;
+  kreativMediaSmtpUser?: string;
+  kreativMediaSmtpPassword?: string;
+  kreativMediaSmtpSecure?: boolean;
   emailEnabled?: boolean;
   emailOtpEnabled?: boolean;
   emailWelcomeEnabled?: boolean;
@@ -92,7 +126,8 @@ export type ComplianceUrlCategory =
   | 'legal'
   | 'registration'
   | 'pricing'
-  | 'ipc';
+  | 'ipc'
+  | 'paypal';
 
 export interface ComplianceUrlItem {
   key: string;
@@ -116,6 +151,7 @@ export interface ComplianceUrlsResponse {
   backofficePublicUrl: string;
   apiPublicUrl: string;
   ipc: ComplianceUrlItem[];
+  paypal: ComplianceUrlItem[];
   compliance: ComplianceUrlItem[];
   all: ComplianceUrlItem[];
   submissionText: string;

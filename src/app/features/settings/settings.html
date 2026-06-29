@@ -198,6 +198,20 @@
                     <span class="form-hint">Client Number, Key Index et clés RSA si pas de Configuration Pack.</span>
                   </div>
 
+                  <div class="form-field">
+                    <label class="form-label">Mode myPOS</label>
+                    <div class="provider-toggle">
+                      <label class="toggle" for="toggle-mypos-test">
+                        <input type="checkbox" id="toggle-mypos-test" [(ngModel)]="myposTestMode" class="toggle__input"/>
+                        <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      </label>
+                      <span class="provider-status" [class.provider-status--on]="myposTestMode">
+                        {{ myposTestMode ? 'Sandbox (test)' : 'Production' }}
+                      </span>
+                    </div>
+                    <span class="form-hint">En sandbox, les paiements passent par checkout-test.mypos.com.</span>
+                  </div>
+
                   <div class="form-field form-field--actions">
                     <button class="copy-btn copy-btn--inline" type="button" (click)="showMyposSecrets = !showMyposSecrets">
                       {{ showMyposSecrets ? 'Masquer les secrets' : 'Afficher les secrets' }}
@@ -340,12 +354,33 @@
                   <div class="form-field">
                     <label class="form-label" for="paypal-webhook">URL Webhook</label>
                     <div class="input-with-copy">
-                      <input id="paypal-webhook" class="form-input" type="url" [(ngModel)]="paypalWebhookUrl" placeholder="https://api.leplatdujour.ch/webhooks/paypal"/>
-                      <button class="copy-btn" (click)="copyToClipboard(paypalWebhookUrl)" title="Copier" type="button">
+                      <input id="paypal-webhook" class="form-input" type="url" [(ngModel)]="paypalWebhookUrl" [placeholder]="defaultPaypalWebhookUrl || 'https://api.leplatdujour.ch/api/v1/payments/paypal/webhook'"/>
+                      <button class="copy-btn" (click)="copyToClipboard(paypalWebhookUrl || defaultPaypalWebhookUrl)" title="Copier" type="button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
                       </button>
                     </div>
+                    <span class="form-hint">URL à enregistrer dans PayPal Developer → Webhooks</span>
                   </div>
+                  <div class="form-field">
+                    <label class="form-label" for="paypal-webhook-id">Webhook ID</label>
+                    <input id="paypal-webhook-id" class="form-input" type="text" [(ngModel)]="paypalWebhookId" placeholder="WH-XXXXXXXX"/>
+                    <span class="form-hint">Identifiant du webhook PayPal (requis pour la vérification des signatures en production)</span>
+                  </div>
+                  @if (paypalComplianceUrls.length > 0) {
+                    <h4 class="provider-card__sub">URLs PayPal (API)</h4>
+                    @for (item of paypalComplianceUrls; track item.url) {
+                      <div class="form-field form-field--full">
+                        <label class="form-label">{{ item.label }}</label>
+                        <span class="form-hint form-hint--inline">{{ item.description }}</span>
+                        <div class="input-with-copy">
+                          <input class="form-input form-input--readonly" type="text" [value]="item.url" readonly tabindex="-1"/>
+                          <button class="copy-btn" (click)="copyToClipboard(item.url)" title="Copier" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  }
                   <div class="form-field">
                     <label class="form-label">Mode Sandbox</label>
                     <div class="provider-toggle" style="margin-top:6px;">
@@ -374,7 +409,7 @@
                 </div>
                 <div class="provider-card__title-group">
                   <h3 class="provider-card__name">Virement bancaire</h3>
-                  <p class="provider-card__desc">Transfert direct vers votre compte — IBAN &amp; BIC</p>
+                  <p class="provider-card__desc">QR-facture suisse — IBAN, adresse créancier &amp; BIC</p>
                 </div>
                 <div class="provider-toggle">
                   <label class="toggle" for="toggle-bank">
@@ -409,9 +444,29 @@
                     <input id="bank-bic" class="form-input" type="text" [(ngModel)]="bankBic" placeholder="UBSWCHZH80A"/>
                   </div>
                   <div class="form-field">
-                    <label class="form-label" for="bank-reference">Référence de paiement</label>
-                    <input id="bank-reference" class="form-input" type="text" [(ngModel)]="bankReference" placeholder="PDJ-XXXXXX"/>
-                    <span class="form-hint">Référence ajoutée automatiquement aux instructions de virement</span>
+                    <label class="form-label" for="bank-street">Rue</label>
+                    <input id="bank-street" class="form-input" type="text" [(ngModel)]="bankStreet" placeholder="Rue Example 1"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-postal">NPA</label>
+                    <input id="bank-postal" class="form-input" type="text" [(ngModel)]="bankPostalCode" placeholder="1000"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-city">Ville</label>
+                    <input id="bank-city" class="form-input" type="text" [(ngModel)]="bankCity" placeholder="Lausanne"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-country">Pays</label>
+                    <input id="bank-country" class="form-input" type="text" [(ngModel)]="bankCountry" placeholder="CH"/>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-reference">Préfixe de référence</label>
+                    <input id="bank-reference" class="form-input" type="text" [(ngModel)]="bankReference" placeholder="INV"/>
+                    <span class="form-hint">Préfixe des références de paiement (ex. INV-20260626-ABC123)</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="bank-instructions">Instructions (FR)</label>
+                    <input id="bank-instructions" class="form-input" type="text" [(ngModel)]="bankInstructionsFr" placeholder="Merci d'indiquer la référence dans le motif du virement."/>
                   </div>
                 </div>
               } @else {
@@ -421,6 +476,43 @@
                 </div>
               }
             </div>
+
+            @if (bankTransferEnabled) {
+              <div class="provider-card" id="bank-transfer-pending">
+                <div class="provider-card__header">
+                  <div class="provider-card__title-group">
+                    <h3 class="provider-card__name">Virements en attente</h3>
+                    <p class="provider-card__desc">Confirmez manuellement après réception sur le compte bancaire</p>
+                  </div>
+                  <button type="button" class="copy-btn" (click)="loadPendingBankTransfers()">Actualiser</button>
+                </div>
+                @if (pendingLoading) {
+                  <p class="form-hint">Chargement…</p>
+                } @else if (pendingBankTransfers.length === 0) {
+                  <p class="form-hint">Aucun virement en attente.</p>
+                } @else {
+                  <div class="pending-list">
+                    @for (p of pendingBankTransfers; track p.id) {
+                      <div class="pending-item">
+                        <div>
+                          <strong>{{ p.reference }}</strong>
+                          <span class="form-hint"> — {{ p.amount }} {{ p.currency }}</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn-save"
+                          style="width:auto;padding:0.5rem 1rem;"
+                          [disabled]="confirmingId === p.id"
+                          (click)="confirmBankTransfer(p.id)"
+                        >
+                          {{ confirmingId === p.id ? '…' : 'Confirmer' }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
 
             <!-- Save bar -->
             <div class="settings-actions">
@@ -448,7 +540,7 @@
           <div class="settings-section" id="panel-email">
             <div class="settings-section__header">
               <h2 class="settings-section__title">Configuration e-mail</h2>
-              <p class="settings-section__desc">Paramètres Brevo (ex-Sendinblue) et contrôle des envois par type</p>
+              <p class="settings-section__desc">Choisissez Brevo (API HTTP) ou Kreativ Media (SMTP hébergement) et contrôlez les envois par type</p>
             </div>
 
             <!-- Master toggle -->
@@ -468,79 +560,203 @@
               </div>
             </div>
 
-            <!-- Brevo config block -->
-            <div class="email-config-block" [class.email-config-block--disabled]="!emailEnabled">
-              <div class="email-config-block__title">
-                <div class="provider-logo" style="width:36px;height:36px;background:#0B7285;border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <!-- BREVO Card -->
+            <div
+              class="provider-card email-provider-card"
+              [class.provider-card--active]="brevoEnabled"
+              [class.email-provider-card--selected]="emailProvider === 'brevo'"
+              id="brevo-email-card"
+            >
+              <div class="provider-card__header">
+                <div class="provider-logo" style="width:40px;height:40px;background:#0B7285;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="white" opacity=".9"/>
                     <path d="M22 6l-10 7L2 6" stroke="#0B7285" stroke-width="1.8" stroke-linecap="round"/>
                   </svg>
                 </div>
-                <div>
-                  <strong>Brevo (Sendinblue)</strong>
-                  <span>Fournisseur d'e-mails transactionnels</span>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">Brevo (Sendinblue)</h3>
+                  <p class="provider-card__desc">API HTTP — e-mails transactionnels et marketing</p>
                 </div>
-                @if (emailMissingConfig) {
-                  <span class="email-warning-badge">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#F59E0B" stroke-width="1.8"/><path d="M12 9v4M12 17h.01" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/></svg>
-                    Clé API manquante
+                <div class="provider-toggle">
+                  <label class="toggle" for="toggle-brevo">
+                    <input type="checkbox" id="toggle-brevo" [(ngModel)]="brevoEnabled" class="toggle__input" [disabled]="!emailEnabled"/>
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="brevoEnabled">
+                    {{ brevoEnabled ? 'Activé' : 'Désactivé' }}
                   </span>
-                }
+                </div>
               </div>
 
-              <div class="form-grid" style="margin-top:20px;">
-                <div class="form-field">
-                  <label class="form-label" for="brevo-api-key">Clé API Brevo</label>
-                  <div class="input-with-copy">
+              @if (brevoEnabled && emailEnabled) {
+                <div class="provider-card__fields">
+                  <label class="email-provider-select">
                     <input
-                      id="brevo-api-key"
-                      class="form-input form-input--secret"
-                      [type]="showBrevoKey ? 'text' : 'password'"
-                      [(ngModel)]="brevoApiKey"
-                      placeholder="xkeysib-••••••••••••••••"
-                      autocomplete="new-password"
-                      [disabled]="!emailEnabled"
+                      type="radio"
+                      name="emailProvider"
+                      value="brevo"
+                      [checked]="emailProvider === 'brevo'"
+                      (change)="selectEmailProvider('brevo')"
                     />
-                    <button class="copy-btn" (click)="showBrevoKey = !showBrevoKey" title="Afficher/masquer" type="button">
-                      @if (!showBrevoKey) {
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
-                      } @else {
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
-                      }
-                    </button>
+                    <span>Utiliser Brevo pour les envois automatiques</span>
+                  </label>
+
+                  @if (emailProvider === 'brevo' && emailMissingConfig) {
+                    <span class="email-warning-badge email-warning-badge--inline">
+                      Clé API manquante
+                    </span>
+                  }
+
+                  <div class="form-field">
+                    <label class="form-label" for="brevo-api-key">Clé API Brevo</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="brevo-api-key"
+                        class="form-input form-input--secret"
+                        [type]="showBrevoKey ? 'text' : 'password'"
+                        [(ngModel)]="brevoApiKey"
+                        placeholder="xkeysib-••••••••••••••••"
+                        autocomplete="new-password"
+                      />
+                      <button class="copy-btn" (click)="showBrevoKey = !showBrevoKey" title="Afficher/masquer" type="button">
+                        @if (!showBrevoKey) {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                        } @else {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                        }
+                      </button>
+                    </div>
+                    <span class="form-hint form-hint--warn">
+                      Récupérez votre clé sur <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener" style="color:#DC2626">app.brevo.com</a>.
+                      L'expéditeur utilise le nom de la plateforme et l'e-mail de support (onglet Général).
+                    </span>
                   </div>
-                  <span class="form-hint form-hint--warn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/></svg>
-                    Récupérez votre clé sur <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noopener" style="color:#DC2626">app.brevo.com</a>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  Activez Brevo pour configurer l'API HTTP
+                </div>
+              }
+            </div>
+
+            <!-- KREATIV MEDIA Card -->
+            <div
+              class="provider-card email-provider-card"
+              [class.provider-card--active]="kreativMediaEnabled"
+              [class.email-provider-card--selected]="emailProvider === 'kreativmedia'"
+              id="kreativ-email-card"
+            >
+              <div class="provider-card__header">
+                <div class="provider-logo provider-logo--bank">
+                  <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+                    <rect width="48" height="48" rx="12" fill="#B45309"/>
+                    <path d="M24 14l10 6v2H14v-2l10-6z" fill="white" opacity=".9"/>
+                    <rect x="16" y="24" width="16" height="10" rx="2" fill="white" opacity=".75"/>
+                  </svg>
+                </div>
+                <div class="provider-card__title-group">
+                  <h3 class="provider-card__name">Kreativ Media</h3>
+                  <p class="provider-card__desc">SMTP hébergement suisse — boîte mail / SMTP-Relay</p>
+                </div>
+                <div class="provider-toggle">
+                  <label class="toggle" for="toggle-kreativ-media">
+                    <input type="checkbox" id="toggle-kreativ-media" [(ngModel)]="kreativMediaEnabled" class="toggle__input" [disabled]="!emailEnabled"/>
+                    <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                  </label>
+                  <span class="provider-status" [class.provider-status--on]="kreativMediaEnabled">
+                    {{ kreativMediaEnabled ? 'Activé' : 'Désactivé' }}
                   </span>
                 </div>
-
-                <div class="form-field">
-                  <label class="form-label" for="email-sender-name">Nom de l'expéditeur</label>
-                  <input
-                    id="email-sender-name"
-                    class="form-input"
-                    type="text"
-                    [(ngModel)]="emailSenderName"
-                    placeholder="Plat du Jour"
-                    [disabled]="!emailEnabled"
-                  />
-                </div>
-
-                <div class="form-field">
-                  <label class="form-label" for="email-sender-address">Adresse expéditeur</label>
-                  <input
-                    id="email-sender-address"
-                    class="form-input"
-                    type="email"
-                    [(ngModel)]="emailSenderAddress"
-                    placeholder="contact@caytout.com"
-                    [disabled]="!emailEnabled"
-                  />
-                  <span class="form-hint">Doit être vérifiée dans votre compte Brevo</span>
-                </div>
               </div>
+
+              @if (kreativMediaEnabled && emailEnabled) {
+                <div class="provider-card__fields">
+                  <label class="email-provider-select">
+                    <input
+                      type="radio"
+                      name="emailProvider"
+                      value="kreativmedia"
+                      [checked]="emailProvider === 'kreativmedia'"
+                      (change)="selectEmailProvider('kreativmedia')"
+                    />
+                    <span>Utiliser Kreativ Media pour les envois automatiques</span>
+                  </label>
+
+                  @if (emailProvider === 'kreativmedia' && emailMissingConfig) {
+                    <span class="email-warning-badge email-warning-badge--inline">
+                      Configuration SMTP incomplète
+                    </span>
+                  }
+
+                  <div class="form-field">
+                    <label class="form-label" for="kreativ-smtp-host">Serveur SMTP</label>
+                    <input
+                      id="kreativ-smtp-host"
+                      class="form-input"
+                      type="text"
+                      [(ngModel)]="kreativMediaSmtpHost"
+                      placeholder="servername.kreativmedia.ch"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="kreativ-smtp-port">Port SMTP</label>
+                    <input
+                      id="kreativ-smtp-port"
+                      class="form-input"
+                      type="number"
+                      [(ngModel)]="kreativMediaSmtpPort"
+                      placeholder="465"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="kreativ-smtp-user">Utilisateur SMTP</label>
+                    <input
+                      id="kreativ-smtp-user"
+                      class="form-input"
+                      type="email"
+                      [(ngModel)]="kreativMediaSmtpUser"
+                      placeholder="contact@votredomaine.ch"
+                    />
+                    <span class="form-hint">Adresse e-mail complète — utilisée aussi comme expéditeur des envois</span>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="kreativ-smtp-password">Mot de passe SMTP</label>
+                    <div class="input-with-copy">
+                      <input
+                        id="kreativ-smtp-password"
+                        class="form-input form-input--secret"
+                        [type]="showKreativPassword ? 'text' : 'password'"
+                        [(ngModel)]="kreativMediaSmtpPassword"
+                        autocomplete="new-password"
+                      />
+                      <button class="copy-btn" (click)="showKreativPassword = !showKreativPassword" title="Afficher/masquer" type="button">
+                        @if (!showKreativPassword) {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+                        } @else {
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></svg>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label">Connexion sécurisée (SSL/TLS)</label>
+                    <div class="provider-toggle">
+                      <label class="toggle" for="toggle-kreativ-secure">
+                        <input type="checkbox" id="toggle-kreativ-secure" [(ngModel)]="kreativMediaSmtpSecure" class="toggle__input"/>
+                        <span class="toggle__track"><span class="toggle__thumb"></span></span>
+                      </label>
+                      <span class="provider-status" [class.provider-status--on]="kreativMediaSmtpSecure">
+                        {{ kreativMediaSmtpSecure ? 'Port 465 (SMTPS)' : 'STARTTLS' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="provider-card__disabled-hint">
+                  Activez Kreativ Media pour configurer le SMTP hébergement
+                </div>
+              }
             </div>
 
             <!-- Per-type toggles -->
@@ -621,7 +837,7 @@
             <div class="settings-section__header settings-section__header--row">
               <div>
                 <h2 class="settings-section__title">Comptes administrateurs</h2>
-                <p class="settings-section__desc">Créez des comptes admin et envoyez des e-mails de réinitialisation de mot de passe</p>
+                <p class="settings-section__desc">Créez, supprimez des comptes admin et envoyez des e-mails de réinitialisation de mot de passe</p>
               </div>
               <button type="button" class="btn-save btn-save--secondary" (click)="toggleCreateAdminForm()">
                 {{ showCreateAdminForm ? 'Annuler' : 'Nouvel administrateur' }}
@@ -701,18 +917,51 @@
                           </span>
                         </td>
                         <td>
-                          <button
-                            type="button"
-                            class="admin-table__action"
-                            (click)="sendPasswordReset(admin)"
-                            [disabled]="resetSendingId === admin.id"
-                          >
-                            @if (resetSendingId === admin.id) {
-                              Envoi...
-                            } @else {
-                              Envoyer reset mot de passe
+                          <div class="admin-table__actions">
+                            <button
+                              type="button"
+                              class="admin-table__action"
+                              (click)="sendPasswordReset(admin)"
+                              [disabled]="resetSendingId === admin.id"
+                            >
+                              @if (resetSendingId === admin.id) {
+                                Envoi...
+                              } @else {
+                                Envoyer reset mot de passe
+                              }
+                            </button>
+                            @if (!isCurrentAdmin(admin)) {
+                              @if (confirmDeleteAdminId !== admin.id) {
+                                <button
+                                  type="button"
+                                  class="admin-table__action admin-table__action--danger"
+                                  (click)="askDeleteAdmin(admin)"
+                                >
+                                  Supprimer
+                                </button>
+                              } @else {
+                                <div class="admin-table__confirm">
+                                  <span>Confirmer ?</span>
+                                  <button
+                                    type="button"
+                                    class="admin-table__action admin-table__action--danger"
+                                    [disabled]="deletingAdmin"
+                                    (click)="confirmDeleteAdmin(admin.id)"
+                                  >
+                                    {{ deletingAdmin ? 'Suppression...' : 'Oui' }}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class="admin-table__action"
+                                    [disabled]="deletingAdmin"
+                                    (click)="cancelDeleteAdmin()"
+                                  >
+                                    Non
+                                  </button>
+                                </div>
+                              }
                             }
-                          </button>
+                          </div>
                         </td>
                       </tr>
                     } @empty {
